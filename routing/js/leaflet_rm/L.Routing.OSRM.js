@@ -30,7 +30,7 @@
  
 		options: {
 			serviceUrl: 'http://localhost:8002/',
-			geometryPrecision: 5
+			geometryPrecision: 6
 		},
 
 		initialize: function(options) {
