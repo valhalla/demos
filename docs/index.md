@@ -19,10 +19,12 @@ This demo allows the testing of point and click routing through a web interface 
         wget http://download.geofabrik.de/europe/liechtenstein-latest.osm.pbf
         pbfgraphbuilder -c valhalla.json liechtenstein-latest.osm.pbf
 
-4. And start up a default `tyr` server, the requests will be logged to stdout by default:
+4. And start up a default `tyr` server, the requests will be logged to stdout:
 
-        python tyr/py/server.py valhalla.json
+        python -m tyr_simple_server valhalla.json
 
 5. Fire up the webpage:
 
         firefox demos/routing/index.html
+
+6. Have fun!
