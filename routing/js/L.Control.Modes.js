@@ -45,8 +45,8 @@ L.Control.Modes = L.Control.extend({
             var icon = this.options.mode_icons[key];
             this._transit_link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);
             this._transit_link.href = '#';
-            this._transit_link.title = this.options.strings.title + (key === 'foot' ? ' on ' : ' on a ') + key;
-            this._transit_link.setAttribute('class', key === 'foot' ? 'routing' : '');
+            this._transit_link.title = this.options.strings.title + (key === 'car' ? ' on ' : ' on a ') + key;
+            this._transit_link.setAttribute('class', key === 'car' ? 'routing' : '');
             this._transit_link.setAttribute('data-mode', key)
             this._transit_icon = L.DomUtil.create('img', 'modes', this._transit_link);
             this._transit_icon.src = icon;
@@ -64,8 +64,8 @@ L.Control.Modes = L.Control.extend({
             })
             .on(this._transit_link, 'dblclick', L.DomEvent.stopPropagation);
         }
-        // default on foot
-        self.trigger_mode('foot');
+        // default on car
+        self.trigger_mode('car');
 
         return container;
     }

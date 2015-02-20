@@ -47,9 +47,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var mode_icons = {
+    'car' : 'js/images/ic_car_start_pressed.png',
     'foot': 'js/images/ic_walk_start_pressed.png',
-    'bicycle': 'js/images/bike-01.png',
-    'car' : 'js/images/ic_car_start_pressed.png'
+    'bicycle': 'js/images/bike-01.png'
   };
 
   var getIcon = function(icon){
