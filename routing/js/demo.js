@@ -52,9 +52,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     'bicycle': 'js/images/bike-01.png'
   };
 
-  var getIcon = function(icon){
+  var getStartIcon = function(icon){
     return L.icon({
-      iconUrl: 'js/images/ic_pin_active.png',
+      iconUrl: 'js/images/ic_pin_active_start.png',
       shadowUrl: 'js/images/marker-shadow.png',
 
       iconSize:     [38, 35], // size of the icon
@@ -65,7 +65,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   };
 
-  //L.tileLayer('http://{s}.tiles.mapbox.com/v3/randyme.jpnaac3a/{z}/{x}/{y}.png', { 
+  var getEndIcon = function(icon){
+    return L.icon({
+      iconUrl: 'js/images/ic_pin_active_end.png',
+      shadowUrl: 'js/images/marker-shadow.png',
+
+      iconSize:     [38, 35], // size of the icon
+      shadowSize:   [50, 64], // size of the shadow
+      iconAnchor:   [22, 34], // point of the icon which will correspond to marker's location
+      shadowAnchor: [4, 62],  // the same for the shadow
+      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+  };
+
 
   L.tileLayer('http://{s}.tiles.mapbox.com/v3/randyme.i0568680/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -100,8 +112,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     map.setView( geo, zoom || 8 );
   });
 
-  $rootScope.$on( 'map.dropMarker', function( ev, geo, m ){
-    var marker = new L.marker(geo, {icon: getIcon(m || 'car')});
+  $rootScope.$on( 'map.dropMarker', function( ev, geo, m){
+    if (locations == 0) {
+      var marker = new L.marker(geo, {icon: getStartIcon(m || 'car')});
+    }
+    else {
+      var marker = new L.marker(geo, {icon: getEndIcon(m || 'car')});
+    }
     map.addLayer(marker);
     markers.push(marker);
     //marker.openPopup();
