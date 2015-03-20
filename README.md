@@ -9,7 +9,7 @@
           ░        ░  ░    ░  ░ ░  ░  ░      ░  ░    ░  ░    ░  ░     ░  ░
          ░                                                                    
 
-Valhalla is an open source routing engine and accompanying libraries for use with Open Street Map data. The demos repository serves as a sort of scratch pad which can be used to test and demo different pieces of the valhalla organization working together to accomplish thier various tasks.
+Valhalla is an open source routing engine and accompanying libraries for use with Open Street Map data. The demos repository serves as a sort of scratch pad which can be used to test and demo different pieces of the valhalla organization working together to accomplish their various tasks.
 
 Building
 --------
