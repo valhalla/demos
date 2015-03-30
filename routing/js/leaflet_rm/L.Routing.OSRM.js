@@ -29,7 +29,7 @@
 /*Uncomment the following options to use valhalla services.*/
  
 		options: {
-			serviceUrl: 'http://localhost:8002/',
+			serviceUrl: 'http://localhost:8002',
 			geometryPrecision: 6
 		},
 
@@ -96,8 +96,9 @@
 				}
 			}
 
-			return this.options.serviceUrl + this.options.transitmode + '/viaroute?' +
-				'instructions=true&' +
+			return this.options.serviceUrl + '/viaroute?' +
+                                'costing_method=' + this.options.transitmode +
+				'&instructions=true&' +
 				locs.join('&') +
 				(this._hints.checksum !== undefined ? '&checksum=' + this._hints.checksum : '');
 		},
