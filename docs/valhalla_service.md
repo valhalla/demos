@@ -19,7 +19,7 @@ Valhalla can be considered a **Bring Your Own Search** service. Valhalla does no
 
 Locations are provided as an ordered list of two or more locations within a JSON array. Locations are visited in the route in the provided order. A maximum of **TBD** locations is supported. Each location includes the following information:
 
-The location information shall consist of two or more stop locations. Also, 0 to n via locations may be supplied to influence the route path.
+The location information shall consist of two or more `break` locations. Also, 0 to n `through` locations may be supplied to influence the route path.
 * latitude = Latitude of the location in degrees.
 * longitude = Longitude of the location in degrees.
 * type = Type of location. There are two location types: **break** and **through**. Break forms a stop - the first and last locations must be type = break. Through locations form a location that the route path goes through - the path is not allowed to reverse direction at the through locations. Through locations are useful to force a route to go through locations. If no type is provided, the type is assumed to be a break.
