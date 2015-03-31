@@ -5,6 +5,7 @@ This code was originally used for the "ghost busters" OSRM routing demo.  Modifi
 
 var app = angular.module('routing', []);
 var hash_params = L.Hash.parseHash(location.hash);
+var mode_mapping = { 'foot' : 'pedestrian', 'car' : 'auto', 'bicycle' : 'bicycle' };
 
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {'center': {'lat': 40.2380, 'lng': -76.8413}, 'zoom': 12};
@@ -171,10 +172,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], mode);
     locations++;
 
+    valhalla_mode = mode_mapping[mode];
+
     L.Routing.control({
       waypoints: waypoints,
       geocoder: null,
-      transitmode: mode
+      transitmode: valhalla_mode
     }).addTo(map);
   
   });
