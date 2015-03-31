@@ -1,7 +1,7 @@
 
 ## Valhalla Service Level Interface Description
 
-Welcome to Valhalla open source routing. By now you have perhaps seen our demo page and meybe even checked out our open source software at https://github.com/valhalla. If you are here you are likely interested in accessing the Valhalla routing service at Mapzen to integrate routing and navigation into a Web or mobile application. This page documents the inputs and ouptuts to our service.
+Welcome to Valhalla open source routing. By now you have perhaps seen our demo page and maybe even checked out our open source software at https://github.com/valhalla. If you are here you are likely interested in accessing the Valhalla routing service at Mapzen to integrate routing and navigation into a Web or mobile application. This page documents the inputs and ouptuts to our service.
 
 Your first step is to get a developer key from Mapzen. This does great things for you! Baldur/Mike please elaborate and provide instructions!
 
