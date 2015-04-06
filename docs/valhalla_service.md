@@ -46,7 +46,7 @@ Valhalla uses dynamic, run-time costing to form the route path. The route reques
 Costing models currently supported include:
 
 * costing = auto. Standard costing for driving routes (using car, motorcycle, truck, etc.) that obeys automobile driving rules (access, turn restrictions, etc.) that provides a short time path (not guaranteed to be shortest time) that also uses intersection costing to help minimize turns and maneuvers or road name changes. Routes also tend to favor highways (higher classification roads: motorways, trunk).
-* costing = auto-shorter. Alternate costing for driving that is intended to provide a short distance path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
+* costing = auto_shorter. Alternate costing for driving that is intended to provide a short distance path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
 * costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than **TBD** kilometers apart due to performance limitations. 
 
 ##### Notes on Costing 
@@ -59,7 +59,7 @@ Costing methods can have several options that can be adjusted to modify costing 
 
 ##### Auto/Vehicle Costing Options
 
-The auto and auto-shorter costing methods support the following options:
+The auto and auto_shorter costing methods support the following options:
 * maneuver_penalty = A penalty in seconds that is applied when transitioning between roads that do not have consistent naming (no road names in common). This penalty can be used to create simpler routes that tend to have less maneuvers or guidance instructions. The default maneuver penalty is 5 seconds.
 * gate_cost = A cost in seconds that is applied when a gate is encountered. This cost is added to the estimated time / elapsed time. The default gate cost is 30 seconds.
 * toll_booth_cost = A cost that is applied when a toll booth is encountered. This cost is added to the estimated time / elapsed time. The default cost is 15 seconds. 
