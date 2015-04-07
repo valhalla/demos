@@ -97,7 +97,7 @@
 			}
 
 			return this.options.serviceUrl + '/viaroute?' +
-                                'costing_method=' + this.options.transitmode +
+                                'costing=' + this.options.transitmode +
 				'&instructions=true&' +
 				locs.join('&') +
 				(this._hints.checksum !== undefined ? '&checksum=' + this._hints.checksum : '');
