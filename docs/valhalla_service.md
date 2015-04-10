@@ -46,12 +46,15 @@ Valhalla uses dynamic, run-time costing to form the route path. The route reques
 Costing models currently supported include:
 
 * costing = auto. Standard costing for driving routes (using car, motorcycle, truck, etc.) that obeys automobile driving rules (access, turn restrictions, etc.) that provides a short time path (not guaranteed to be shortest time) that also uses intersection costing to help minimize turns and maneuvers or road name changes. Routes also tend to favor highways (higher classification roads: motorways, trunk).
-* costing = auto_shorter. Alternate costing for driving that is intended to provide a short distance path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
+* costing = auto_shorter. Alternate costing for driving that is intended to provide a short 
+*  path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
 * costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than **TBD** kilometers apart due to performance limitations. 
 
-##### Notes on Costing 
+##### Costing Model Options 
 
-Costing methods can have several options that can be adjusted to modify costing (used for finding the route path) as well as for estmating time along the path. The following terms are used in these options:
+Costing methods can have several options that can be adjusted to modify costing (used for finding the route path) as well as for estmating time along the path. Options for each costing model are specified under costing_options.type (e.g. costing_options.auto).
+
+The following terms are used in these options:
 
 * Cost = Cost options are fixed costs (seconds) that are added to both the path cost and the estimated time. Examples of costs are gate_costs and toll_booth_costs where a fixed amount of time is added. Costs are not generally used to influence the route path - use `penalties` instead.
 * Penalty = Penalty options are fixed costs (seconds) that are only added to the path cost. These add extra cost in a way that can influence the route path detemrination but do not add to the estimated time along the path. Examples are toll_booth_penalty which can be added to create route paths that tend to avoid toll booths.
@@ -79,12 +82,16 @@ The following options are supported for pedestrian routes (using the standard pe
 #### Output Options
 
 * narrtype = Narrative type. 
-* units = Distance units. Allowable unit types are miles and km. If no unit type is specified, km is selected.
+* units = Distance units. Allowable unit types are miles (or m) and kilometers (or k). If no unit type is specified, kilometers is selected.
 * outformat = Output Format. Allowable output formats are json and pbf (protocol buffer). If no outformat is specified, JSON is selected.
 * 
 TODO - add example that shows a simple request and response.
 
 ### JSON Output
+
+The selected units of length are returned:
+
+units = "kilometers" (or "miles"),.
 
 #### Trip
 
@@ -100,7 +107,7 @@ Location information is returned in the same form as it is entered with addition
 The trip summary includes basic details about the entire trip including:
 
 * time = Estimated elapsed time to complete the trip.
-* distance = Distance traveled for the entire trip. Units are either miles or kilometers based on the input units specified.
+* length = Length (distance) traveled for the entire trip. Units are either miles or kilometers based on the input units specified.
 
 ##### Legs
 
@@ -108,7 +115,7 @@ A trip may include multiple legs. For n break locations there are n-1 legs. Thro
 
 Each leg of the trip includes a summary (comprised of the same information as a trip summary but applied to the single leg of the trip). It also includes the following:
 
-* shape = Encoded shape (using Google polyline encoding - ADD LINK) of the route path. 
+* shape = Encoded shape (using Google polyline encoding - ADD LINK) of the route path.
 * maneuvers = A list (JSON array) of manuevers
 
 ###### Manuever
@@ -119,7 +126,7 @@ Each maneuver includes the following:
 * writtenInstruction = 
 * streetNames = 
 * time = Estimated time along the  maneuver in seconds.
-* distance = Maneuver distance in the units specified.
+* length = Maneuver length in the units specified.
 * beginShapeIndex = Index into the list of shape points for the start of the maneuver.
 * endShapeIndex = Index into the list of shape points for the end of the maneuver.
 * toll = True if the maneuver has any toll or portions of the maneuver are subject to a toll.
