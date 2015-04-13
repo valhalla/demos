@@ -25,14 +25,14 @@ The location information shall consist of two or more `break` locations. Also, 0
 * latitude = Latitude of the location in degrees.
 * longitude = Longitude of the location in degrees.
 * type = Type of location. There are two location types: `break` and `through`. Break forms a stop - the first and last locations must be type = break. Through locations form a location that the route path goes through - the path is not allowed to reverse direction at the through locations. Through locations are useful to force a route to go through locations. If no type is provided, the type is assumed to be a break.
-* heading = A preferred direction of travel (heading) for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road and the route should start out in that direction. heading is indicated in degrees from north in a clockwise direction. North is 0°, east is 90°, south is 180°, and west is 270°.
-* street = Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude.
+* heading = (Optional) A preferred direction of travel (heading) for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road and the route should start out in that direction. heading is indicated in degrees from north in a clockwise direction. North is 0°, east is 90°, south is 180°, and west is 270°.
+* street = (Optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude.
 
-The following location information may be provided but does not impact routing. This information is simply carried through the request and returned as a convenience.
-* name = Location name (e.g. Chipotle). May be used in the guidance/textual directions.
+The following, optional location information may be provided but does not impact routing. This information is simply carried through the request and returned as a convenience.
+* name = Location name (e.g. Roburrito). May be used in the guidance/textual directions (for example: "You have arrived at Roburrito")
 * city = City.
 * state = State.
-* postalCode = Postal Code.
+* postal_code = Postal Code.
 * country = Country.
 * phone = Phone.
 * url = URL for the place/location.
@@ -91,7 +91,7 @@ TODO - add example that shows a simple request and response.
 
 The selected units of length are returned:
 
-units = "kilometers" (or "miles"),.
+units = "kilometers" (or "miles").
 
 #### Trip
 
@@ -122,17 +122,19 @@ Each leg of the trip includes a summary (comprised of the same information as a 
 
 Each maneuver includes the following:
 
-* type = Type (TBD)
-* writtenInstruction = 
-* streetNames = 
-* time = Estimated time along the  maneuver in seconds.
+* type = Type (TBD - what are the possible types)
+* instruction = Written maneuver instruction. Describes the maneuver (e.g., "Turn Right onto Main Street").
+* street_names = List of street names.
+* time = Estimated time along the maneuver in seconds.
 * length = Maneuver length in the units specified.
-* beginShapeIndex = Index into the list of shape points for the start of the maneuver.
-* endShapeIndex = Index into the list of shape points for the end of the maneuver.
+* begin_shape_index = Index into the list of shape points for the start of the maneuver.
+* end_shape_index = Index into the list of shape points for the end of the maneuver.
 * toll = True if the maneuver has any toll or portions of the maneuver are subject to a toll.
 * rough = True if the maneuver is unpaved/rough pavement or has any portions that have rought pavement.
 * gate = True if a gate is encountered on this maneuver.
 * ferry = True if a ferry is encountered on this maneuver.
+
+FUTURE: Look for additional maneuver information to enhance navigation applications - features like text-to-speech and (TBD).
 
 #### OSRM Compatibility Mode
 
