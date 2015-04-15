@@ -132,7 +132,7 @@ Each maneuver includes the following:
 * begin_shape_index = Index into the list of shape points for the start of the maneuver.
 * end_shape_index = Index into the list of shape points for the end of the maneuver.
 * toll = True if the maneuver has any toll or portions of the maneuver are subject to a toll.
-* rough = True if the maneuver is unpaved/rough pavement or has any portions that have rought pavement.
+* rough = True if the maneuver is unpaved/rough pavement or has any portions that have rough pavement.
 * gate = True if a gate is encountered on this maneuver.
 * ferry = True if a ferry is encountered on this maneuver.
 
