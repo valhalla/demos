@@ -82,7 +82,7 @@ The following options are supported for pedestrian routes (using the standard pe
 #### Directions Options
 
 * units = Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, kilometers is selected.
-* language = The langauge the instructions will use. If no language is specified, United States based English (en_US) will be used.
+* language = The langauge the instructions will use. If no language is specified, United States based English (en_US) will be used. The current list of supported languages: en_US.
 
 #### Output Options
 
