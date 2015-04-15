@@ -79,13 +79,15 @@ The following options are supported for pedestrian routes (using the standard pe
 
 **Bicycle costing will soon be available.**
 
+#### Directions Options
+
+* units = Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, kilometers is selected.
+* language = The langauge the instructions will use. If no language is specified, United States based English (en_US) will be used. The current list of supported languages: en_US.
+
 #### Output Options
 
-* narrtype = Narrative type. 
-* units = Distance units. Allowable unit types are miles (or m) and kilometers (or k). If no unit type is specified, kilometers is selected.
 * outformat = Output Format. Allowable output formats are json and pbf (protocol buffer). If no outformat is specified, JSON is selected.
-* 
-TODO - add example that shows a simple request and response.
+* TODO - add example that shows a simple request and response.
 
 ### JSON Output
 
@@ -123,14 +125,14 @@ Each leg of the trip includes a summary (comprised of the same information as a 
 Each maneuver includes the following:
 
 * type = Type (TBD - what are the possible types)
-* instruction = Written maneuver instruction. Describes the maneuver (e.g., "Turn Right onto Main Street").
+* instruction = Written maneuver instruction. Describes the maneuver (e.g., "Turn right onto Main Street").
 * street_names = List of street names.
 * time = Estimated time along the maneuver in seconds.
 * length = Maneuver length in the units specified.
 * begin_shape_index = Index into the list of shape points for the start of the maneuver.
 * end_shape_index = Index into the list of shape points for the end of the maneuver.
 * toll = True if the maneuver has any toll or portions of the maneuver are subject to a toll.
-* rough = True if the maneuver is unpaved/rough pavement or has any portions that have rought pavement.
+* rough = True if the maneuver is unpaved/rough pavement or has any portions that have rough pavement.
 * gate = True if a gate is encountered on this maneuver.
 * ferry = True if a ferry is encountered on this maneuver.
 
