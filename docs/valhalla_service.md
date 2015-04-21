@@ -22,8 +22,8 @@ Valhalla can be considered a **Bring Your Own Search** service. Valhalla does no
 Locations are provided as an ordered list of two or more locations within a JSON array. Locations are visited in the route in the provided order. A maximum of **TBD** locations is supported. Each location includes the following information:
 
 The location information shall consist of two or more `break` locations. Also, 0 to n `through` locations may be supplied to influence the route path.
-* latitude = Latitude of the location in degrees.
-* longitude = Longitude of the location in degrees.
+* lat = Latitude of the location in degrees.
+* lon = Longitude of the location in degrees.
 * type = Type of location. There are two location types: `break` and `through`. Break forms a stop - the first and last locations must be type = break. Through locations form a location that the route path goes through - the path is not allowed to reverse direction at the through locations. Through locations are useful to force a route to go through locations. If no type is provided, the type is assumed to be a break.
 * heading = (Optional) A preferred direction of travel (heading) for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road and the route should start out in that direction. heading is indicated in degrees from north in a clockwise direction. North is 0°, east is 90°, south is 180°, and west is 270°.
 * street = (Optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude.
@@ -136,7 +136,7 @@ Each maneuver includes the following:
 * gate = True if a gate is encountered on this maneuver.
 * ferry = True if a ferry is encountered on this maneuver.
 
-FUTURE: Look for additional maneuver information to enhance navigation applications - features like text-to-speech and (TBD).
+FUTURE: Look for additional maneuver information to enhance navigation applications - features like verbal instructions and landmark usage.
 
 #### OSRM Compatibility Mode
 
