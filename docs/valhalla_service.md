@@ -67,6 +67,8 @@ The auto and auto_shorter costing methods support the following options:
 * gate_cost = A cost in seconds that is applied when a gate is encountered. This cost is added to the estimated time / elapsed time. The default gate cost is 30 seconds.
 * toll_booth_cost = A cost that is applied when a toll booth is encountered. This cost is added to the estimated time / elapsed time. The default cost is 15 seconds. 
 * toll_booth_penalty = A penalty that is applied to the cost when a toll booth is encountered. This penalty can be used to create paths that avoid tolls. The default toll booth penalty is 0.
+* country_crossing_cost = A cost that is applied when a country crossing is encountered. This cost is added to the estimated time / elapsed time. The default cost is 600 seconds.
+* country_crossing_penalty = A penalty that is applied to the cost when a country crossing is encountered. This penalty can be used to create paths that avoid country crossings. The default penalty is 0.
 
 #####Pedestrian Costing Options
 
