@@ -1,11 +1,29 @@
 
 ## Valhalla Service Level Interface Description
 
-**NOTE: This document is IN PROGRESS and documents a service which is NOT YET PUBLICLY AVAILABLE. STAY TUNED!**
-
 Welcome to Valhalla open source routing. By now you have perhaps seen our demo page and maybe even checked out our open source software at https://github.com/valhalla. If you are here you are likely interested in accessing the Valhalla routing service at Mapzen to integrate routing and navigation into a Web or mobile application. This page documents the inputs and ouptuts to our service.
 
+The Mapzen Valhalla routing service is a work in progress. Please check back and be on the lookout for blogs about new features.
+
+TODO - Add a note about where to send issues, feature requests, etc.
+
+##### Developer Keys
 Your first step is to get a developer key from Mapzen. This does great things for you! Baldur/Mike please elaborate and provide instructions!
+
+##### Notes on Service Limits
+
+Valhalla @ mapzen.com is a free, shared routing service. As such there are rate limits and other limitations that prevent any one user from degrading the overall system performance. We hope to increase rate limits and generally increase the service capabilities through time. In the meantime if the following limits do not work for you please contact us and we will see what we can do to help you. The following limits are in place:
+
+* XXX requests per second.
+* YYY requests per day.
+* Pedestrian routes have a limit of ZZZ kilometers.
+* Bicycle routes have a limit of TTT kilometers.
+* Automobile routes have a limit of UUU kilometers.
+* No more than 2 locations can be provided.
+
+We hope to relax the limits on route distance as we improve performance on longer routes. The limit of number of locations will be increased shortly, stay tuned.
+
+##### Sample Valhalla Route Request
 
 Valhalla will accept json input for routes:
 
