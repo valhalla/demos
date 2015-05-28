@@ -21,7 +21,7 @@ Valhalla is a free, shared routing service. As such, there are limitations on re
 * Automobile routes have a limit of 5,000 kilometers.
 * No more than two locations can be provided.
 
-Send a message if you need higher limits in the meantime.
+Contact routing@mapzen.com if you need higher limits in the meantime.
 
 ##### Sample Valhalla Route Request
 
@@ -64,9 +64,11 @@ Valhalla uses dynamic, run-time costing to form the route path. The route reques
 Costing models currently supported include:
 
 * costing = auto. Standard costing for driving routes (using car, motorcycle, truck, etc.) that obeys automobile driving rules (access, turn restrictions, etc.) that provides a short time path (not guaranteed to be shortest time) that also uses intersection costing to help minimize turns and maneuvers or road name changes. Routes also tend to favor highways (higher classification roads: motorways, trunk).
-* costing = auto_shorter. Alternate costing for driving that is intended to provide a short
-*  path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
-* costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than **TBD** kilometers apart due to performance limitations.
+* costing = auto_shorter. Alternate costing for driving that is intended to provide a short path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
+* costing = bus. Standard costing for bus routes.  This costing inherits the auto costing behaviors; however, it checks for bus access on the roads versus auto access.
+* costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than 100 kilometers apart due to performance limitations.
+* costing = bicycle. A default bicycle costing method has been implemented, but its options are currently being evaluated.
+
 
 ##### Costing Model Options
 
@@ -97,7 +99,8 @@ The following options are supported for pedestrian routes (using the standard pe
 * driveway_factor = A factor that modifies (mulitplies) the cost to try when driveways are encountered. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 2.0.
 * step_penalty = A penalty in seconds to add to each transition onto a path marked as having steps/stairs. Higher values apply larger cost penalties to avoid paths that contain steps/stairs.
 
-**Bicycle costing will soon be available.**
+#### Bicycle Costing Options
+A default bicycle costing method has been implemented, but its options are currently being evaluated.
 
 #### Directions Options
 
@@ -144,7 +147,39 @@ Each leg of the trip includes a summary (comprised of the same information as a 
 
 Each maneuver includes the following:
 
-* type = Type (TBD - what are the possible types)
+* type = Type
+```
+      kNone = 0;
+      kStart = 1;
+      kStartRight = 2;
+      kStartLeft = 3;
+      kDestination = 4;
+      kDestinationRight = 5;
+      kDestinationLeft = 6;
+      kBecomes = 7;
+      kContinue = 8;
+      kSlightRight = 9;
+      kRight = 10;
+      kSharpRight = 11;
+      kUturnRight = 12;
+      kUturnLeft = 13;
+      kSharpLeft = 14;
+      kLeft = 15;
+      kSlightLeft = 16;
+      kRampStraight = 17;
+      kRampRight = 18;
+      kRampLeft = 19;
+      kExitRight = 20;
+      kExitLeft = 21;
+      kStayStraight = 22;
+      kStayRight = 23;
+      kStayLeft = 24;
+      kMerge = 25;
+      kRoundaboutEnter = 26;
+      kRoundaboutExit = 27;
+      kFerryEnter = 28;
+      kFerryExit = 29;
+```
 * instruction = Written maneuver instruction. Describes the maneuver (e.g., "Turn right onto Main Street").
 * street_names = List of street names.
 * time = Estimated time along the maneuver in seconds.
