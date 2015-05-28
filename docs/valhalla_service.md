@@ -1,27 +1,27 @@
 
 ## Valhalla Service Level Interface Description
 
-Welcome to Valhalla open source routing. By now you have perhaps seen our demo page and maybe even checked out our open source software at https://github.com/valhalla. If you are here you are likely interested in accessing the Valhalla routing service at Mapzen to integrate routing and navigation into a Web or mobile application. This page documents the inputs and ouptuts to our service.
+Valhalla is a free, open-source routing service that lets you integrate routing and navigation into a web or mobile application. This page documents the inputs and outputs to the service.
 
-The Mapzen Valhalla routing service is a work in progress. Please check back and be on the lookout for blogs about new features.
+The Valhalla routing service is in active development. You can follow the [Mapzen blog](https://mapzen.com/blog) to get updates.
 
-TODO - Add a note about where to send issues, feature requests, etc.
+To report software issues or suggest enhancements, you can open an issue in GitHub (use the [Thor repository](https://github.com/valhalla/thor) for comments about route paths or [Odin repository](https://github.com/valhalla/odin) for narration). You can also send a message to routing@mapzen.com.
 
 ##### Developer Keys
-Your first step is to get a developer key from Mapzen. This does great things for you! Baldur/Mike please elaborate and provide instructions!
+To use the Valhalla routing service, you must obtain a free developer API key from Mapzen. Sign in at https://mapzen.com/developers to create and manage your API keys.
 
 ##### Notes on Service Limits
 
-Valhalla @ mapzen.com is a free, shared routing service. As such there are rate limits and other limitations that prevent any one user from degrading the overall system performance. We hope to increase rate limits and generally increase the service capabilities through time. In the meantime if the following limits do not work for you please contact us and we will see what we can do to help you. The following limits are in place:
+Valhalla is a free, shared routing service. As such, there are limitations on requests, maximum distances, and numbers of locations to prevent individual users from degrading the overall system performance. Limits may be increased in the future, but the following are currently in place:
 
 * XXX requests per second.
 * YYY requests per day.
-* Pedestrian routes have a limit of ZZZ kilometers.
-* Bicycle routes have a limit of TTT kilometers.
-* Automobile routes have a limit of UUU kilometers.
-* No more than 2 locations can be provided.
+* Pedestrian routes have a limit of 100 kilometers.
+* Bicycle routes have a limit of 500 kilometers.
+* Automobile routes have a limit of 5,000 kilometers.
+* No more than two locations can be provided.
 
-We hope to relax the limits on route distance as we improve performance on longer routes. The limit of number of locations will be increased shortly, stay tuned.
+Send a message if you need higher limits in the meantime.
 
 ##### Sample Valhalla Route Request
 
@@ -35,9 +35,9 @@ The route service request supports the following inputs: location information, n
 
 #### Locations
 
-Valhalla can be considered a **Bring Your Own Search** service. Valhalla does not search for locations given a name or address and does not do any geocoding or reverse geocoding. External services like Pelias or Nominatum must be used to find places and geocode addresses. A location must include a latitude, longitude. This can be from a GPS or other locator, point and click on a map, a geocode service, etc. The Valhalla routing service will not perform any external service calls to generate a latitude,longitude (i.e., geocoding). The routing service will not perform any external service calls to fill in other location information given a latitude,longitude (i.e. reverse geocoding).
+Valhalla can be considered a **Bring Your Own Search** service. Valhalla does not search for or perform any external service calls for locations given a name or address, and does no geocoding or reverse geocoding. External services, such as [Pelias](https://github.com/pelias) or [Nominatum](http://wiki.openstreetmap.org/wiki/Nominatim) must be used to find places and geocode addresses. A location must include a latitude and longitude in decimal degrees. The coordinates can come from a GPS or other locator, point and click on a map, a geocode service, and so on.
 
-Locations are provided as an ordered list of two or more locations within a JSON array. Locations are visited in the route in the provided order. A maximum of **TBD** locations is supported. Each location includes the following information:
+Locations are provided as an ordered list of two or more locations within a JSON array. Locations are visited in the route in the provided order. A maximum of two locations is supported. Each location includes the following information:
 
 The location information shall consist of two or more `break` locations. Also, 0 to n `through` locations may be supplied to influence the route path.
 * lat = Latitude of the location in degrees.
@@ -64,11 +64,11 @@ Valhalla uses dynamic, run-time costing to form the route path. The route reques
 Costing models currently supported include:
 
 * costing = auto. Standard costing for driving routes (using car, motorcycle, truck, etc.) that obeys automobile driving rules (access, turn restrictions, etc.) that provides a short time path (not guaranteed to be shortest time) that also uses intersection costing to help minimize turns and maneuvers or road name changes. Routes also tend to favor highways (higher classification roads: motorways, trunk).
-* costing = auto_shorter. Alternate costing for driving that is intended to provide a short 
+* costing = auto_shorter. Alternate costing for driving that is intended to provide a short
 *  path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
-* costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than **TBD** kilometers apart due to performance limitations. 
+* costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than **TBD** kilometers apart due to performance limitations.
 
-##### Costing Model Options 
+##### Costing Model Options
 
 Costing methods can have several options that can be adjusted to modify costing (used for finding the route path) as well as for estmating time along the path. Options for each costing model are specified under costing_options.type (e.g. costing_options.auto).
 
@@ -83,7 +83,7 @@ The following terms are used in these options:
 The auto and auto_shorter costing methods support the following options:
 * maneuver_penalty = A penalty in seconds that is applied when transitioning between roads that do not have consistent naming (no road names in common). This penalty can be used to create simpler routes that tend to have less maneuvers or guidance instructions. The default maneuver penalty is 5 seconds.
 * gate_cost = A cost in seconds that is applied when a gate is encountered. This cost is added to the estimated time / elapsed time. The default gate cost is 30 seconds.
-* toll_booth_cost = A cost that is applied when a toll booth is encountered. This cost is added to the estimated time / elapsed time. The default cost is 15 seconds. 
+* toll_booth_cost = A cost that is applied when a toll booth is encountered. This cost is added to the estimated time / elapsed time. The default cost is 15 seconds.
 * toll_booth_penalty = A penalty that is applied to the cost when a toll booth is encountered. This penalty can be used to create paths that avoid tolls. The default toll booth penalty is 0.
 * country_crossing_cost = A cost that is applied when a country crossing is encountered. This cost is added to the estimated time / elapsed time. The default cost is 600 seconds.
 * country_crossing_penalty = A penalty that is applied to the cost when a country crossing is encountered. This penalty can be used to create paths that avoid country crossings. The default penalty is 0.
@@ -164,6 +164,3 @@ Note that OSRM compatibility mode uses:
 valhalla.mapzen.com/viaroute?
 
 Example:
-
-
-
