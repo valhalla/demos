@@ -1,8 +1,6 @@
 ## OSM Routing Connectivity Map
 
-In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producing routing tiles - they provide a rough, first order approximation of connectivity. The notion is any tile navigable ways will be added to a Valhalla graph tile.
-
-Since the Valhalla tiles are uniform sized latitude, longitude squares the tiling structure creates a 2-D array which can be used to create an image where each color indicates regions (tiles) that are possibly connected by OSM ways.
+In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producing routing tiles - they provide a rough, first order approximation of connectivity. The notion a Valhalla graph tile exists where there are navigable ways and conversely no graph tile exists if there are no navigable ways within the tile region. Since the Valhalla tiles are uniform sized latitude, longitude squares the tiling structure creates a 2-D array which can be used to create an image where each "color" indicates regions (tiles) that are possibly connected by OSM ways. Also, any uncolored region (white in the image) is unreachable by routing methods.
 
 ![](images/connectivity2.png)
 
@@ -20,7 +18,7 @@ Using just the files that contain the Valhalla graph data we can create the conn
 
 ####Using the Connectivity Map
 
-The connectivity map has one very important use within Valhalla - we are instantaneuosly able to reject routes that have no possible connection. Any 2 locations that lie in tiles that have different "colors" in the connectivity map have no possible path between them over navigable ways. A quick image lookup can quickly determine this and allow us to filter these impossible paths. Note that just because 2 locations have the same color does not mean they are guaranteed to have a valid, connecting path.
+The connectivity map has one very important use within Valhalla - we are instantaneuosly able to reject routes that have no possible connection. Any 2 locations that lie in tiles that have different "colors" (or either one is uncolored) in the connectivity map have no possible path between them over navigable ways. A quick image lookup can quickly determine this and allow us to filter these impossible paths. Note that just because 2 locations have the same color does not mean they are guaranteed to have a valid, connecting path.
 
 The connectivity map may also be useful to the OSM community to identify regions where no connectivity exists but perhaps should exist. This may allow focused efforts to map regions to improve connectivity.
 
