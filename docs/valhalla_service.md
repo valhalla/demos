@@ -25,9 +25,11 @@ Contact routing@mapzen.com if you need higher limits in the meantime.
 
 ##### Sample Valhalla Route Request
 
-Valhalla will accept json input for routes:
+Valhalla accepts JSON as input for routes, as seen in this example.
 
-valhalla.mapzen.com/route?json=
+  http://valhalla.api.dev.mapzen.com/route?json={"locations":[{"lat":42.358528,"lon":-83.271400,"street":"Appleton"},{"lat":42.996613,"lon":-78.749855,"street":"Ranch Trail"}],"costing": "auto","costing_options":{"auto":{"country_crossing_penalty":2000.0}},"directions_options":{"units":"miles"}}&api_key=
+
+This request provides automobile routing between the Detroit, Michigan area and Buffalo, New York, with an optional street name parameter to improve navigation at the start and end points. It attempts to avoid routing north through Canada by adding a penalty for crossing international borders. The resulting route is displayed in miles.
 
 ### Basic Parts of a Route Request
 
