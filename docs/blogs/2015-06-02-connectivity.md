@@ -1,6 +1,6 @@
 ## OSM Routing Connectivity Map
 
-In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producting routing tiles - they provide a rough, first order approximation of connectivity. The notion is any tile navigable ways will be added to a Valhalla graph tile.
+In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producing routing tiles - they provide a rough, first order approximation of connectivity. The notion is any tile navigable ways will be added to a Valhalla graph tile.
 
 Since the Valhalla tiles are uniform sized latitude, longitude squares the tiling structure creates a 2-D array which can be used to create an image where each color indicates regions (tiles) that are possibly connected by OSM ways.
 
