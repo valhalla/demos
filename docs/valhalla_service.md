@@ -7,10 +7,12 @@ The Valhalla routing service is in active development. You can follow the [Mapze
 
 To report software issues or suggest enhancements, you can open an issue in GitHub (use the [Thor repository](https://github.com/valhalla/thor) for comments about route paths or [Odin repository](https://github.com/valhalla/odin) for narration). You can also send a message to routing@mapzen.com.
 
-##### Developer Keys
-To use the Valhalla routing service, you must obtain a free developer API key from Mapzen. Sign in at https://mapzen.com/developers to create and manage your API keys.
+### Get an API key
+To use the Valhalla routing service, you must first obtain a free developer API key from Mapzen. Sign in at https://mapzen.com/developers to create and manage your API keys.
 
-##### Notes on Service Limits
+TODO - more get started section/links.
+
+### Service limits
 
 Valhalla is a free, shared routing service. As such, there are limitations on requests, maximum distances, and numbers of locations to prevent individual users from degrading the overall system performance. Limits may be increased in the future, but the following are currently in place:
 
@@ -23,96 +25,97 @@ Valhalla is a free, shared routing service. As such, there are limitations on re
 
 Contact routing@mapzen.com if you need higher limits in the meantime.
 
-##### Sample Valhalla Route Request
+### Build a Valhalla route request
 
-Valhalla accepts JSON as input for routes, as seen in this example.
+The route service request has the following inputs: location information, name and options for the costing model name, and output options. The form of each is JSON, as seen in this example:
 
   http://valhalla.api.dev.mapzen.com/route?json={"locations":[{"lat":42.358528,"lon":-83.271400,"street":"Appleton"},{"lat":42.996613,"lon":-78.749855,"street":"Ranch Trail"}],"costing": "auto","costing_options":{"auto":{"country_crossing_penalty":2000.0}},"directions_options":{"units":"miles"}}&api_key=
 
-This request provides automobile routing between the Detroit, Michigan area and Buffalo, New York, with an optional street name parameter to improve navigation at the start and end points. It attempts to avoid routing north through Canada by adding a penalty for crossing international borders. The resulting route is displayed in miles.
-
-### Basic Parts of a Route Request
-
-The route service request supports the following inputs: location information, name and options for the costing model name, and output options. The form of each is JSON.
+This request provides automobile routing between the Detroit, Michigan area and Buffalo, New York, with an optional street name parameter to improve navigation at the start and end points. It attempts to avoid routing north through Canada by adding a penalty for crossing international borders. The resulting route is displayed in miles. You append your own Valhalla API key to the end of the URL.
 
 #### Locations
 
-Valhalla can be considered a **Bring Your Own Search** service. Valhalla does not search for or perform any external service calls for locations given a name or address, and does no geocoding or reverse geocoding. External services, such as [Pelias](https://github.com/pelias) or [Nominatum](http://wiki.openstreetmap.org/wiki/Nominatim) must be used to find places and geocode addresses. A location must include a latitude and longitude in decimal degrees. The coordinates can come from a GPS or other locator, point and click on a map, a geocode service, and so on.
+You specify locations as an ordered list of two or more locations within a JSON array. Locations are visited in the order specified, with a maximum of two locations currently supported.
 
-Locations are provided as an ordered list of two or more locations within a JSON array. Locations are visited in the route in the provided order. A maximum of two locations is supported. Each location includes the following information:
+A location must include a latitude and longitude in decimal degrees. The coordinates can come from many input sources, such as a GPS location, a point or a click on a map, a geocoding service, and so on. Note that Valhalla is a routing service only, so cannot search for names or addresses or perform geocoding or reverse geocoding. External search services, such as [Pelias](https://github.com/pelias) or [Nominatum](http://wiki.openstreetmap.org/wiki/Nominatim), can be used to find places and geocode addresses, which must be converted to coordinates for input to Valhalla.  
 
-The location information shall consist of two or more `break` locations. Also, 0 to n `through` locations may be supplied to influence the route path.
-* lat = Latitude of the location in degrees.
-* lon = Longitude of the location in degrees.
-* type = Type of location. There are two location types: `break` and `through`. Break forms a stop - the first and last locations must be type = break. Through locations form a location that the route path goes through - the path is not allowed to reverse direction at the through locations. Through locations are useful to force a route to go through locations. If no type is provided, the type is assumed to be a break.
-* heading = (Optional) A preferred direction of travel (heading) for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road and the route should start out in that direction. heading is indicated in degrees from north in a clockwise direction. North is 0°, east is 90°, south is 180°, and west is 270°.
-* street = (Optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude.
+To build a route, you need to specify two `break` locations. In addition, you can include `through` locations to influence the route path.
 
-The following, optional location information may be provided but does not impact routing. This information is simply carried through the request and returned as a convenience.
-* name = Location name (e.g. Roburrito). May be used in the guidance/textual directions (for example: "You have arrived at Roburrito")
+| Location parameters | Description |
+| --------- | ----------- |
+| lat | Latitude of the location in degrees. |
+| lon | Longitude of the location in degrees. |
+| type | Type of location, either `break` or `through`. A `break` is a stop, so the first and last locations must be of type `break`. A `through` location is one that the route path travels through, and is useful to force a route to go through location. The path is not allowed to reverse direction at the through locations. If no type is provided, the type is assumed to be a break. |
+| heading | (optional) Preferred direction of travel (`heading`) for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road, and the route should start in that direction. The heading is indicated in degrees from north in a clockwise direction, where north is 0°, east is 90°, south is 180°, and west is 270°. |
+| street | (optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude. |
+
+Optionally, you can include the following location information without impacting the routing. This information is carried through the request and returned as a convenience.
+* name = Location or business name. The name may be used in the route narration directions, such as "You have arrived at _&lt;business name&gt;_.")
 * city = City.
 * state = State.
-* postal_code = Postal Code.
+* postal_code = Postal code.
 * country = Country.
 * phone = Phone.
-* url = URL for the place/location.
+* url = URL for the place or location.
 
-FUTURE: look for additional location options and information related to time at each location. This will allow routes to specify a start time or an arrive by time at each location.
+Future Valhalla development work includes adding location options and information related to time at each location. This will allow routes to specify a start time or an arrive by time at each location.
 
-#### Costing Model
+#### Costing models
 
-Valhalla uses dynamic, run-time costing to form the route path. The route request must include the name of the costing model and can include optional parameters accepted by the costing mode.
+Valhalla uses dynamic, run-time costing to generate the route path. The route request must include the name of the costing model and can include optional parameters available for the chosen costing model.
 
-Costing models currently supported include:
+| Costing model | Description |
+| ----------------- | ----------- |
+| auto | Standard costing for driving routes by car, motorcycle, truck, and so on that obeys automobile driving rules, such as access and turn restrictions. Auto provides a short time path, which is not guaranteed to be shortest time, and uses intersection costing to minimize turns and maneuvers or road name changes. Routes also tend to favor highways and higher classification roads, such as motorways and trunks. |
+| auto_shorter | Alternate costing for driving that provides a short path, which is not guaranteed to be shortest distance, that obeys driving rules for access and turn restrictions. |
+| bicycle | A default bicycle costing method has been implemented, but its options are currently being evaluated. |
+| bus | Standard costing for bus routes. Bus costing inherits the auto costing behaviors, but checks for bus access on the roads. |
+| pedestrian | Standard walking route that excludes roads without pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways and footpaths are slightly favored, while and steps or stairs and alleys are slightly avoided. |
 
-* costing = auto. Standard costing for driving routes (using car, motorcycle, truck, etc.) that obeys automobile driving rules (access, turn restrictions, etc.) that provides a short time path (not guaranteed to be shortest time) that also uses intersection costing to help minimize turns and maneuvers or road name changes. Routes also tend to favor highways (higher classification roads: motorways, trunk).
-* costing = auto_shorter. Alternate costing for driving that is intended to provide a short path (though not guaranteed to be shortest distance) that obeys driving rules (access, turn restr)
-* costing = bus. Standard costing for bus routes.  This costing inherits the auto costing behaviors; however, it checks for bus access on the roads versus auto access.
-* costing = pedestrian. Standard walking route that does not allow roads with no pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways/foot-paths are slightly favored and steps/stairs and alleys are slightly avoided. At this time, pedestrian routes are not allowed for locations that are more than 100 kilometers apart due to performance limitations.
-* costing = bicycle. A default bicycle costing method has been implemented, but its options are currently being evaluated.
+#### Costing options
 
+Costing methods can have several options that can be adjusted to develop the the route path, as well as for estimating time along the path. Specify costing model options in your request using the format of `costing_options.type`, such as ` costing_options.auto`.
 
-##### Costing Model Options
+* Cost options are fixed costs in seconds that are added to both the path cost and the estimated time. Examples of costs are `gate_costs` and `toll_booth_costs`, where a fixed amount of time is added. Costs are not generally used to influence the route path; instead, use penalties to do this.
+* Penalty options are fixed costs in seconds that are only added to the path cost. Penalties can influence the route path determination but do not add to the estimated time along the path. For exmaple, add a `toll_booth_penalty` to create route paths that tend to avoid toll booths.
+* Factor options are used to multiply the cost along an edge or road section in a way that influences the path to favor or avoid a particular attribute. Factor options do not impact estimated time along the path, though. Factors must be in the range 0.25 to 100000.0, where factors of 1.0 have no influence on cost. Use a factor less than 1.0 to attempt to favor paths containing preferred attributes, and a value greater than 1.0 to avoid paths with undesirable attributes. Avoidance factors are more effective than favor factors at influencing a path. A factor's impact also depends on the length of road containing the specified attribute, as longer roads have more impact on the costing than very short roads. For this reason, penalty options tend to be better at influencing paths.
 
-Costing methods can have several options that can be adjusted to modify costing (used for finding the route path) as well as for estmating time along the path. Options for each costing model are specified under costing_options.type (e.g. costing_options.auto).
+##### Automobile and bus costing options
 
-The following terms are used in these options:
+These options are available for `auto`, `auto_shorter`, and `bus` costing methods.
 
-* Cost = Cost options are fixed costs (seconds) that are added to both the path cost and the estimated time. Examples of costs are gate_costs and toll_booth_costs where a fixed amount of time is added. Costs are not generally used to influence the route path - use `penalties` instead.
-* Penalty = Penalty options are fixed costs (seconds) that are only added to the path cost. These add extra cost in a way that can influence the route path detemrination but do not add to the estimated time along the path. Examples are toll_booth_penalty which can be added to create route paths that tend to avoid toll booths.
-* Factor - Factor options are used to multiply the cost along an edge (road section) in a way that influences the path. Factor options do not impact estimated time along the path. Factors of 1.0 do not influence cost. Factors less than 1.0 are used to favor paths with the favored attribute. Factors greater than 1.0 are used to avoid paths with the avoided attribute. Factors must be in the range 0.25 to 100000.0. Note that avoidance factors are more effective than favor factors at influencing a path. The effectiveness of a factor also depends on the length of road that has the attribution being impacted: long roads lead to more impact n the costing than very short roads. For this reason, penalty options tend to be better at influencing paths.
+| Automobile options | Description |
+| -------------------------- | ----------- |
+| maneuver_penalty | A penalty applied when transitioning between roads that do not have consistent naming–in other words, no road names in common. This penalty can be used to create simpler routes that tend to have fewer maneuvers or narrative guidance instructions. The default maneuver penalty is five seconds. |
+| gate_cost | A cost applied when a [gate](http://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate) is encountered. This cost is added to the estimated time / elapsed time. The default gate cost is 30 seconds. |
+| toll_booth_cost | A cost applied when a [toll booth](http://wiki.openstreetmap.org/wiki/Tag:barrier%3Dtoll_booth) is encountered. This cost is added to the estimated and elapsed times. The default cost is 15 seconds. |
+| toll_booth_penalty | A penalty applied to the cost when a [toll booth](http://wiki.openstreetmap.org/wiki/Tag:barrier%3Dtoll_booth) is encountered. This penalty can be used to create paths that avoid toll roads. The default toll booth penalty is 0. |
+| country_crossing_cost | A cost applied when encountering an international border. This cost is added to the estimated and elapsed times. The default cost is 600 seconds. |
+| country_crossing_penalty | A penalty applied for a country crossing. This penalty can be used to create paths that avoid spanning country boundaries. The default penalty is 0. |
 
-##### Auto/Vehicle Costing Options
+##### Bicycle costing options
+A default bicycle costing method has been implemented, but its options are currently being evaluated. The default bicycle costing is tuned towards road bicycles with a preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. Rough road surfaces and mountain bike trails are currently disallowed for bicycle paths, but future methods may consider the bicycle type and enable their use use by cyclo-cross or mountain bicycles.
 
-The auto and auto_shorter costing methods support the following options:
-* maneuver_penalty = A penalty in seconds that is applied when transitioning between roads that do not have consistent naming (no road names in common). This penalty can be used to create simpler routes that tend to have less maneuvers or guidance instructions. The default maneuver penalty is 5 seconds.
-* gate_cost = A cost in seconds that is applied when a gate is encountered. This cost is added to the estimated time / elapsed time. The default gate cost is 30 seconds.
-* toll_booth_cost = A cost that is applied when a toll booth is encountered. This cost is added to the estimated time / elapsed time. The default cost is 15 seconds.
-* toll_booth_penalty = A penalty that is applied to the cost when a toll booth is encountered. This penalty can be used to create paths that avoid tolls. The default toll booth penalty is 0.
-* country_crossing_cost = A cost that is applied when a country crossing is encountered. This cost is added to the estimated time / elapsed time. The default cost is 600 seconds.
-* country_crossing_penalty = A penalty that is applied to the cost when a country crossing is encountered. This penalty can be used to create paths that avoid country crossings. The default penalty is 0.
+##### Pedestrian costing options
 
-#####Pedestrian Costing Options
+These options are available for pedestrian routes (using the standard pedestrian costing model):
 
-The following options are supported for pedestrian routes (using the standard pedestrian costing model):
-* walking_speed = Walking speed in the units specified within the units option. Defaults to 5.1 km/hr (3.1 miles/hour).
-* walkway_factor = A factor that modifies the cost when footpaths/sidewalks/walkways (roads or paths that do not allow vehicles) are encountered. Pedestrian routes generally want to favr using walkways. The default walkway_factor is 0.9, which slightly favors walkways.
-* alley_factor = A factor that modifies (multiplies) the cost when alleys are encountered. Pedestrian routes generally want to avoid alleys. The default alley_factor is 2.0.
-* driveway_factor = A factor that modifies (mulitplies) the cost to try when driveways are encountered. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 2.0.
-* step_penalty = A penalty in seconds to add to each transition onto a path marked as having steps/stairs. Higher values apply larger cost penalties to avoid paths that contain steps/stairs.
+| Pedestrian options | Description |
+| -------------------------- | ----------- |
+| walking_speed | Walking speed in the units specified by the directions unit. Defaults to 5.1 km/hr (3.1 miles/hour). |
+| walkway_factor | A factor that modifies the cost when encountering roads or paths that do not allow vehicles and are set aside for pedestrian use. Pedestrian routes generally attempt to favor using these [walkways and sidewalks](http://wiki.openstreetmap.org/wiki/Sidewalks). The default walkway_factor is 0.9, indicating a slight preference. |
+| alley_factor | A factor that modifies (multiplies) the cost when [alleys](http://wiki.openstreetmap.org/wiki/Tag:service%3Dalley) are encountered. Pedestrian routes generally want to avoid alleys or narrow service roads between buildings. The default alley_factor is 2.0. |
+| driveway_factor | A factor that modifies (mulitplies) the cost when encountering a [driveway](http://wiki.openstreetmap.org/wiki/Tag:service%3Ddriveway), which is often a private, service road. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 2.0. |
+| step_penalty | A penalty in seconds added to each transition onto a path with [steps or stairs](http://wiki.openstreetmap.org/wiki/Tag:highway%3Dsteps). Higher values apply larger cost penalties to avoid paths that contain flights of steps. |
 
-#### Bicycle Costing Options
-A default bicycle costing method has been implemented, but its options are currently being evaluated.
+#### Other request options
 
-#### Directions Options
+| Options | Description |
+| ------------------ | ----------- |
+| units | Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
+| language | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. The current list of supported languages: en_US. |
+|outformat | Output format. Allowable output formats are .json and .pbf (protocol buffer). If no `outformat` is specified, .json is returned. |
 
-* units = Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, kilometers is selected.
-* language = The langauge the instructions will use. If no language is specified, United States based English (en_US) will be used. The current list of supported languages: en_US.
-
-#### Output Options
-
-* outformat = Output Format. Allowable output formats are json and pbf (protocol buffer). If no outformat is specified, JSON is selected.
-* TODO - add example that shows a simple request and response.
 
 ### JSON Output
 
@@ -143,9 +146,9 @@ A trip may include multiple legs. For n break locations there are n-1 legs. Thro
 Each leg of the trip includes a summary (comprised of the same information as a trip summary but applied to the single leg of the trip). It also includes the following:
 
 * shape = Encoded shape (using Google polyline encoding - ADD LINK) of the route path.
-* maneuvers = A list (JSON array) of manuevers
+* maneuvers = A list (JSON array) of maneuvers
 
-###### Manuever
+###### Maneuver
 
 Each maneuver includes the following:
 
