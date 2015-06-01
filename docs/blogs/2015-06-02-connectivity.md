@@ -10,14 +10,14 @@ Using just the files that contain the Valhalla graph data we can create the conn
 
 1. Iterate through tiles on disk to figure out which exist placing each into a hash map as the key with an initial color of white (meaning uncolored tile)
 2. Iterate over the entries in the map
-..* If this entry is uncolored
-....* Select a new color and create a queue of just the tile in this entry
-....* While the queue is not empty
-......* Pop a tile off the queue
-......* Color it and add any of its neighbors to the queue who appear in the map
+  * If this entry is uncolored
+    * Select a new color and create a queue of just the tile in this entry
+    * While the queue is not empty
+      * Pop a tile off the queue
+      * Color it and add any of its neighbors to the queue who appear in the map
 3. Iterate over all the tiles in the world to create an image in PPM (Portable Pixel Map) format, use white for any tiles that are not in the map
-* Convert the PPM image into png using ImageMagik
-* Flip the image vertically (Valhalla tiles are row ordered from South to North).
+4. Convert the PPM image into png using ImageMagik
+5. Flip the image vertically (Valhalla tiles are row ordered from South to North).
 
 ####GeoJSON
 
