@@ -21,7 +21,7 @@ Using just the files that contain the Valhalla graph data we can create the conn
 
 ####GeoJSON
 
-For all you geo hackers out there, we also provide a [connectivity map in geojson format](). The colors in the geojson feature properties are simply integers so you'll want to do something on your own to get a proper color out of that for rendering.
+For all you geo hackers out there, we also provide a [connectivity map in geojson format](https://s3.amazonaws.com/mapzen.valhalla/prod/connectivity.geojson). The colors in the geojson feature properties are simply integers so you'll want to do something on your own to get a proper color out of that for rendering.
 
 ####Using the Connectivity Map
 
