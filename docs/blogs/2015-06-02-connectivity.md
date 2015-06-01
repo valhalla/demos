@@ -1,6 +1,6 @@
 ## OSM Routing Connectivity Map
 
-In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producing routing tiles - they provide a rough, first order approximation of connectivity. Valhalla graph tiles are a uniformly sampled grid in latitude, longitude space. A Valhalla graph tile exists wherever there are navigable ways. Conversely no graph tile exists if there are no navigable ways within a given tile's region. Imagine each tile in the grid were a pixel in an image. We have indeed used these tiles to create an image, in which same "colored" regions (tiles) are connected by OSM ways. Note that any uncolored region (white in the image) is deamed unreachable via Valhalla's various modes of transportation.
+In our work on open source routing, the Valhalla team at Mapzen have found an interesting byproduct of producing routing tiles - they provide a rough, first order approximation of connectivity. Valhalla graph tiles are a uniformly sampled grid in latitude, longitude space. A Valhalla graph tile exists wherever there are navigable ways. Conversely no graph tile exists if there are no navigable ways within a given tile's region. Imagine each tile in the grid were a pixel in an image. We have indeed used these tiles to create an image, in which same "colored" regions (tiles) are connected by OSM ways. Note that any uncolored region (white in the image) is deemed unreachable via Valhalla's various modes of transportation.
 
 ![](images/connectivity2.png)
 
