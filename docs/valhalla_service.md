@@ -14,16 +14,16 @@ TODO - more get started section/links.
 
 ### Service limits
 
-Valhalla is a free, shared routing service. As such, there are limitations on requests, maximum distances, and numbers of locations to prevent individual users from degrading the overall system performance. Limits may be increased in the future, but the following are currently in place:
+Valhalla is a free, shared routing service. As such, there are limitations on requests, maximum distances, and numbers of locations to prevent individual users from degrading the overall system performance.
 
-* XXX requests per second.
-* YYY requests per day.
+The following distance limitations are currently in place:
+
 * Pedestrian routes have a limit of 100 kilometers.
 * Bicycle routes have a limit of 500 kilometers.
 * Automobile routes have a limit of 5,000 kilometers.
 * No more than two locations can be provided.
 
-Contact routing@mapzen.com if you need higher limits in the meantime.
+Limits may be increased in the future, but you can contact routing@mapzen.com if you encounter rate limit status messages and need higher limits in the meantime.
 
 ### Build a Valhalla route request
 
@@ -58,7 +58,7 @@ Optionally, you can include the following location information without impacting
 * phone = Phone.
 * url = URL for the place or location.
 
-Future Valhalla development work includes adding location options and information related to time at each location. This will allow routes to specify a start time or an arrive by time at each location.
+Future Valhalla development work includes adding location options and information related to time at each location. This will allow routes to specify a start time or an arrive by time at each location. There is also ongoing work to improve support for `through` locations.
 
 #### Costing models
 
@@ -77,7 +77,7 @@ Valhalla uses dynamic, run-time costing to generate the route path. The route re
 Costing methods can have several options that can be adjusted to develop the the route path, as well as for estimating time along the path. Specify costing model options in your request using the format of `costing_options.type`, such as ` costing_options.auto`.
 
 * Cost options are fixed costs in seconds that are added to both the path cost and the estimated time. Examples of costs are `gate_costs` and `toll_booth_costs`, where a fixed amount of time is added. Costs are not generally used to influence the route path; instead, use penalties to do this.
-* Penalty options are fixed costs in seconds that are only added to the path cost. Penalties can influence the route path determination but do not add to the estimated time along the path. For exmaple, add a `toll_booth_penalty` to create route paths that tend to avoid toll booths.
+* Penalty options are fixed costs in seconds that are only added to the path cost. Penalties can influence the route path determination but do not add to the estimated time along the path. For example, add a `toll_booth_penalty` to create route paths that tend to avoid toll booths.
 * Factor options are used to multiply the cost along an edge or road section in a way that influences the path to favor or avoid a particular attribute. Factor options do not impact estimated time along the path, though. Factors must be in the range 0.25 to 100000.0, where factors of 1.0 have no influence on cost. Use a factor less than 1.0 to attempt to favor paths containing preferred attributes, and a value greater than 1.0 to avoid paths with undesirable attributes. Avoidance factors are more effective than favor factors at influencing a path. A factor's impact also depends on the length of road containing the specified attribute, as longer roads have more impact on the costing than very short roads. For this reason, penalty options tend to be better at influencing paths.
 
 ##### Automobile and bus costing options
@@ -94,11 +94,11 @@ These options are available for `auto`, `auto_shorter`, and `bus` costing method
 | country_crossing_penalty | A penalty applied for a country crossing. This penalty can be used to create paths that avoid spanning country boundaries. The default penalty is 0. |
 
 ##### Bicycle costing options
-A default bicycle costing method has been implemented, but its options are currently being evaluated. The default bicycle costing is tuned towards road bicycles with a preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. Rough road surfaces and mountain bike trails are currently disallowed for bicycle paths, but future methods may consider the bicycle type and enable their use use by cyclo-cross or mountain bicycles.
+A default bicycle costing method has been implemented, but its options are currently being evaluated. The default bicycle costing is tuned toward road bicycles with a preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. Rough road surfaces and mountain bike trails are currently disallowed for bicycle paths, but future methods may consider the bicycle type and enable their use use by cyclo-cross or mountain bicycles.
 
 ##### Pedestrian costing options
 
-These options are available for pedestrian routes (using the standard pedestrian costing model):
+These options are available for pedestrian costing methods.
 
 | Pedestrian options | Description |
 | -------------------------- | ----------- |
@@ -113,94 +113,80 @@ These options are available for pedestrian routes (using the standard pedestrian
 | Options | Description |
 | ------------------ | ----------- |
 | units | Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
-| language | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. The current list of supported languages: en_US. |
+| language | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. Currently supported languages: en_US. |
 |outformat | Output format. Allowable output formats are .json and .pbf (protocol buffer). If no `outformat` is specified, .json is returned. |
 
+### JSON output
 
-### JSON Output
+The route results are returned as a trip. This is a JSON object that contains details about the trip, including locations, a summary with basic information about the entire trip, and a list of legs. Location information is returned in the same form as it is entered with additional fields to indicate the side of the street.
 
-The selected units of length are returned:
+| Item | Description |
+| ---- | ----------- |
+| units | The specified units of length are returned, either kilometers or miles. |
+| sos | Side of street. Possible values are: `right`, `left`, or `ind` (indeterminant). |
+| time | Estimated elapsed time to complete the trip. |
+| length | Length (distance) traveled for the entire trip. Units are either miles or kilometers based on the input units specified. |
 
-units = "kilometers" (or "miles").
+#### Legs and maneuvers of a trip
 
-#### Trip
+A trip may include multiple legs. For `n` number of `break` locations, there are `n-1` legs. `Through` locations do not create separate legs.
 
-The route results are returned as a **trip**. This is a JSON object that contains details about the trip, including locations, a summary, and a list of **legs**.
+Each leg of the trip includes a summary, which is comprised of the same information as a trip summary but applied to the single leg of the trip. It also includes a `shape`, which is an [encoded polyline](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) of the route path, and a list of `maneuvers` as a JSON array.
 
-##### Locations
-Location information is returned in the same form as it is entered with additional fields:
+These maneuvers contain the following items.
 
-* sos = Side of street. Possible values are: **right**, **left**, or **ind** (indeterminant).
+| Maneuver items | Description |
+| --------- | ---------- |
+| type | Type of maneuver. See below for a list. |
+| instruction | Written maneuver instruction. Describes the maneuver, such as "Turn right onto Main Street". |
+| street_names | List of street names. |
+| time | Estimated time along the maneuver in seconds. |
+| length | Maneuver length in the units specified. |
+| begin_shape_index | Index into the list of shape points for the start of the maneuver. |
+| end_shape_index | Index into the list of shape points for the end of the maneuver. |
+| toll | True if the maneuver has any toll, or portions of the maneuver are subject to a toll. |
+| rough | True if the maneuver is unpaved or rough pavement or has any portions that have rough pavement. |
+| gate | True if a gate is encountered on this maneuver. |
+| ferry | True if a ferry is encountered on this maneuver. |
 
-##### Summary
+The following are the available types of maneuvers:
 
-The trip summary includes basic details about the entire trip including:
-
-* time = Estimated elapsed time to complete the trip.
-* length = Length (distance) traveled for the entire trip. Units are either miles or kilometers based on the input units specified.
-
-##### Legs
-
-A trip may include multiple legs. For n break locations there are n-1 legs. Through locations do not create a separate legs.
-
-Each leg of the trip includes a summary (comprised of the same information as a trip summary but applied to the single leg of the trip). It also includes the following:
-
-* shape = Encoded shape (using Google polyline encoding - ADD LINK) of the route path.
-* maneuvers = A list (JSON array) of maneuvers
-
-###### Maneuver
-
-Each maneuver includes the following:
-
-* type = Type
 ```
-      kNone = 0;
-      kStart = 1;
-      kStartRight = 2;
-      kStartLeft = 3;
-      kDestination = 4;
-      kDestinationRight = 5;
-      kDestinationLeft = 6;
-      kBecomes = 7;
-      kContinue = 8;
-      kSlightRight = 9;
-      kRight = 10;
-      kSharpRight = 11;
-      kUturnRight = 12;
-      kUturnLeft = 13;
-      kSharpLeft = 14;
-      kLeft = 15;
-      kSlightLeft = 16;
-      kRampStraight = 17;
-      kRampRight = 18;
-      kRampLeft = 19;
-      kExitRight = 20;
-      kExitLeft = 21;
-      kStayStraight = 22;
-      kStayRight = 23;
-      kStayLeft = 24;
-      kMerge = 25;
-      kRoundaboutEnter = 26;
-      kRoundaboutExit = 27;
-      kFerryEnter = 28;
-      kFerryExit = 29;
+kNone = 0;
+kStart = 1;
+kStartRight = 2;
+kStartLeft = 3;
+kDestination = 4;
+kDestinationRight = 5;
+kDestinationLeft = 6;
+kBecomes = 7;
+kContinue = 8;
+kSlightRight = 9;
+kRight = 10;
+kSharpRight = 11;
+kUturnRight = 12;
+kUturnLeft = 13;
+kSharpLeft = 14;
+kLeft = 15;
+kSlightLeft = 16;
+kRampStraight = 17;
+kRampRight = 18;
+kRampLeft = 19;
+kExitRight = 20;
+kExitLeft = 21;
+kStayStraight = 22;
+kStayRight = 23;
+kStayLeft = 24;
+kMerge = 25;
+kRoundaboutEnter = 26;
+kRoundaboutExit = 27;
+kFerryEnter = 28;
+kFerryExit = 29;
 ```
-* instruction = Written maneuver instruction. Describes the maneuver (e.g., "Turn right onto Main Street").
-* street_names = List of street names.
-* time = Estimated time along the maneuver in seconds.
-* length = Maneuver length in the units specified.
-* begin_shape_index = Index into the list of shape points for the start of the maneuver.
-* end_shape_index = Index into the list of shape points for the end of the maneuver.
-* toll = True if the maneuver has any toll or portions of the maneuver are subject to a toll.
-* rough = True if the maneuver is unpaved/rough pavement or has any portions that have rough pavement.
-* gate = True if a gate is encountered on this maneuver.
-* ferry = True if a ferry is encountered on this maneuver.
 
-FUTURE: Look for additional maneuver information to enhance navigation applications - features like verbal instructions and landmark usage.
+In the future, look for additional maneuver information to enhance navigation applications, including verbal instructions and landmark usage.
 
 #### OSRM Compatibility Mode
 
 Note that OSRM compatibility mode uses:
 valhalla.mapzen.com/viaroute?
-
-Example:
