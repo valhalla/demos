@@ -111,7 +111,7 @@ These options are available for pedestrian costing methods.
 | :------------------ | :----------- |
 | `units` | Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
 | `language` | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. Currently supported languages: en_US. |
-| `outformat` | Output format. Allowable output formats are .json and .pbf (protocol buffer). If no `outformat` is specified, .json is returned. |
+| `out_format` | Output format. If no `out_format` is specified, json is returned. Future work includes pbf (protocol buffer) support. |
 
 ### Outputs of a Valhalla route
 
@@ -120,7 +120,7 @@ The route results are returned as a `trip`. This is a JSON object that contains 
 | Item | Description |
 | :---- | :----------- |
 | `units` | The specified units of length are returned, either kilometers or miles. |
-| `sos` | Side of street. Possible values are: `right`, `left`, or `ind` (indeterminant). |
+| `sos` | Side of street. Possible values are: `right`, `left`, or `ind` (indeterminant). This is not currently implemented. |
 | `time` | Estimated elapsed time to complete the trip. |
 | `length` | Distance traveled for the entire trip. Units are either miles or kilometers based on the input units specified. |
 
