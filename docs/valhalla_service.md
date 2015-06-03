@@ -36,7 +36,7 @@ You specify locations as an ordered list of two or more locations within a JSON 
 
 A location must include a latitude and longitude in decimal degrees. The coordinates can come from many input sources, such as a GPS location, a point or a click on a map, a geocoding service, and so on. Note that Valhalla is a routing service only, so cannot search for names or addresses or perform geocoding or reverse geocoding. External search services, such as [Pelias](https://github.com/pelias) or [Nominatum](http://wiki.openstreetmap.org/wiki/Nominatim), can be used to find places and geocode addresses, which must be converted to coordinates for input to Valhalla.  
 
-To build a route, you need to specify two `break` locations. In addition, you can include `through` locations to influence the route path.
+To build a route, you need to specify two `break` locations. In addition, you can include `through` locations to influence the route path. 
 
 | Location parameters | Description |
 | :--------- | :----------- |
@@ -44,7 +44,8 @@ To build a route, you need to specify two `break` locations. In addition, you ca
 | `lon` | Longitude of the location in degrees. |
 | `type` | Type of location, either `break` or `through`. A `break` is a stop, so the first and last locations must be of type `break`. A `through` location is one that the route path travels through, and is useful to force a route to go through location. The path is not allowed to reverse direction at the through locations. If no type is provided, the type is assumed to be a break. |
 | `heading` | (optional) Preferred direction of travel for the start from the location. This can be useful for mobile routing where a vehicle is traveling in a specific direction along a road, and the route should start in that direction. The `heading` is indicated in degrees from north in a clockwise direction, where north is 0°, east is 90°, south is 180°, and west is 270°. |
-| `street` | (optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude,longitude. |
+| `street` | (optional) Street name. The street name may be used to assist finding the correct routing location at the specified latitude, longitude. This is not currently implemented. |
+| `way_id` | (optional) OpenStreetMap identification number for a polyline [way] (http://wiki.openstreetmap.org/wiki/Way). The way ID may be used to assist finding the correct routing location at the specified latitude, longitude. This is not currently implemented. |
 
 Optionally, you can include the following location information without impacting the routing. This information is carried through the request and returned as a convenience.
 * `name` = Location or business name. The name may be used in the route narration directions, such as "You have arrived at _&lt;business name&gt;_.")
