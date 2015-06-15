@@ -1,3 +1,0 @@
-[submodule "routing"]
-	path = routing
-	url = https://github.com/kdiluca/route-tester
