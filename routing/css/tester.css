@@ -37,9 +37,10 @@ div#route_inst table td.distance {
   height:20px;
 }
 
+
 a.routing {
   opacity: 0.5;
-  /*-webkit-box-shadow: 0px 0px 15px 5px rgba(255, 255, 190, .75);
+ /* -webkit-box-shadow: 0px 0px 15px 5px rgba(0, 0, 255, .75);
   -moz-box-shadow: 0px 0px 15px 5px rgba(255, 255, 190, .75);
   box-shadow: 0px 0px 15px 5px rgba(255, 0, 0, .75);*/
 }

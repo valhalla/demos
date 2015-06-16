@@ -1,0 +1,67 @@
+cameras:
+    camera1:
+        type: flat
+
+lights:
+    light1:
+        type: directional
+        direction: [0, 1, -.5]
+        diffuse: .3
+        ambient: 1
+
+sources:
+    osm:
+        type: TopoJSONTiles
+        url:  //vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-HqUVidw
+
+layers:
+    earth:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: 0
+                color: '#ddeeee'
+
+    landuse:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: 1
+                color: '#aaffaa'
+
+    water:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: 2
+                color: '#88bbee'
+
+    roads:
+        data: { source: osm }
+        filter:
+            not: { kind: ["path", "rail"] }
+        draw:
+            lines:
+                order: 4
+                color: gray
+                width: 8
+                cap: round
+        highway:
+            filter:
+                kind: highway
+            draw:
+                lines:
+                    order: 5
+                    color: '#cc6666'
+                    width: 12
+                    outline:
+                        color: grey
+                        width: 1.5
+        minor_road:
+            filter:
+                kind: minor_road
+            draw:
+                lines:
+                    order: 3
+                    color: lightgrey
+                    width: 5
