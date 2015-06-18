@@ -166,12 +166,33 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    valhalla_mode = mode_mapping[mode];
 
 	var rr = L.Routing.control({
-		waypoints: waypoints,
-		geocoder: null,
+	  waypoints: waypoints,
+	  geocoder: null,
 	  transitmode: valhalla_mode,
 	  routeWhileDragging: false,
 	  router: L.Routing.valhalla('valhalla-t_16n1c','auto'),
 	  summaryTemplate:'<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
+	  
+	  createMarker: function(i,wp,n){
+      var iconV;
+        if(i == 0){
+          iconV = L.icon({
+          iconUrl: 'resource/dot.png',
+          iconSize:[24,24]
+          });
+        }else{
+          iconV = L.icon({
+          iconUrl: 'resource/dot.png',
+          iconSize:[24,24]
+        })
+        }
+        var options = {
+          draggable: true,
+          icon: iconV
+        }
+        return L.marker(wp.latLng,options);
+	  },
+	  formatter: new L.Routing.Valhalla.Formatter(),
 	    pointMarkerStyle: {radius: 6,color: '#25A5FA',fillColor: '#5E6472',opacity: 1,fillOpacity: 1}
 		}).addTo(map);
 	
@@ -179,7 +200,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var bikeBtn = document.getElementById("bike_btn");
   var walkBtn = document.getElementById("walk_btn");
   var multiBtn = document.getElementById("multi_btn");
-  var timeBtn = document.getElementById("time_btn");
+  var datetime = document.getElementById("datetimepicker");
   
   driveBtn.addEventListener('click', function (e) {
     rr.route({transitmode: 'auto'});
@@ -197,35 +218,37 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
 
-  timeBtn.addEventListener('click', function (e) {
-    var changeDt, inputDateTime, year, month, changeMonth, day, changeDay, hour,changeHour, minute, changeMin; 
-    changeDt = prompt("Set time/date to depart (24hr clock), hh:mm MM-DD");
-    if (changeDt != null && changeDt.length == 11) {
-      changeHour = changeDt.substring(0,2);
-      hour = (changeHour <= 24 && changeHour >= 0) ? changeHour : date.getHours();
-      changeMin = changeDt.substring(3,5);
-      minute = (changeMin < 60  && changeMin >= 0) ? changeMin : date.getMinutes();
-      inputDateTime = changeDt.substring(6, changeDt.length);
-      changeMonth = inputDateTime.substring(0,2);
-      changeDay = inputDateTime.substring(3,5);
-      year = (changeMonth < date.getMonth() + 1) ? date.getFullYear() + 1 : date.getFullYear();
-      month = (changeMonth > 0 && changeMonth <= 12) ? changeMonth : date.getMonth();
-      if (changeDay>0 && changeDay <=31) {
-    	  day = changeDay;
-      } else {
-    	  day = date.getDate();
-    	  if (day < 10) {
-       	    day = '0' + day;
-    	  } 
-      }
-      dateStr = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
-    } else {
-	    dateStr = parseIsoDateTime(isoDateTime.toString());
-    }
-    multiBtn.click();	
-  });
+  function datetimeUpdate(datetime) {
+      var changeDt = datetime;
+      var inputDate, splitDate, year, month, day, time, hour, minute; 
+       if(changeDt != null){
+   	     if (changeDt.length >= 11) {
+   	    	inputDate = changeDt.split(" ");
+   	    	splitDate = inputDate[0].split("-");
+     	    day = splitDate[0];
+     	    if (day < 10) {
+      	      day = '0' + day;
+      	    } 
+     	    month = GetMonthIndex(splitDate[1])+1;
+     	   if (month < 10) {
+     		  month = '0' + month;
+       	    } 
+     	    year = splitDate[2];
+     	  
+    	  time = inputDate[1].split(":");
+     	  hour = time[0];
+     	  minute = time[1];
+   	      
+   	      dateStr = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
+   	    } else {
+   		    dateStr = parseIsoDateTime(isoDateTime.toString());
+   	    }
+   	    multiBtn.click();	
+       }
 
-$(document).on('mode-alert', function(e, m) {
+  };
+	  
+  $(document).on('mode-alert', function(e, m) {
     mode = m;
     reset();
     Locations = [];
@@ -235,5 +258,10 @@ $(document).on('mode-alert', function(e, m) {
     var instructions = $('.leaflet-routing-container.leaflet-control').html();
     $scope.$emit( 'setRouteInstruction', instructions);
   });
-	  });
+
+  $("#datepicker").on("click", function() {
+	datetimeUpdate(this.value);
+  });
+  
+  });
 })
