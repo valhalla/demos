@@ -3,6 +3,31 @@ var hash_params = L.Hash.parseHash(location.hash);
 var mode_mapping = { 'foot' : 'pedestrian', 'car' : 'auto', 'bicycle' : 'bicycle', 'transit' : 'multimodal'};
 var date = new Date();
 var isoDateTime = date.toISOString();  //"2015-06-12T15:28:46.493Z"
+var serviceUrl;
+var envToken;
+var envServer;
+
+function selectEnv(){
+	$( "option:selected" ).each(function() {
+	  envServer = $( this ).text();
+	  serviceUrl =  document.getElementById(envServer).value;
+	  getEnvToken();
+	});
+}
+
+function getEnvToken(){
+  switch (envServer) {
+  case "localhost":
+	  envToken = accessToken.local;
+	  break;
+  case "development":
+	  envToken = accessToken.dev;
+	  break;
+  case "production":
+	  envToken = accessToken.prod;
+	  break;
+  }
+}
 
 //sets ISO date time to 12:15 of current date on initial transit run
 function parseIsoDateTime(dtStr) {
@@ -95,6 +120,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  var reset = function() {
 	    $('svg').html('');
 	    $('.leaflet-routing-container').remove();
+	    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
 	    $scope.$emit( 'resetRouteInstruction' );
 	    remove_markers();
 	    locations = 0;
@@ -170,7 +196,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  geocoder: null,
 	  transitmode: valhalla_mode,
 	  routeWhileDragging: false,
-	  router: L.Routing.valhalla('valhalla-t_16n1c','auto'),
+	  router: L.Routing.valhalla(envToken,'auto'),
 	  summaryTemplate:'<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 	  
 	  createMarker: function(i,wp,n){
@@ -203,18 +229,22 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var datetime = document.getElementById("datetimepicker");
   
   driveBtn.addEventListener('click', function (e) {
+	getEnvToken();
     rr.route({transitmode: 'auto'});
   });
 
   bikeBtn.addEventListener('click', function (e) {
+	getEnvToken();
     rr.route({transitmode: 'bicycle'});
   });
 
   walkBtn.addEventListener('click', function (e) {
+	getEnvToken();
     rr.route({transitmode: 'pedestrian'});
   }); 
 
   multiBtn.addEventListener('click', function (e) {
+	getEnvToken();
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
 
@@ -247,7 +277,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
        }
 
   };
-	  
+
   $(document).on('mode-alert', function(e, m) {
     mode = m;
     reset();
