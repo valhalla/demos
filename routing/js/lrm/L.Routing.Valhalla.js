@@ -197,7 +197,7 @@ if (typeof module !== undefined) module.exports = polyline;
 
   L.Routing.Valhalla = L.Class.extend({
     options: {
-      serviceUrl: 'http://valhalla.dev.mapzen.com/',
+      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
       timeout: 30 * 1000,
       transitmode: 'auto'
     },
@@ -408,6 +408,13 @@ if (typeof module !== undefined) module.exports = polyline;
          street: streetName
        });
 
+       //reset service url & access token if environment has changed
+       (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
+       (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
+
+       console.log(this.options.serviceUrl + 'route?json=' +
+              params + '&api_key=' + this._accessToken);
+       
       return this.options.serviceUrl + 'route?json=' +
               params + '&api_key=' + this._accessToken;
     },

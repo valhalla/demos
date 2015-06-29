@@ -17,7 +17,7 @@
       min-height: 40px;
       line-height: 40px;
       padding-left: 40px;
-      background-image: url('../resource/startmarker.png');
+      background-image: url('../resource/startmarker@2x.png');
       background-repeat: no-repeat;
       background-position: 5px 8px;
       letter-spacing: 0.5px;
@@ -28,7 +28,7 @@
       line-height:40px;
       min-height:40px;
       padding-left:40px;
-      background-image: url('../resource/destmarker.png');
+      background-image: url('../resource/destmarker@2x.png');
       background-repeat: no-repeat;
       background-position: 5px 8px;
       letter-spacing: 0.5px;
