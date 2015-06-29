@@ -29,7 +29,7 @@ Checks if access is allowed for the provided directed edge based on the prior ed
 This method gets the cost to traverse the specified directed edge. Cost includes a path cost along with the actual time (seconds) to traverse the edge. Path costs are generally time or distance and can include artifical cost penalties to avoid roads/edges with specific attributes. By returning the actual elapsed time in seconds the costing method can be applied to time dependent and schedule based routing (e.g. transit).
 
 
-Costing methods also can compute **edge transition costs**, sometimes called turn costs. These are costs to applied to go from one edge to another when traversing a node/intersection. A fourth costing method can be defined in the costing class to consider the cost to go from one edge to another at an intersection:
+Costing methods can also compute **edge transition costs**, sometimes called turn costs. These costs are applied at the node/intersection when transitioning from one edge to another. A fourth costing method can be defined in the costing class to account for this:
 
 	virtual Cost TransitionCost(const baldr::DirectedEdge* edge, const baldr::NodeInfo* node,
                                 const EdgeLabel& pred) const;
