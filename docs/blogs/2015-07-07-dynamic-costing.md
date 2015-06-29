@@ -19,7 +19,7 @@ INSET IMAGE
 Costing methods have access to all attributes of an edge (road section between 2 intersections) to form the cost along the edge and when transitoning between edges. Within Sif, costing methods are created by deriving a class from the base dynamic costing class or one of the existing costing classes. Each costing method must override 3 different methods to create the unique costing logic:
 
 	virtual bool Allowed(const baldr::NodeInfo* node) const = 0;
-Checks if access is allowed for the provided node. Node access can be restricted for specific modes of travel if bollards are present.
+Checks if access is allowed for the provided node. For example, node access can be restricted for specific modes of travel if bollards are present.
 
 	virtual bool Allowed(const baldr::DirectedEdge* edge, const EdgeLabel& pred) const = 0;
 Checks if access is allowed for the provided directed edge based on the prior edge along the path. This is generally based on mode of travel and the access modes allowed on the edge. It can also be used to prohibit turns where turn restrictions exist, prohibit Uturns, and to prohibit entering roads that do not have through paths.
