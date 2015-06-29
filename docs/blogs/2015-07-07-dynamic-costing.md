@@ -1,6 +1,6 @@
 ## SIF - Dynamic Costing within Valhalla
 
-Two core components of the Valhalla open source routing engine are **Thor** and **Sif**. These 2 companions (in Norse mythoogy Thor and Sif are husband and wife) form the basis of the path generation algorithm. Thor holds the path algorithms and traverses the rouing tiles, while Sif performs costing that is central to forming the best path. Rather than baking costs into the routing graph data, Valhalla uses dynamic, run-time costing to generate costs based on a rich set of attributes stored in the routing graph tiles. This allows run-time generation of alternate routes simply by using different costing methods or options.
+Two core components of the Valhalla open source routing engine are **Thor** and **Sif**. These 2 companions (in Norse mythoogy Thor and Sif are husband and wife) form the basis of the path generation algorithm. Thor holds the path algorithms and traverses the routing tiles, while Sif performs costing that is central to forming the best path. Rather than baking costs into the routing graph data, Valhalla uses dynamic, run-time costing to generate costs based on a rich set of attributes stored in the routing graph tiles. This allows run-time generation of alternate routes simply by using different costing methods or options.
 
 ####Path Costing Introduction
 
@@ -10,13 +10,13 @@ Naive assignment of cost to edges of the routing graph will lead to poor routing
 
 #### Dynamic Costing
 
-Valhalla uses dynamic, run-time costing when computing route paths and can consider much more than strict time or distance. Different route types to be computed from a single set of route data tiles. There is no need to configure data each time a new **touting profile** is needed. Simply change the costing methods or apply different options to existing costing methods.
+Valhalla uses dynamic, run-time costing when computing route paths and can consider much more than strict time or distance. Different route types to be computed from a single set of route data tiles. There is no need to configure data each time a new **routing profile** is needed. Simply change the costing methods or apply different options to existing costing methods, the data stays the same.
 
 INSET IMAGE
 
 #### Costing Interface
 
-Costing methods have access to all attributes of the edge to form the cost along the edge and when transitoning between edges. Within Sif, costing methods are created by deriving a class from the base dynamic costing class or one of the existing costing classes. Each costing method must override 3 different methods to create the unique costing logic:
+Costing methods have access to all attributes of an edge (road section between 2 intersections) to form the cost along the edge and when transitoning between edges. Within Sif, costing methods are created by deriving a class from the base dynamic costing class or one of the existing costing classes. Each costing method must override 3 different methods to create the unique costing logic:
 
 	virtual bool Allowed(const baldr::NodeInfo* node) const = 0;
 Checks if access is allowed for the provided node. Node access can be restricted for specific modes of travel if bollards are present.
@@ -26,10 +26,10 @@ Checks if access is allowed for the provided directed edge based on the prior ed
 
 	virtual Cost EdgeCost(const baldr::DirectedEdge* edge, const uint32_t density) const = 0;
     
-This methods get the cost to traverse the specified directed edge. Cost includes a path cost (generally time or distance and can include artifical cost penalties to avoid roads/edges with specific attributes). The returned cost also includes the actual time (seconds) to traverse the edge.
+This method gets the cost to traverse the specified directed edge. Cost includes a path cost along with the actual time (seconds) to traverse the edge. Path costs are generally time or distance and can include artifical cost penalties to avoid roads/edges with specific attributes. By returning the actual elapsed time in seconds the costing method can be applied to time dependent and schedule based routing (e.g. transit).
 
 
-Costing methods also can compute **edge transition costs**, sometimes called turn costs. These are costs to applied to go from one edge to another when traversing a node/intersection.
+Costing methods also can compute **edge transition costs**, sometimes called turn costs. These are costs to applied to go from one edge to another when traversing a node/intersection. A fourth costing method can be defined in the costing class to consider the cost to go from one edge to another at an intersection:
 
 	virtual Cost TransitionCost(const baldr::DirectedEdge* edge, const baldr::NodeInfo* node,
                                 const EdgeLabel& pred) const;
@@ -38,7 +38,7 @@ Edge transition costs generally consider 3 things:
 
 - **Turn type** - whether the turn is a left turn, right turn, or is crossing another road. The cost applied to the turn type also needs to know if driving is done on the left side or right side of the road. While left turns are generally more costly in the US than right turns, the opposite holds in UK.
 - **Likelihood of stopping** - higher costs should be applied where there is a high likelihood of stopping when going from one road to another. Examples are when crossing a higher class road while on a lower class road. The opposite occurs when on a higher class road - transitions at intersections of lower class roads often do not require a stop.
-- **Name consistency** - this one is less intuitive. But applying small cost penalties when going from a road with one name onto one with a different name can lead to "simpler" route paths where there are less maneuvers or turns that need descrition.
+- **Name consistency** - this one is less intuitive. By applying small cost penalties when going from a road with one name onto one with a different name can lead to "simpler" route paths where there are less maneuvers or turns that need description.
 
 In addition to these general cases, edge transition costing can be used to apply penalties for specific cases like crossing a country border, going onto a toll road, entering a road that has private access, and other cases where the route path might want to avoid specific roads or types of conditions!
 
