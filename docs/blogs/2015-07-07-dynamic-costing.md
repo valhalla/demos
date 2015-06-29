@@ -46,4 +46,4 @@ A good example of how edge transition costs can affect a route path is a driving
 
 #### Check it out!
 
-You can try out our open source routing via the Mapzen instance of Valhalla: https://mapzen.com/projects/valhalla. You can also [browse the code](https://github.com/valhalla) and reach out if you have questions or suggestions!
+You can try out our open source routing via the [Mapzen instance of Valhalla](https://mapzen.com/projects/valhalla). You can also [browse the code](https://github.com/valhalla) and reach out if you have questions or suggestions!
