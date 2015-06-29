@@ -10,7 +10,7 @@ Naive assignment of cost to edges of the routing graph will lead to poor routing
 
 #### Dynamic Costing
 
-Valhalla uses dynamic, run-time costing when computing route paths and can consider much more than strict time or distance. Different route types to be computed from a single set of route data tiles. There is no need to configure data each time a new **routing profile** is needed. Simply change the costing methods or apply different options to existing costing methods, the data stays the same.
+Valhalla uses dynamic, run-time costing when computing route paths and can consider much more than strict time or distance. Different route types can be computed from a single set of route data tiles. There is no need to configure data each time a new **routing profile** is needed. Simply change the costing methods or apply different options to existing costing methods, the data stays the same.
 
 INSET IMAGE
 
