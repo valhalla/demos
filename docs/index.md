@@ -12,7 +12,7 @@ This demo allows the testing of point and click routing through a web interface 
 
 1. Install all of the valhalla software by following these [README instructions](https://github.com/valhalla/chef-valhalla/blob/master/README.md#building-and-running).
 
-2. Configure your json file to something similar to [this sample](https://github.com/valhalla/mjolnir/blob/master/conf/valhalla.json). Note the locations of the various files and output directory.
+2. Configure your json file to something similar to [this sample](https://github.com/valhalla/conf/blob/master/valhalla.json). Note the locations of the various files and output directory.
 
 3. Cut some graph tiles so that you can route on them:
 
