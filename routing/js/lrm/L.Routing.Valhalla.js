@@ -210,69 +210,69 @@ if (typeof module !== undefined) module.exports = polyline;
         locations: {}
       };
     },
-
-    route: function(waypoints, callback, context, options) {
-      console.log(waypoints);
-      console.log(options);
-      var timedOut = false,
-        wps = [],
-        url,
-        timer,
-        wp,
-        i;
-
-      options = options || {};
-      //waypoints = options.waypoints || waypoints;
-      console.log(waypoints);
-      url = this.buildRouteUrl(waypoints, options);
-
-
-      timer = setTimeout(function() {
-                timedOut = true;
-                callback.call(context || callback, {
-                  status: -1,
-                  message: 'OSRM request timed out.'
-                });
-              }, this.options.timeout);
-
-      // Create a copy of the waypoints, since they
-      // might otherwise be asynchronously modified while
-      // the request is being processed.
-      for (i = 0; i < waypoints.length; i++) {
-        wp = waypoints[i];
-        wps.push({
-          latLng: wp.latLng,
-          name: wp.name,
-          options: wp.options
-        });
-      }
-
-
-      corslite(url, L.bind(function(err, resp) {
-        var data;
-
-        clearTimeout(timer);
-        if (!timedOut) {
-          if (!err) {
-            data = JSON.parse(resp.responseText);
-            this._routeDone(data, wps, callback, context);
-          } else {
-            callback.call(context || callback, {
-              status: -1,
-              message: 'HTTP request failed: ' + err
-            });
-          }
-        }
-      }, this), true);
-
-      return this;
+    
+   route: function(waypoints, callback, context, options) {
+	      console.log(waypoints);
+	      console.log(options);
+	      var timedOut = false,
+	        wps = [],
+	        url,
+	        timer,
+	        wp,
+	        i;
+	
+	      options = options || {};
+	      //waypoints = options.waypoints || waypoints;
+	      console.log(waypoints);
+	      url = this.buildRouteUrl(waypoints, options);
+	
+	      timer = setTimeout(function() {
+	                timedOut = true;
+	                callback.call(context || callback, {
+	                  status: -1,
+	                  message: 'request timed out.'
+	                });
+	              }, this.options.timeout);
+	
+	      // Create a copy of the waypoints, since they
+	      // might otherwise be asynchronously modified while
+	      // the request is being processed.
+	      for (i = 0; i < waypoints.length; i++) {
+	        wp = waypoints[i];
+	        wps.push({
+	          latLng: wp.latLng,
+	          name: wp.name,
+	          options: wp.options
+	        });
+	      }
+	
+	      corslite(url, L.bind(function(err, resp) {
+	        var data;
+	
+	        clearTimeout(timer);
+	        if (!timedOut) {
+	          if (!err) {
+	            data = JSON.parse(resp.responseText);
+	            this._routeDone(data, wps, callback, context);
+	          } else {
+	            callback.call(context || callback, {
+	              status: -1,
+	              message: 'HTTP request failed: ' + err
+	            });
+	          }
+	        }
+	      }, this), true);
+	
+	      return this;
     },
 
     _routeDone: function(response, inputWaypoints, callback, context) {
+
       var coordinates,
           alts,
           actualWaypoints,
           i;
+
       context = context || callback;
       if (response.trip.status !== 0) {
         callback.call(context, {
@@ -281,33 +281,17 @@ if (typeof module !== undefined) module.exports = polyline;
         });
         return;
       }
-
-//if valhalla changes to array of objects
-
       var insts = [];
-      var coordinates = [];
-      var shapeIndex =  0;
-      for(var i = 0; i<response.trip.legs.length;  i++){
-        var coord = polyline.decode(response.trip.legs[i].shape, 6);
+      var i,j;
 
-        for(var k = 0; k < coord.length; k++){
-          coordinates.push(coord[k]);
+      for(i = 0; i<response.trip.legs.length; i++){
+        for(j = 0; j< response.trip.legs[i].maneuvers.length; j++){
+          var l =  response.trip.legs[i].maneuvers.length;
+          insts.push(response.trip.legs[i].maneuvers[j]);
         }
-
-        for(var j =0; j < response.trip.legs[i].maneuvers.length; j++){
-          var res = response.trip.legs[i].maneuvers[j];
-          res.distance = response.trip.legs[i].maneuvers[j]["length"];
-          res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
-          insts.push(res);
-        }
-
-        shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
       }
-      //coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-      //console.log(coordinates);
+      coordinates = polyline.decode(response.trip.legs[0].shape, 6);
       actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
-
-
       alts = [{
         ////gotta change
         name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
@@ -320,8 +304,8 @@ if (typeof module !== undefined) module.exports = polyline;
         waypoints: actualWaypoints,
         waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
       }];
- //     this._changeURL(this._transitmode, inputWaypoints[0].latLng.lat, inputWaypoints[0].latLng.lng, inputWaypoints[1].latLng.lat, inputWaypoints[1].latLng.lng);
 
+     
 /*
       if (response.trip.legs[0].shape) {
         for (i = 0; i < response.trip.legs[0].maneuvers; i++) {
@@ -367,8 +351,8 @@ if (typeof module !== undefined) module.exports = polyline;
           i;
       for (i = 0; i < vias.length; i++) {
         wps.push(L.Routing.waypoint(L.latLng([vias[i]["lat"],vias[i]["lon"]]),
-                                    "name",
-                                    {}));
+                                    inputWaypoints[i].name,
+                                    inputWaypoints[i].options));
       }
 
       return wps;
@@ -468,9 +452,6 @@ if (typeof module !== undefined) module.exports = polyline;
       return result;
     },
 
-    _changeURL: function(transitM,startLat,startLng,destLat,destLng){
-      window.location.hash = transitM + '/' + startLat + '/' + startLng + '/' + destLat + '/' + destLng;
-    },
 
     _drivingDirectionType: function(d) {
       switch (parseInt(d, 10)) {
