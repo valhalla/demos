@@ -15,8 +15,8 @@
     .leaflet-routing-container .start {
       font-size: 18px;
       min-height: 40px;
-      line-height: 40px;
-      padding-left: 40px;
+      line-height: 60px;
+      padding-left: 50px;
       background-image: url('../resource/startmarker@2x.png');
       background-repeat: no-repeat;
       background-position: 5px 8px;
@@ -25,9 +25,9 @@
 
     .leaflet-routing-container .dest{
       font-size: 18px;
-      line-height:40px;
+      line-height:60px;
       min-height:40px;
-      padding-left:40px;
+      padding-left:50px;
       background-image: url('../resource/destmarker@2x.png');
       background-repeat: no-repeat;
       background-position: 5px 8px;
