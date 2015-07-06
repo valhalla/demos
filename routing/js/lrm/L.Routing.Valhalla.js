@@ -268,191 +268,208 @@ if (typeof module !== undefined) module.exports = polyline;
     },
 
     _routeDone: function(response, inputWaypoints, callback, context) {
-
-      var coordinates,
-          alts,
-          actualWaypoints,
-          i;
-
-      context = context || callback;
-      if (response.trip.status !== 0) {
-        callback.call(context, {
-          status: response.status,
-          message: response.status_message
-        });
-        alert("Trip Unsuccessful:: Travel Mode: " + this._transitmode + ", status code: " +response.status + ", " + response.status_message);
-        return;
-      }
-      var insts = [];
-      var i,j;
-
-      for(i = 0; i<response.trip.legs.length; i++){
-        for(j = 0; j< response.trip.legs[i].maneuvers.length; j++){
-          var l =  response.trip.legs[i].maneuvers.length;
-          insts.push(response.trip.legs[i].maneuvers[j]);
-        }
-      }
-      coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-      actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
-      alts = [{
-        ////gotta change
-        name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
-        unit: response.trip.units,
-        transitmode: this._transitmode,
-        coordinates: coordinates,
-        instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
-        summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
-        inputWaypoints: inputWaypoints,
-        waypoints: actualWaypoints,
-        waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
-      }];
-
-     
-/*
-      if (response.trip.legs[0].shape) {
-        for (i = 0; i < response.trip.legs[0].maneuvers; i++) {
-          coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-          alts.push({
-            name: 'km'
-            coordinates: coordinates,
-            instructions: insts[i],//response.alternative_instructions[i] ? this._convertInstructions(response.alternative_instructions[i]) : [],
-            summary: response.alternative_summaries[i] ? this._convertSummary(response.trip.summary) : [],
-            inputWaypoints: inputWaypoints,
-            waypoints: actualWaypoints,
-            waypointIndices: this._clampIndices(response.alternative_geometries.length === 1 ?
-              // Unsure if this is a bug in OSRM or not, but alternative_indices
-              // does not appear to be an array of arrays, at least not when there is
-              // a single alternative route.
-              response.alternative_indices : response.alternative_indices[i],
-              coordinates)
+        var coordinates,
+            alts,
+            actualWaypoints,
+            i;
+        context = context || callback;
+        if (response.trip.status !== 0) {
+          callback.call(context, {
+            status: response.status,
+            message: response.status_message
           });
+          return;
         }
-      }
-*/
-      // only versions <4.5.0 will support this flag
-        if (response.hint_data) {
-          this._saveHintData(response.hint_data, inputWaypoints);
+
+  //if valhalla changes to array of objects
+
+        var insts = [];
+        var coordinates = [];
+        var shapeIndex =  0;
+        for(var i = 0; i<response.trip.legs.length;  i++){
+          var coord = polyline.decode(response.trip.legs[i].shape, 6);
+
+          for(var k = 0; k < coord.length; k++){
+            coordinates.push(coord[k]);
+          }
+
+          for(var j =0; j < response.trip.legs[i].maneuvers.length; j++){
+            var res = response.trip.legs[i].maneuvers[j];
+            res.distance = response.trip.legs[i].maneuvers[j]["length"];
+            res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
+            insts.push(res);
+          }
+
+          shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
         }
-      callback.call(context, null, alts);
-    },
+        //coordinates = polyline.decode(response.trip.legs[0].shape, 6);
+        //console.log(coordinates);
+        actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
 
-    _saveHintData: function(hintData, waypoints) {
-      var loc;
-      this._hints = {
-        checksum: hintData.checksum,
-        locations: {}
-      };
-      for (var i = hintData.locations.length - 1; i >= 0; i--) {
-        loc = waypoints[i].latLng;
-        this._hints.locations[this._locationKey(loc)] = hintData.locations[i];
-      }
-    },
 
-    _toWaypoints: function(inputWaypoints, vias) {
-      var wps = [],
-          i;
-      for (i = 0; i < vias.length; i++) {
-        wps.push(L.Routing.waypoint(L.latLng([vias[i]["lat"],vias[i]["lon"]]),
-                                    inputWaypoints[i].name,
-                                    inputWaypoints[i].options));
-      }
+        alts = [{
+          ////gotta change
+          name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
+          unit: response.trip.units,
+          transitmode: this._transitmode,
+          coordinates: coordinates,
+          instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
+          summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
+          inputWaypoints: inputWaypoints,
+          waypoints: actualWaypoints,
+          waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
+        }];
+   //     this._changeURL(this._transitmode, inputWaypoints[0].latLng.lat, inputWaypoints[0].latLng.lng, inputWaypoints[1].latLng.lat, inputWaypoints[1].latLng.lng);
 
-      return wps;
-    },
-    ///mapzen example
-    buildRouteUrl: function(waypoints, options) {
-      var locs = [],
-          locationKey,
-          hint;
-      var transitM = options.transitmode || this._transitmode;
-      var streetName = options.street;
-      this._transitmode = transitM;
+  /*
+        if (response.trip.legs[0].shape) {
+          for (i = 0; i < response.trip.legs[0].maneuvers; i++) {
+            coordinates = polyline.decode(response.trip.legs[0].shape, 6);
+            alts.push({
+              name: 'km'
+              coordinates: coordinates,
+              instructions: insts[i],//response.alternative_instructions[i] ? this._convertInstructions(response.alternative_instructions[i]) : [],
+              summary: response.alternative_summaries[i] ? this._convertSummary(response.trip.summary) : [],
+              inputWaypoints: inputWaypoints,
+              waypoints: actualWaypoints,
+              waypointIndices: this._clampIndices(response.alternative_geometries.length === 1 ?
+                // Unsure if this is a bug in OSRM or not, but alternative_indices
+                // does not appear to be an array of arrays, at least not when there is
+                // a single alternative route.
+                response.alternative_indices : response.alternative_indices[i],
+                coordinates)
+            });
+          }
+        }
+  */
+        // only versions <4.5.0 will support this flag
+          if (response.hint_data) {
+            this._saveHintData(response.hint_data, inputWaypoints);
+          }
+        callback.call(context, null, alts);
+      },
 
-      for (var i = 0; i < waypoints.length; i++) {
+      _saveHintData: function(hintData, waypoints) {
         var loc;
-        locationKey = this._locationKey(waypoints[i].latLng).split(',');
-        if(i === 0 || i === waypoints.length-1){
-          loc = {
-            lat: parseFloat(locationKey[0]),
-            lon: parseFloat(locationKey[1]),
-            type: "break"
+        this._hints = {
+          checksum: hintData.checksum,
+          locations: {}
+        };
+        for (var i = hintData.locations.length - 1; i >= 0; i--) {
+          loc = waypoints[i].latLng;
+          this._hints.locations[this._locationKey(loc)] = hintData.locations[i];
+        }
+      },
+
+      _toWaypoints: function(inputWaypoints, vias) {
+        var wps = [],
+            i;
+        for (i = 0; i < vias.length; i++) {
+          wps.push(L.Routing.waypoint(L.latLng([vias[i]["lat"],vias[i]["lon"]]),
+                                      "name",
+                                      {}));
+        }
+
+        return wps;
+      },
+      ///mapzen example
+      buildRouteUrl: function(waypoints, options) {
+        var locs = [],
+            locationKey,
+            hint;
+        var transitM = options.transitmode || this._transitmode;
+        var streetName = options.street;
+        this._transitmode = transitM;
+
+        for (var i = 0; i < waypoints.length; i++) {
+          var loc;
+          locationKey = this._locationKey(waypoints[i].latLng).split(',');
+          if(i === 0 || i === waypoints.length-1){
+            loc = {
+              lat: parseFloat(locationKey[0]),
+              lon: parseFloat(locationKey[1]),
+              type: "break"
+            }
+          }else{
+            loc = {
+              lat: parseFloat(locationKey[0]),
+              lon: parseFloat(locationKey[1]),
+              type: "through"
+            }
           }
-        }else{
-          loc = {
-            lat: parseFloat(locationKey[0]),
-            lon: parseFloat(locationKey[1]),
-            type: "through"
+  	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
+          locs.push(loc);
+        }
+
+         var params = JSON.stringify({
+           locations: locs,
+           costing: transitM,
+           street: streetName
+         });
+
+         //reset service url & access token if environment has changed
+         (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
+         (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
+
+         console.log(this.options.serviceUrl + 'route?json=' +
+                params + '&api_key=' + this._accessToken);
+         
+        return this.options.serviceUrl + 'route?json=' +
+                params + '&api_key=' + this._accessToken;
+      },
+
+      _locationKey: function(location) {
+        return location.lat + ',' + location.lng;
+      },
+
+      _trimLocationKey: function(location){
+        var lat = location.lat;
+        var lng = location.lng;
+
+        var nameLat = Math.floor(location.lat * 1000)/1000;
+        var nameLng = Math.floor(location.lng * 1000)/1000;
+
+        return nameLat + ' , ' + nameLng;
+
+      },
+
+      _convertSummary: function(route) {
+        return {
+          totalDistance: route.length,
+          totalTime: route.time
+        };
+      },
+
+      _convertInstructions: function(osrmInstructions) {
+        var result = [],
+            i,
+            instr,
+            type,
+            driveDir;
+
+        for (i = 0; i < osrmInstructions.length; i++) {
+          instr = osrmInstructions[i];
+          type = this._drivingDirectionType(instr[0]);
+          driveDir = instr[0].split('-');
+          if (type) {
+            result.push({
+              type: type,
+              distance: instr[2],
+              time: instr[4],
+              road: instr[1],
+              direction: instr[6],
+              exit: driveDir.length > 1 ? driveDir[1] : undefined,
+              index: instr[3]
+            });
           }
         }
-	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
-        locs.push(loc);
-      }
 
-       var params = JSON.stringify({
-         locations: locs,
-         costing: transitM,
-         street: streetName
-       });
+        return result;
+      },
 
-       //reset service url & access token if environment has changed
-       (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
-       (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
-
-       console.log(this.options.serviceUrl + 'route?json=' +
-              params + '&api_key=' + this._accessToken);
-       
-      return this.options.serviceUrl + 'route?json=' +
-              params + '&api_key=' + this._accessToken;
-    },
-
-    _locationKey: function(location) {
-      return location.lat + ',' + location.lng;
-    },
-
-    _trimLocationKey: function(location){
-      var lat = location.lat;
-      var lng = location.lng;
-
-      var nameLat = Math.floor(location.lat * 1000)/1000;
-      var nameLng = Math.floor(location.lng * 1000)/1000;
-
-      return nameLat + ' , ' + nameLng;
-
-    },
-
-    _convertSummary: function(route) {
-      return {
-        totalDistance: route.length,
-        totalTime: route.time
-      };
-    },
-
-    _convertInstructions: function(osrmInstructions) {
-      var result = [],
-          i,
-          instr,
-          type,
-          driveDir;
-
-      for (i = 0; i < osrmInstructions.length; i++) {
-        instr = osrmInstructions[i];
-        type = this._drivingDirectionType(instr[0]);
-        driveDir = instr[0].split('-');
-        if (type) {
-          result.push({
-            type: type,
-            distance: instr[2],
-            time: instr[4],
-            road: instr[1],
-            direction: instr[6],
-            exit: driveDir.length > 1 ? driveDir[1] : undefined,
-            index: instr[3]
-          });
-        }
-      }
-
-      return result;
-    },
+      _changeURL: function(transitM,startLat,startLng,destLat,destLng){
+        window.location.hash = transitM + '/' + startLat + '/' + startLng + '/' + destLat + '/' + destLng;
+      },
 
 
     _drivingDirectionType: function(d) {
