@@ -623,9 +623,11 @@ if (typeof module !== undefined) module.exports = polyline;
     },
 
     route: function(options) {
-      var ts = ++this._requestCount,
-        wps;
-
+      var ts = new Date().getTime(),
+      wps;
+      this._lastRequestTimestamp = ts;
+      this._clearLine();
+      this._clearAlts();
       options = options || {};
 
       if (this._plan.isReady()) {
@@ -640,22 +642,21 @@ if (typeof module !== undefined) module.exports = polyline;
           // by checking the current request's timestamp
           // against the last request's; ignore result if
           // this isn't the latest request.
-          if (ts === this._requestCount) {
-            this._clearLine();
-            this._clearAlts();
-            if (err) {
-              this.fire('routingerror', {error: err});
-              return;
-            }
-
-            if (!options.geometryOnly) {
-              this.fire('routesfound', {waypoints: wps, routes: routes});
-              this.setAlternatives(routes);
-            } else {
-              this._routeSelected({route: routes[0]});
-            }
-          }
-        }, this, options);
+	        if (ts === this._lastRequestTimestamp) {
+	
+	            if (err) {
+	              this.fire('routingerror', {error: err});
+	              return;
+	            }
+	
+	            if (!options.geometryOnly) {
+	              this.fire('routesfound', {waypoints: wps, routes: routes});
+	              this.setAlternatives(routes);
+	            } else {
+	              this._routeSelected({route: routes[0]});
+	            }
+	        }
+          }, this, options);
       }
     },
 
