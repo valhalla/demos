@@ -257,8 +257,9 @@ if (typeof module !== undefined) module.exports = polyline;
 	          } else {
 	            callback.call(context || callback, {
 	              status: -1,
-	              message: 'HTTP request failed: ' + err
+	              message: 'HTTP request failed: ' + err.response
 	            });
+	            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
 	          }
 	        }
 	      }, this), true);
@@ -279,6 +280,7 @@ if (typeof module !== undefined) module.exports = polyline;
           status: response.status,
           message: response.status_message
         });
+        alert("Trip Unsuccessful:: Travel Mode: " + this._transitmode + ", status code: " +response.status + ", " + response.status_message);
         return;
       }
       var insts = [];
