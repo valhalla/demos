@@ -12,8 +12,6 @@ Naive assignment of cost to edges of the routing graph will lead to poor routing
 
 Valhalla uses dynamic, run-time costing when computing route paths and can consider much more than strict time or distance. Different route types can be computed from a single set of route data tiles. There is no need to configure data each time a new **routing profile** is needed. Simply change the costing methods or apply different options to existing costing methods, the data stays the same.
 
-INSET IMAGE
-
 #### Costing Interface
 
 Costing methods have access to all attributes of an edge (road section between 2 intersections) to form the cost along the edge and when transitoning between edges. Within Sif, costing methods are created by deriving a class from the base dynamic costing class or one of the existing costing classes. Each costing method must override 3 different methods to create the unique costing logic:
@@ -42,7 +40,12 @@ Edge transition costs generally consider 3 things:
 
 In addition to these general cases, edge transition costing can be used to apply penalties for specific cases like crossing a country border, going onto a toll road, entering a road that has private access, and other cases where the route path might want to avoid specific roads or types of conditions!
 
-A good example of how edge transition costs can affect a route path is a driving route in a gridded downtown area. A shortest time or distance path can make many different turns as it zig-zags from the origin to the destination. Applying edge transition costs will reduce the number of turns and create a much simpler route that is often shorter time in practice.
+A good example of how edge transition costs can affect a route path is a driving route in a gridded downtown area. A shortest time or distance path can make many different turns as it zig-zags from the origin to the destination. Applying edge transition costs will reduce the number of turns and create a much simpler route that is often shorter time in practice. The first image below is without edge transition costs - it makes additional turns that complicate the path description. The second image shows the path with edge transition costs applied - there are fewer turns leading to a simpler route. Note also in the first image that the estimated time is much less - this shows how important edge transition costs are to estimating the time along a route.
+
+![ZigZag1](images/sf_turns1.png "Without Edge Transition costing")
+
+![ZigZag2](images/sf_turns2.png "With Edge Transition costing")
+
 
 #### Check it out!
 
