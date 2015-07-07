@@ -1,12 +1,12 @@
 ## SIF - Dynamic Costing within Valhalla
 
-Two core components of the Valhalla open source routing engine are **Thor** and **Sif**. These 2 companions (in Norse mythoogy Thor and Sif are husband and wife) form the basis of the path generation algorithm. Thor holds the path algorithms and traverses the routing tiles, while Sif performs costing that is central to forming the best path. Rather than baking costs into the routing graph data, Valhalla uses dynamic, run-time costing to generate costs based on a rich set of attributes stored in the routing graph tiles. This allows run-time generation of alternate routes simply by using different costing methods or options.
+Two core components of the Valhalla open source routing engine are **Thor** and **Sif**. These 2 companions (in Norse mythoogy Thor and Sif are husband and wife) form the basis of Valhalla's path generation algorithm. Thor contains the path computation algorithms and traverses the routing tiles, while Sif performs **costing** that is central to forming the best path. Rather than baking costs into the routing graph data, Valhalla uses dynamic, run-time costing to generate costs based on a rich set of attributes stored in the routing graph tiles. This allows run-time generation of different types of routes (or routes with different characteristics) simply by using different costing methods and options within those methods.
 
 ####Path Costing Introduction
 
 Routing from one location to another is solved by a class of algorithms known as **shortest path algorithms**. This is somewhat misleading, as often one is interested in a route that is shortest time or one that makes fewer turns. A better term for shortest path algorithms is **least cost algorithms** - this properly indicates that the method is minimizing cost, be it distance, time, or some other metric.
 
-Naive assignment of cost to edges of the routing graph will lead to poor routing solutions. Simple costing based solely on distance or time based solely on speed assigned to edges can lead to route paths that are difficult to describe and to traverse. Considerations such as turn types, presence of intersections with higher class roads, road surface type, elevation change, road curvature, and a host of other considerations can be important.  It is also important to note that there are generally different considerations needed for bicycle routing than pedestrian routing or automobile routing,
+Naive assignment of cost to edges of the routing graph will lead to poor routing solutions. Simple costing based solely on distance or on time (based solely on speed) can lead to poor route paths with excessive turns and stops. Considerations such as turn types, classifications of roads at intersections along the route, road surface type, elevation change, road curvature, and a host of other considerations can be important.  It is also important to note that different costing considerations are needed for bicycle routing than pedestrian routing or automobile routing.
 
 #### Dynamic Costing
 
@@ -35,7 +35,7 @@ Costing methods can also compute **edge transition costs**, sometimes called tur
 Edge transition costs generally consider 3 things:
 
 - **Turn type** - whether the turn is a left turn, right turn, or is crossing another road. The cost applied to the turn type also needs to know if driving is done on the left side or right side of the road. While left turns are generally more costly in the US than right turns, the opposite holds in UK.
-- **Likelihood of stopping** - higher costs should be applied where there is a high likelihood of stopping when going from one road to another. Examples are when crossing a higher class road while on a lower class road. The opposite occurs when on a higher class road - transitions at intersections of lower class roads often do not require a stop.
+- **Likelihood of stopping** - higher costs should be applied where there is a high likelihood of stopping when going from one road to another. Examples are when crossing a higher class road while on a lower class road. The opposite occurs when on a higher class road - transitions at intersections with lower class roads usually do not require a stop.
 - **Name consistency** - this one is less intuitive. By applying small cost penalties when going from a road with one name onto one with a different name can lead to "simpler" route paths where there are less maneuvers or turns that need description.
 
 In addition to these general cases, edge transition costing can be used to apply penalties for specific cases like crossing a country border, going onto a toll road, entering a road that has private access, and other cases where the route path might want to avoid specific roads or types of conditions!
