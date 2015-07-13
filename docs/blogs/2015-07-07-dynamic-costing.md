@@ -42,10 +42,13 @@ In addition to these general cases, edge transition costing can be used to apply
 
 A good example of how edge transition costs can affect a route path is a driving route in a gridded downtown area. A shortest time or distance path can make many different turns as it zig-zags from the origin to the destination. Applying edge transition costs will reduce the number of turns and create a much simpler route that is often shorter time in practice. The first image below is without edge transition costs - it makes additional turns that complicate the path description. The second image shows the path with edge transition costs applied - there are fewer turns leading to a simpler route. Note also in the first image that the estimated time is much less - this shows how important edge transition costs are to estimating the time along a route.
 
-![ZigZag1](images/sf_turns1.png "Without Edge Transition costing")
+![ZigZag1](images/chicago_turns2.png "Without Edge Transition costing")
 
-![ZigZag2](images/sf_turns2.png "With Edge Transition costing")
+![ZigZag2](images/chicago_turns1.png "With Edge Transition costing")
 
+SIF costing for driving routes (auto) penalizes left hand turns more than right hand turns by default (in countries where driving occurs on the left hand side of the road the opposite occurs). The simple example below shows a case where a longer path is taken so that left turns are avoided. In this case, two right hand turns are made and the route is much longer (almost 700 meters rather than 100 meters).
+
+![AvoidLeftTurns](images/avoid_left_turns.png "Costing to avoid left turns")
 
 #### Check it out!
 
