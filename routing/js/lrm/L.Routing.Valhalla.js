@@ -256,10 +256,10 @@ if (typeof module !== undefined) module.exports = polyline;
 	            this._routeDone(data, wps, callback, context);
 	          } else {
 	            callback.call(context || callback, {
-	              status: -1,
-	              message: 'HTTP request failed: ' + err.response
+	              status: err.status,
+	              message: err.responseText
 	            });
-	            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
+	            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.responseText);
 	          }
 	        }
 	      }, this), true);
