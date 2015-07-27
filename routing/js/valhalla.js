@@ -53,15 +53,27 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-	  
-  $scope.route_instructions = '';
-  
+
+  var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'});
+
+  var baseMaps = {
+	    "RoadMap": roadmap,
+	    "CycleMap": cyclemap,
+	    "TransitMap": transitmap
+	};
+ 
   var map = L.map('map', {
       zoom: $rootScope.geobase.zoom,
       zoomControl: false,
+      layers: [roadmap],
       center: [$rootScope.geobase.lat, $rootScope.geobase.lon]
   });
 
+  L.control.layers(baseMaps, null).addTo(map);
+	
+  $scope.route_instructions = '';
   var Locations = [];
   var mode = 'car';
 
@@ -84,10 +96,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	var getStartIcon = function(icon){
 	  return L.icon({
 	    iconUrl: 'resource/startmarker@2x.png',
-
 	    iconSize:     [44, 56], // size of the icon
 	    iconAnchor: [22, 50]
-
 	  });
 	};
 
