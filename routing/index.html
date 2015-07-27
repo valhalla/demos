@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/valhalla.css" />
     <script src="conf/env.conf"></script>
@@ -41,10 +41,10 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Transit</h1>
-            <h4>Point & click on the map to select a start & end point. Defaults to auto.</h4>
+            <h1>Valhalla Routing</h1>
+            <h4>Point & click on the map to select a start & end point. Defaults to auto. Route test files may be uploaded as well.</h4>
             <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
-            <h4>NOTE: Transit ('Transport Me!') defaults to 12:15 on current date.</h4>
+            <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
             <hr>
             <span style="color:white" class="dropdown">Select an environment:</span><br>
 			<select id = "env_dropdown" onchange="selectEnv()">
@@ -59,7 +59,11 @@
             <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
-            <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
+            <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a>
+            <br><br>
+            <input type="file" id="inputFile" onchange="selectFiles(this.files)" style="color:white"/>
+            <select id="selector" class="select" style="width:50px; position:absolute;"></select><br><br>
+            <span style="color:white" class="load_desc">The test file sample <b>demo_routes.txt</b> can be loaded from the scripts directory of the Thor repo.</span>
           </div>
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)">
           </div>
