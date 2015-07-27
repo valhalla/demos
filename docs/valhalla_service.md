@@ -13,7 +13,7 @@ Valhalla is a free, shared routing service. As such, there are limitations on re
 
 The following distance limitations are currently in place:
 
-* Pedestrian routes have a limit of 100 kilometers.
+* Pedestrian routes have a limit of 250 kilometers.
 * Bicycle routes have a limit of 500 kilometers.
 * Automobile routes have a limit of 5,000 kilometers.
 * No more than two locations can be provided.
