@@ -182,3 +182,30 @@ kFerryExit = 29;
 Continuing with the earlier routing example from the Detroit, Michigan area, a maneuver such as this one may be returned with that request: `{"begin_shape_index":0,"length":0.109,"end_shape_index":1,"instruction":"Go south on Appleton.","street_names":["Appleton"],"type":1,"time":0}`
 
 In the future, look for additional maneuver information to enhance navigation applications, including verbal instructions and landmark usage.
+
+#### Error Conditions
+
+The following is a table of error conditions that may occur for a particular request. In general we follow the http spec. That is to say `5xx` are generally ephemeral server problems that should be resolved shortly, `4xx` are used to mark requests that cannot be carried out and `2xx` are used when we have a successful route.
+
+| Code | Message | Description |
+| :--------- | :---------- | :---------- |
+| 400 | Failed to parse json request | You need a valid json request |
+| 400 | Failed to parse location | You need a valid location object in your json request |
+| 400 | Failed to parse correlated location | There was a problem with the location once correlated to the route network |
+| 400 | Insufficiently specified required parameter 'locations' | You forgot the locations parameter |
+| 400 | No edge/node costing provided | You forgot the costing parameter |
+| 400 | Insufficient number of locations provided | You didn't provide enough locations |
+| 400 | Exceeded max route locations of X | You are asking for too many locations |
+| 400 | Locations are in unconnected regions. Go check/edit the map at osm.org | You are routing between regions of no connectivity |
+| 400 | No costing method found for 'X' | You are asking for a non-existant costing mode |
+| 400 | Path distance exceeds the max distance limit | You want to travel further than this mode allows |
+| 400 | No suitable edges near location | There were no edges applicable to your mode of travel near the input location |
+| 400 | No data found for location | There was no route data tile at the input location |
+| 400 | No path could be found for input | There was no path found between the input locations |
+| 404 | Try any of: '/route' '/locate' | You asked for an invalid path |
+| 405 | Try a POST or GET request instead | We only support GET and POST requests |
+| 500 | Failed to parse intermediate request format | Had a problem reading an intermediate request format |
+| 500 | Failed to parse TripPath | Had a problem reading the computed path from Protobuf |
+| 500 | Could not build directions for TripPath | Had a problem using the trip path to create TripDirections |
+| 500 | Failed to parse TripDirections | Had a problem using the trip directions to serialze a json response |
+| 501 | Not implemented | Not Implemented |
