@@ -185,7 +185,7 @@ In the future, look for additional maneuver information to enhance navigation ap
 
 #### Error Conditions
 
-The following is a table of error conditions that may occur for a particular request. In general we follow the http spec. That is to say `5xx` are generally ephemeral server problems that should be resolved shortly, `4xx` are used to mark requests that cannot be carried out and `2xx` are used when we have a successful route.
+The following is a table of error conditions that may occur for a particular request. In general we follow the http specification. That is to say that `5xx` returns are generally ephemeral server problems that should be resolved shortly or are the result of a bug. `4xx` returns are used to mark requests that cannot be carried out generally due to bad input in the request or problems with the underlying data. A `2xx` return is expected when we have a successful route result or `trip`, as described above.
 
 | Code | Message | Description |
 | :--------- | :---------- | :---------- |
