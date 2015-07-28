@@ -183,12 +183,13 @@ Continuing with the earlier routing example from the Detroit, Michigan area, a m
 
 In the future, look for additional maneuver information to enhance navigation applications, including verbal instructions and landmark usage.
 
-#### Error Conditions
+#### Return Codes and Conditions
 
 The following is a table of error conditions that may occur for a particular request. In general we follow the http specification. That is to say that `5xx` returns are generally ephemeral server problems that should be resolved shortly or are the result of a bug. `4xx` returns are used to mark requests that cannot be carried out generally due to bad input in the request or problems with the underlying data. A `2xx` return is expected when we have a successful route result or `trip`, as described above.
 
-| Code | Message | Description |
+| Code | Body | Description |
 | :--------- | :---------- | :---------- |
+| 200 | *your_trip_json* | A happy bit of json describing your `trip` result |
 | 400 | Failed to parse json request | You need a valid json request |
 | 400 | Failed to parse location | You need a valid location object in your json request |
 | 400 | Failed to parse correlated location | There was a problem with the location once correlated to the route network |
