@@ -16,7 +16,7 @@ The Valhalla organization is comprised of several repositories each responsible 
 
 (definitions are in progress)
 
-###Common Valhalla and routing & elevation terms
+###Common Valhalla, Routing & Elevation terms
 * break location - the start or end point of a route.
 * cost - fixed costs in seconds that are added to both the path cost and the estimated time.
 * costing model - set of costs for particular methods of travel, such as automobile or pedestrian.
