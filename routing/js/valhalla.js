@@ -141,7 +141,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    markers.push(marker);
 	    //marker.openPopup();
 	  });
-	  
+
 	  $scope.renderHtml = function(html_code){
 	    return $sce.trustAsHtml(html_code);
 	  };
@@ -234,7 +234,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   bikeBtn.addEventListener('click', function (e) {
 	getEnvToken();
-	bikeoptions = getBikeOptions();
+	var bikeoptions = setBikeOptions();
 	rr.route({transitmode: 'bicycle', options: bikeoptions});
   });
 
@@ -249,14 +249,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var bicycle_type = document.getElementByName("btype");
-  var useroads_ = document.getElementByName("use_roads");
+  var useroads = document.getElementByName("use_roads");
   var cycling_speed = document.getElementByName("cycle_speed");
   var hilliness_factor = document.getElementByName("hill_factor");
-
-  var bikeoptions = getBikeOptions(bicycle_type, useroads_, cycling_speed, hilliness_factor) {
-	  //TODO: set the options
-	  return bikeoptions;
-  };
 
   function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -285,6 +280,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
    	    }
    	    multiBtn.click();	
        }
+  };
+
+  function setBikeOptions (bicycle_type, useroads, cycling_speed, hilliness_factor) {
+	bikeoptions = {
+	  bicycle_type: bicycle_type,
+	  useroads_: useroads,
+	  cycling_speed: cycling_speed,
+	  hilliness_factor: hilliness_factor
+	}
+	return bikeoptions;
   };
 
   $(document).on('mode-alert', function(e, m) {
