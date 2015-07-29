@@ -49,3 +49,11 @@ div#route_inst table td.distance{
     white-space: -moz-pre-wrap;
 }
 
+.biketextbox {
+  width: 15%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  color: black;
+
+}

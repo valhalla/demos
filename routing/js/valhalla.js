@@ -226,7 +226,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var bikeBtn = document.getElementById("bike_btn");
   var walkBtn = document.getElementById("walk_btn");
   var multiBtn = document.getElementById("multi_btn");
-  var datetime = document.getElementById("datetimepicker");
   
   driveBtn.addEventListener('click', function (e) {
 	getEnvToken();
@@ -235,7 +234,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   bikeBtn.addEventListener('click', function (e) {
 	getEnvToken();
-    rr.route({transitmode: 'bicycle'});
+	bikeoptions = getBikeOptions();
+	rr.route({transitmode: 'bicycle', options: bikeoptions});
   });
 
   walkBtn.addEventListener('click', function (e) {
@@ -247,6 +247,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	getEnvToken();
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
+
+  var bicycle_type = document.getElementByName("btype");
+  var useroads_ = document.getElementByName("use_roads");
+  var cycling_speed = document.getElementByName("cycle_speed");
+  var hilliness_factor = document.getElementByName("hill_factor");
+
+  var bikeoptions = getBikeOptions(bicycle_type, useroads_, cycling_speed, hilliness_factor) {
+	  //TODO: set the options
+	  return bikeoptions;
+  };
 
   function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -275,7 +285,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
    	    }
    	    multiBtn.click();	
        }
-
   };
 
   $(document).on('mode-alert', function(e, m) {
@@ -292,6 +301,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $("#datepicker").on("click", function() {
 	datetimeUpdate(this.value);
   });
-  
+});
+
+  $("#showbtn").on("click", function() {
+	document.getElementById('options').style.display="block";
   });
+
+  $("#hidebtn").on("click", function() {
+	  document.getElementById('options').style.display="none";
+  });
+
 })
