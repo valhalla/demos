@@ -92,7 +92,20 @@ These options are available for `auto`, `auto_shorter`, and `bus` costing method
 | `country_crossing_penalty` | A penalty applied for a country crossing. This penalty can be used to create paths that avoid spanning country boundaries. The default penalty is 0. |
 
 ##### Bicycle costing options
-The default bicycle costing is tuned toward road bicycles with a preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. Rough road surfaces and mountain bike trails are currently disallowed for bicycle paths, but future methods may consider the bicycle type and enable their use use by cyclo-cross or mountain bicycles.
+The default bicycle costing is tuned toward road bicycles with a slight preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. The costing model recognizes several factors unique to bicycle travel:
+*	The types of roads suitable for bicycling depend on the type of bicycle. Road bicycles (skinny tires) generally are suited to paved roads or perhaps very short sections of compacted gravel. They are not suited for riding on coarse gravel or most paths and tracks through wooded areas or farmland.
+*	Average travel speed can be highly variable and can depend on bicycle type, fitness and experieince of the cyclist, road surface, and hilliness. The costing model assumes a default speed on smooth, flat roads for each supported bicycle type. This speed can be overriden by an input option. The "base" speed is modulated by surface type (in conjunction with the bicycle type) and (later) the hilliness of a road section.
+*	Bicyclists vary in their tolerance for riding on roads. Many want to avoid all but the quietest neighborhood roads and prefer cycleways and dedicated paths. Others may be experienced riding on roads and prefer to take roadways since they often provide the fastest way to get between 2 places. The bicycle costing model accounts for this with a "useroads" factor to indicate a cyclists tolerance for riding on roads.
+*	Bicyclists vary in their fitness level and experience level and many wish to avoid hill roads and especially roads with very steep uphill or even downhill sections. Even if the fastest path is over a mountain, many cyclists will prefer a flatter path that avoids the climb and descent up and over the mountain.
+
+The following options are available for bicycle costing methods.
+
+| Bicycle options | Description |
+| :-------------------------- | :----------- |
+| `bicycle_type` | This is the type of bicycle. Accepted values are "Road" - road bicycle with narrow tires, "Hybrid" or "City" - bicyel made mostly for city riding or casual riding on roads and paths with good surfaces, "Cross" - cyclo-cross bicycle which is similar to a road bicycle but with wider tires suitable to rougher surfaces, and "Mountain" - mountain bike suitable for most surfaces but generally heavier and slower on paved surfaces. |
+| `speed` | Speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjucton with bicycle type and also by hilliness of the road section (TODO). Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
+| `useroads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
+
 
 ##### Pedestrian costing options
 
