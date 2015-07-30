@@ -15,7 +15,7 @@ Limits may be increased in the future, but you can contact routing@mapzen.com if
 
 ### Inputs for the Elevation Service
 
-We currently have two types of actions that can be requested from the Elevation Service.  The first is a profile request that can be used to generate a graph along a computed route since this request returns an array of x & y at each shape point.  The second request is an elevation request that can be used to compute the steepness of edges since the request returns an array of height.  Both requests takes the form of `valhalla.dev.mapzen.com/<profile|elevation>?json={}&api_key=`, where the JSON inputs inside the ``{}`` include location information (shape or an encoded polyline).
+We currently have two types of actions that can be requested from the Elevation Service.  The first is a profile request that can be used to generate a graph along a computed route since this request returns an array of x (range) and y (height) at each shape point.  Steepness/gradient can also be easily computed from a profile request.  The second request is an elevation request that is mostly usefull to get the height at a specific location.  Both requests takes the form of `valhalla.dev.mapzen.com/<profile|elevation>?json={}&api_key=`, where the JSON inputs inside the ``{}`` include location information (shape or an encoded polyline).
 
 Please note that both profile & elevation requests take the same input structure, using either profile? or elevation? as the action you want to request.
 
@@ -34,7 +34,7 @@ Note that you must append your own [Valhalla API key](https://mapzen.com/develop
 
 #### Shape / Encoded Polyline
 
-You specify the shape as an ordered list of two or more lat/lng locations within a JSON array. Locations are visited in the order specified.
+You specify the shape as an ordered list of two or more lat,lng locations within a JSON array. Locations are visited in the order specified.
 
 A location must include a latitude and longitude in decimal degrees. The coordinates can come from many input sources, such as a GPS location, a point or a click on a map, a geocoding service, and so on. External search services, such as [Pelias](https://github.com/pelias) or [Nominatum](http://wiki.openstreetmap.org/wiki/Nominatim), can be used to find places and geocode addresses, which must be converted to coordinates for input to Valhalla.
 
@@ -47,7 +47,7 @@ Optionally, you can use an encoded polyline as input.
 
 | Encoded polyline parameters | Description |
 | :--------- | :----------- |
-| 'encoded_polyline' | A set of encoded lat/lng pairs of a line or shape.|
+| 'encoded_polyline' | A set of encoded lat,lng pairs of a line or shape.|
 
 ### Elevation Profile & Elevation Output
 
@@ -57,10 +57,10 @@ The profile results are returned with the form of shape that was input into the 
 | :---- | :----------- |
 | `input_shape` | The specified shape coordinates are returned from the input request. |
 | `input_encoded_polyline` | The specified encoded polyline coordinates are returned from the input request. |
-| `profile` | The 2D array of range (x) and height (y) per lat/lng coordinate. |
-| x or 1st number in the profile array | The calculated cumulative distance from the previous lat/lng coordinate in the shape to the current lat/lng coordinate.  The range for the first coordinate in the shape will always be 0. |
-| y or 2nd number in the profile array | The height of the associated lat/lng pair. The height will be displayed as 'null' if no height data exists. |
-| 'elevation' | An array of height for the associated lat/lng coordinates. |
+| `profile` | The 2D array of range (x) and height (y) per lat,lng coordinate. |
+| x or 1st number in the profile array | x is generally range or distance along the path. It is the cumulative distance from the previous lat,lng coordinate in the shape to the current lat,lng coordinate.  x for the first coordinate in the shape will always be 0. |
+| y or 2nd number in the profile array | y is the height or elevation of the associated lat,lng pair. The height will be displayed as 'null' if no height data exists. |
+| 'elevation' | An array of height for the associated lat,lng coordinates. |
 
 
 In the future, look for additional elevation services information to enhance navigation applications.
