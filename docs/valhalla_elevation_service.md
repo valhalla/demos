@@ -51,7 +51,7 @@ Optionally, you can use an encoded polyline as input.
 
 ### Elevation Profile & Elevation Output
 
-The profile results are returned with the form of shape that was input into the request along with a 2D elevation profile of x and y that contains range and height for each location along the shape. Any status messages will also returned.
+The profile results are returned with the form of shape that was input into the request along with a 2D elevation profile of x and y that contains range and height for each location along the shape. Any status messages will also be returned.
 
 | Item | Description |
 | :---- | :----------- |
