@@ -103,7 +103,7 @@ The following options are available for bicycle costing methods.
 | Bicycle options | Description |
 | :-------------------------- | :----------- |
 | `bicycle_type` | This is the type of bicycle. Accepted values are "Road" - road bicycle with narrow tires, "Hybrid" or "City" - bicyel made mostly for city riding or casual riding on roads and paths with good surfaces, "Cross" - cyclo-cross bicycle which is similar to a road bicycle but with wider tires suitable to rougher surfaces, and "Mountain" - mountain bike suitable for most surfaces but generally heavier and slower on paved surfaces. |
-| `speed` | Speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjucton with bicycle type and also by hilliness of the road section (TODO). Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
+| `cycling_speed` | Cycling speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjucton with bicycle type and also by hilliness of the road section (TODO). Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
 | `use_roads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
 
 
@@ -113,7 +113,7 @@ These options are available for pedestrian costing methods.
 
 | Pedestrian options | Description |
 | :-------------------------- | :----------- |
-| `walking_speed` | Walking speed in the units specified by the directions unit. Defaults to 5.1 km/hr (3.1 miles/hour). |
+| `walking_speed` | Walking speed in kilometers per hour. Defaults to 5.1 km/hr (3.1 miles/hour). |
 | `walkway_factor` | A factor that modifies the cost when encountering roads or paths that do not allow vehicles and are set aside for pedestrian use. Pedestrian routes generally attempt to favor using these [walkways and sidewalks](http://wiki.openstreetmap.org/wiki/Sidewalks). The default walkway_factor is 0.9, indicating a slight preference. |
 | `alley_factor` | A factor that modifies (multiplies) the cost when [alleys](http://wiki.openstreetmap.org/wiki/Tag:service%3Dalley) are encountered. Pedestrian routes generally want to avoid alleys or narrow service roads between buildings. The default alley_factor is 2.0. |
 | `driveway_factor` | A factor that modifies (mulitplies) the cost when encountering a [driveway](http://wiki.openstreetmap.org/wiki/Tag:service%3Ddriveway), which is often a private, service road. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 5.0. |
@@ -123,7 +123,7 @@ These options are available for pedestrian costing methods.
 
 | Options | Description |
 | :------------------ | :----------- |
-| `units` | Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
+| `units` | Distance units for output. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
 | `language` | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. Currently supported languages: en_US. |
 | `out_format` | Output format. If no `out_format` is specified, json is returned. Future work includes pbf (protocol buffer) support. |
 
