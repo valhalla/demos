@@ -380,6 +380,7 @@ if (typeof module !== undefined) module.exports = polyline;
         var transitM = options.transitmode || this._transitmode;
         var streetName = options.street;
         this._transitmode = transitM;
+        var costing_options = options.costing_options;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
@@ -403,8 +404,9 @@ if (typeof module !== undefined) module.exports = polyline;
 
          var params = JSON.stringify({
            locations: locs,
+           street: streetName,
            costing: transitM,
-           street: streetName
+           costing_options: costing_options
          });
 
          //reset service url & access token if environment has changed

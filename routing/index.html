@@ -41,8 +41,8 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Routing</h1>
-            <h4>Point & click on the map to select a start & end point. Defaults to auto. Route test files may be uploaded as well.</h4>
+            <h1>Valhalla Bicyle Routing</h1>
+            <h4>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h4>
             <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
             <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
             <hr>
@@ -63,24 +63,25 @@
             <br>
 
             <button id="drive_btn" class = "transparent_btn" type="button">Drive Me!</button>
-            <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
 
              <div id="options" name="options" style="display:none">
 				<form id="bike" name="bike" ><span style="color:white"
-				  bicycle type: <p>road: <input type="checkbox" checked="yes" name="btype" value="Road" />
+				  road: <p>road: <input type="checkbox" checked="yes" name="btype" value="Road" />
 				  cross: <input style="color:white" type="checkbox" name="btype" value="Cross" />
                   hybrid: <input type="checkbox" name="btype" value="Hybrid" />
                   mountain: <input type="checkbox" name="btype" value="Mountain"/>
                   <br>
-                  use roads (0-1): <input type="textbox" name="use_roads" value="0.5" class="biketextbox"/><br>
-                  cycling speed (between 5 and 60kph): <input type="textbox" name="cycle_speed" value="25.0" class="biketextbox"/><br>
-                  "hilliness" factor: <input type="textbox" name="hill_factor" value="0.0" class="biketextbox"/>
+                  use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
+                  cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
+                  "hilliness" factor: <input type="textbox" id="hill_factor" value="0.0" class="biketextbox"/>
                   </span>
                   <br>
 				  <!--<input type="submit" id="bikebtn" name="bike1btn" value="submit"/> <p>-->
 				</form>
 		    </div>
 			<br>
+            <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
+
             <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>

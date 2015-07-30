@@ -53,14 +53,27 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-	  
-  $scope.route_instructions = '';
-  
+
+  var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'});
+
+  var baseMaps = {
+	"RoadMap": roadmap,
+	"CycleMap": cyclemap,
+	"TransitMap": transitmap
+  };
+ 
   var map = L.map('map', {
       zoom: $rootScope.geobase.zoom,
       zoomControl: false,
+      layers: [cyclemap],
       center: [$rootScope.geobase.lat, $rootScope.geobase.lon]
   });
+
+  L.control.layers(baseMaps, null).addTo(map);
+	
+  $scope.route_instructions = '';
 
   var Locations = [];
   var mode = 'car';
@@ -84,10 +97,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	var getStartIcon = function(icon){
 	  return L.icon({
 	    iconUrl: 'resource/startmarker@2x.png',
-
 	    iconSize:     [44, 56], // size of the icon
 	    iconAnchor: [22, 50]
-
 	  });
 	};
 
@@ -98,11 +109,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    iconAnchor: [22, 50]
 	  });
 	};
-
-	L.tileLayer('http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
-	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
-	    maxZoom: 18
-	}).addTo(map);
 
 	// Set up the hash
 	  var hash = new L.Hash(map);
@@ -196,7 +202,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  geocoder: null,
 	  transitmode: valhalla_mode,
 	  routeWhileDragging: false,
-	  router: L.Routing.valhalla(envToken,'auto'),
+	  router: L.Routing.valhalla(envToken,'bicycle'),
 	  summaryTemplate:'<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 	  
 	  createMarker: function(i,wp,n){
@@ -222,6 +228,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    pointMarkerStyle: {radius: 6,color: '#25A5FA',fillColor: '#5E6472',opacity: 1,fillOpacity: 1}
 		}).addTo(map);
 	
+ 
   var driveBtn = document.getElementById("drive_btn");
   var bikeBtn = document.getElementById("bike_btn");
   var walkBtn = document.getElementById("walk_btn");
@@ -235,7 +242,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   bikeBtn.addEventListener('click', function (e) {
 	getEnvToken();
 	var bikeoptions = setBikeOptions();
-	rr.route({transitmode: 'bicycle', options: bikeoptions});
+	rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
   });
 
   walkBtn.addEventListener('click', function (e) {
@@ -247,11 +254,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	getEnvToken();
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
-
-  var bicycle_type = document.getElementByName("btype");
-  var useroads = document.getElementByName("use_roads");
-  var cycling_speed = document.getElementByName("cycle_speed");
-  var hilliness_factor = document.getElementByName("hill_factor");
 
   function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -282,10 +284,21 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
        }
   };
 
-  function setBikeOptions (bicycle_type, useroads, cycling_speed, hilliness_factor) {
+  function setBikeOptions () {
+	var btype = document.getElementsByName("btype");
+	var bicycle_type = [];
+	  for (var i=0;i<btype.length;i++){
+	    if ( btype[i].checked ) {
+	    	bicycle_type.push(btype[i].value);
+	    }
+	  }
+	var use_roads = document.getElementById("use_roads").value;
+	var cycling_speed = document.getElementById("cycle_speed").value;
+	var hilliness_factor = document.getElementById("hill_factor").value;
+		
 	bikeoptions = {
 	  bicycle_type: bicycle_type,
-	  useroads_: useroads,
+	  use_roads: use_roads,
 	  cycling_speed: cycling_speed,
 	  hilliness_factor: hilliness_factor
 	}
