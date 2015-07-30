@@ -288,17 +288,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   function setBikeOptions () {
 	var btype = document.getElementsByName("btype");
-	var bicycle_type = [];
+	var bicycle_type = "Road";
 	  for (var i=0;i<btype.length;i++){
 	    if ( btype[i].checked ) {
-	    	bicycle_type.push(btype[i].value);
+	    	bicycle_type = btype[i].value;
 	    }
 	  }
 	var use_roads = document.getElementById("use_roads").value;
 	var cycling_speed = document.getElementById("cycle_speed").value;
 	var hilliness_factor = document.getElementById("hill_factor").value;
 		
-	bikeoptions = {"bicycle": {
+	bikeoptions = {"bicycle":{
 	  bicycle_type: bicycle_type,
 	  use_roads: use_roads,
 	  cycling_speed: cycling_speed,
