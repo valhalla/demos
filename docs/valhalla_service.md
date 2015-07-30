@@ -104,7 +104,7 @@ The following options are available for bicycle costing methods.
 | :-------------------------- | :----------- |
 | `bicycle_type` | This is the type of bicycle. Accepted values are "Road" - road bicycle with narrow tires, "Hybrid" or "City" - bicyel made mostly for city riding or casual riding on roads and paths with good surfaces, "Cross" - cyclo-cross bicycle which is similar to a road bicycle but with wider tires suitable to rougher surfaces, and "Mountain" - mountain bike suitable for most surfaces but generally heavier and slower on paved surfaces. |
 | `speed` | Speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjucton with bicycle type and also by hilliness of the road section (TODO). Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
-| `useroads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
+| `use_roads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
 
 
 ##### Pedestrian costing options
