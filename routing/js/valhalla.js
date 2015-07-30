@@ -298,12 +298,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	var cycling_speed = document.getElementById("cycle_speed").value;
 	var hilliness_factor = document.getElementById("hill_factor").value;
 		
-	bikeoptions = {
+	bikeoptions = {"bicycle": {
 	  bicycle_type: bicycle_type,
 	  use_roads: use_roads,
 	  cycling_speed: cycling_speed,
 	  hilliness_factor: hilliness_factor
-	}
+	}}
 	return bikeoptions;
   };
 
