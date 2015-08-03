@@ -129,12 +129,21 @@ These options are available for pedestrian costing methods.
 
 ### Outputs of a Valhalla route
 
-The route results are returned as a `trip`. This is a JSON object that contains details about the trip, including locations, a summary with basic information about the entire trip, and a list of legs. Location information is returned in the same form as it is entered with additional fields to indicate the side of the street. Any status messages are also returned.
+The route results are returned as a `trip`. This is a JSON object that contains details about the trip, including locations, a summary with basic information about the entire trip, and a list of `legs`.
 
-| Item | Description |
+Basic trip information includes:
+
+| Trip Item | Description |
 | :---- | :----------- |
+| `status` | Status code. |
+| `status_message ` | Status message. |
 | `units` | The specified units of length are returned, either kilometers or miles. |
-| `sos` | Side of street. Possible values are: `right`, `left`, or `ind` (indeterminant). This is not currently implemented. |
+| `locations` | Location information is returned in the same form as it is entered with additional fields to indicate the side of the street. |
+
+The summary JSON object includes:
+
+| Summary Item | Description |
+| :---- | :----------- |
 | `time` | Estimated elapsed time to complete the trip. |
 | `length` | Distance traveled for the entire trip. Units are either miles or kilometers based on the input units specified. |
 
@@ -144,11 +153,17 @@ A `trip` contains one or more `legs`. For *n* number of `break` locations, there
 
 Each leg of the trip includes a summary, which is comprised of the same information as a trip summary but applied to the single leg of the trip. It also includes a `shape`, which is an [encoded polyline](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) of the route path, and a list of `maneuvers` as a JSON array.
 
-| Maneuvers | Description |
+Each maneuver includes:
+
+| Maneuver Item | Description |
 | :--------- | :---------- |
 | `type` | Type of maneuver. See below for a list. |
 | `instruction` | Written maneuver instruction. Describes the maneuver, such as "Turn right onto Main Street". |
+| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. Further details are TBD. |
+| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. Further details are TBD. |
+| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. Further details are TBD. |
 | `street_names` | List of street names. |
+| `begin_street_names` | When present, these are the street names at the beginning of the maneuver (if they are different than the names that are consistent along the entire maneuver). |
 | `time` | Estimated time along the maneuver in seconds. |
 | `length` | Maneuver length in the units specified. |
 | `begin_shape_index` | Index into the list of shape points for the start of the maneuver. |
