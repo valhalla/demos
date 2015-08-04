@@ -92,7 +92,21 @@ These options are available for `auto`, `auto_shorter`, and `bus` costing method
 | `country_crossing_penalty` | A penalty applied for a country crossing. This penalty can be used to create paths that avoid spanning country boundaries. The default penalty is 0. |
 
 ##### Bicycle costing options
-The default bicycle costing is tuned toward road bicycles with a preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. Rough road surfaces and mountain bike trails are currently disallowed for bicycle paths, but future methods may consider the bicycle type and enable their use use by cyclo-cross or mountain bicycles.
+The default bicycle costing is tuned toward road bicycles with a slight preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. The costing model recognizes several factors unique to bicycle travel and offers several options for tuning bicycle routes. Factors influencing bicycle routes include:
+*	The types of roads suitable for bicycling depend on the type of bicycle. Road bicycles (skinny tires) generally are suited to paved roads or perhaps very short sections of compacted gravel. They are not suited for riding on coarse gravel or most paths and tracks through wooded areas or farmland. Mountain bikes on the other hand are able to traverse a wider set of surfaces.
+*	Average travel speed can be highly variable and can depend on bicycle type, fitness and experience of the cyclist, road surface, and hilliness. The costing model assumes a default speed on smooth, flat roads for each supported bicycle type. This speed can be overriden by an input option. The "base" speed is modulated by surface type (in conjunction with the bicycle type). Coming Soon: We will soon include logic to modify speed based on the hilliness of a road section.
+*	Bicyclists vary in their tolerance for riding on roads. Most novice bicyclists and even other bicyclists want to avoid all but the quietest neighborhood roads and prefer cycleways and dedicated cycling paths. Other cyclists may be experienced riding on roads and prefer to take roadways since they often provide the fastest way to get between two places. The bicycle costing model accounts for this with a `use_roads` factor to indicate a cyclists tolerance for riding on roads.
+*	Bicyclists vary in their fitness level and experience level and many wish to avoid hill roads and especially roads with very steep uphill or even downhill sections. Even if the fastest path is over a mountain, many cyclists will prefer a flatter path that avoids the climb and descent up and over the mountain.
+
+The following options are available for bicycle costing methods.
+
+| Bicycle options | Description |
+| :-------------------------- | :----------- |
+| `bicycle_type` | This is the type of bicycle. Accepted values are `Road` - a road bicycle with narrow tires, `Hybrid` or `City` - a bicycle made mostly for city riding or casual riding on roads and paths with good surfaces, `Cross` - a cyclo-cross bicycle which is similar to a road bicycle but with wider tires suitable to rougher surfaces, and `Mountain` - mountain bike suitable for most surfaces but generally heavier and slower on paved surfaces. |
+| `cycling_speed` | Cycling speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjuction with bicycle type and (Coming Soon) by hilliness of the road section. Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
+| `use_roads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
+
+Coming Soon: we will soon be offering options to avoid hills and tune the bicycle route costing based on elevation change and steepness.
 
 ##### Pedestrian costing options
 
@@ -100,28 +114,37 @@ These options are available for pedestrian costing methods.
 
 | Pedestrian options | Description |
 | :-------------------------- | :----------- |
-| `walking_speed` | Walking speed in the units specified by the directions unit. Defaults to 5.1 km/hr (3.1 miles/hour). |
+| `walking_speed` | Walking speed in kilometers per hour. Defaults to 5.1 km/hr (3.1 miles/hour). |
 | `walkway_factor` | A factor that modifies the cost when encountering roads or paths that do not allow vehicles and are set aside for pedestrian use. Pedestrian routes generally attempt to favor using these [walkways and sidewalks](http://wiki.openstreetmap.org/wiki/Sidewalks). The default walkway_factor is 0.9, indicating a slight preference. |
 | `alley_factor` | A factor that modifies (multiplies) the cost when [alleys](http://wiki.openstreetmap.org/wiki/Tag:service%3Dalley) are encountered. Pedestrian routes generally want to avoid alleys or narrow service roads between buildings. The default alley_factor is 2.0. |
-| `driveway_factor` | A factor that modifies (mulitplies) the cost when encountering a [driveway](http://wiki.openstreetmap.org/wiki/Tag:service%3Ddriveway), which is often a private, service road. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 2.0. |
+| `driveway_factor` | A factor that modifies (mulitplies) the cost when encountering a [driveway](http://wiki.openstreetmap.org/wiki/Tag:service%3Ddriveway), which is often a private, service road. Pedestrian routes generally want to avoid driveways (private). The default driveway factor is 5.0. |
 | `step_penalty` | A penalty in seconds added to each transition onto a path with [steps or stairs](http://wiki.openstreetmap.org/wiki/Tag:highway%3Dsteps). Higher values apply larger cost penalties to avoid paths that contain flights of steps. |
 
 #### Other request options
 
 | Options | Description |
 | :------------------ | :----------- |
-| `units` | Distance units. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
+| `units` | Distance units for output. Allowable unit types are miles (or mi) and kilometers (or km). If no unit type is specified, the units default to kilometers. |
 | `language` | The language of the narration instructions. If no language is specified, United States-based English (en_US) is used. Currently supported languages: en_US. |
 | `out_format` | Output format. If no `out_format` is specified, json is returned. Future work includes pbf (protocol buffer) support. |
 
 ### Outputs of a Valhalla route
 
-The route results are returned as a `trip`. This is a JSON object that contains details about the trip, including locations, a summary with basic information about the entire trip, and a list of legs. Location information is returned in the same form as it is entered with additional fields to indicate the side of the street. Any status messages are also returned.
+The route results are returned as a `trip`. This is a JSON object that contains details about the trip, including locations, a summary with basic information about the entire trip, and a list of `legs`.
 
-| Item | Description |
+Basic trip information includes:
+
+| Trip Item | Description |
 | :---- | :----------- |
+| `status` | Status code. |
+| `status_message ` | Status message. |
 | `units` | The specified units of length are returned, either kilometers or miles. |
-| `sos` | Side of street. Possible values are: `right`, `left`, or `ind` (indeterminant). This is not currently implemented. |
+| `locations` | Location information is returned in the same form as it is entered with additional fields to indicate the side of the street. |
+
+The summary JSON object includes:
+
+| Summary Item | Description |
+| :---- | :----------- |
 | `time` | Estimated elapsed time to complete the trip. |
 | `length` | Distance traveled for the entire trip. Units are either miles or kilometers based on the input units specified. |
 
@@ -131,11 +154,17 @@ A `trip` contains one or more `legs`. For *n* number of `break` locations, there
 
 Each leg of the trip includes a summary, which is comprised of the same information as a trip summary but applied to the single leg of the trip. It also includes a `shape`, which is an [encoded polyline](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) of the route path, and a list of `maneuvers` as a JSON array.
 
-| Maneuvers | Description |
+Each maneuver includes:
+
+| Maneuver Item | Description |
 | :--------- | :---------- |
 | `type` | Type of maneuver. See below for a list. |
 | `instruction` | Written maneuver instruction. Describes the maneuver, such as "Turn right onto Main Street". |
+| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. Further details are TBD. |
+| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. Further details are TBD. |
+| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. Further details are TBD. |
 | `street_names` | List of street names. |
+| `begin_street_names` | When present, these are the street names at the beginning of the maneuver (if they are different than the names that are consistent along the entire maneuver). |
 | `time` | Estimated time along the maneuver in seconds. |
 | `length` | Maneuver length in the units specified. |
 | `begin_shape_index` | Index into the list of shape points for the start of the maneuver. |
