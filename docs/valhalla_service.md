@@ -160,10 +160,10 @@ Each maneuver includes:
 | :--------- | :---------- |
 | `type` | Type of maneuver. See below for a list. |
 | `instruction` | Written maneuver instruction. Describes the maneuver, such as "Turn right onto Main Street". |
-| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. Further details are TBD. |
-| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. Further details are TBD. |
-| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. Further details are TBD. |
-| `street_names` | List of street names. |
+| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. The transition alert instruction will prepare the user for the forthcoming transition. For example: "Turn right onto North Prince Street". |
+| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. For example "Turn right onto North Prince Street, US 222". |
+| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. For example "Continue on US 222 for 3.9 miles". |
+| `street_names` | List of street names that are consistent along the entire maneuver. |
 | `begin_street_names` | When present, these are the street names at the beginning of the maneuver (if they are different than the names that are consistent along the entire maneuver). |
 | `time` | Estimated time along the maneuver in seconds. |
 | `length` | Maneuver length in the units specified. |
