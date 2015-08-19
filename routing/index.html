@@ -41,10 +41,10 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Transit</h1>
-            <h4>Point & click on the map to select a start & end point. Defaults to auto.</h4>
+            <h1>Valhalla Bicycle Routing</h1>
+            <h4>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h4>
             <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
-            <h4>NOTE: Transit ('Transport Me!') defaults to 12:15 on current date.</h4>
+            <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
             <hr>
             <span style="color:white" class="dropdown">Select an environment:</span><br>
 			<select id = "env_dropdown" onchange="selectEnv()">
@@ -52,10 +52,36 @@
 				  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
 				  <option id=production value="http://valhalla.mapzen.com/">production</option>
 				</select>
-		    <br><br>
+		    <br>
+		    <div>
+		    <h5 style="color:white">Routing Options: </h5>
+				<form>
+					 <input type="button" id="showbtn" name="showbtn"  value="Show"/>
+					 <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
+				</form>
+			</div>
+            <br>
 
             <button id="drive_btn" class = "transparent_btn" type="button">Drive Me!</button>
+
+             <div id="options" name="options" style="display:none">
+				<form id="bike" name="bike" ><span style="color:white"
+				  road: <p>road: <input type="radio" name="btype" value="Road" checked/>
+				  cross: <input style="color:white" type="radio" name="btype" value="Cross" />
+                  hybrid: <input type="radio" name="btype" value="Hybrid" />
+                  mountain: <input type="radio" name="btype" value="Mountain"/>
+                  <br>
+                  use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
+                  cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
+                  "hilliness" factor: <input type="textbox" id="hill_factor" value="0.0" class="biketextbox"/>
+                  </span>
+                  <br>
+				  <!--<input type="submit" id="bikebtn" name="bike1btn" value="submit"/> <p>-->
+				</form>
+		    </div>
+			<br>
             <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
+
             <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
