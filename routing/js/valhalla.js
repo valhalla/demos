@@ -67,7 +67,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
       zoom: $rootScope.geobase.zoom,
       zoomControl: false,
-      layers: [cyclemap],
+      layers: [roadmap],
       center: [$rootScope.geobase.lat, $rootScope.geobase.lon]
   });
 
@@ -203,7 +203,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  geocoder: null,
 	  transitmode: valhalla_mode,
 	  routeWhileDragging: false,
-	  router: L.Routing.valhalla(envToken,'bicycle'),
+	  router: L.Routing.valhalla(envToken,'auto'),
 	  summaryTemplate:'<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 	  
 	  createMarker: function(i,wp,n){
@@ -230,11 +230,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    pointMarkerStyle: {radius: 6,color: '#25A5FA',fillColor: '#5E6472',opacity: 1,fillOpacity: 1}
 		}).addTo(map);
 	
- 
   var driveBtn = document.getElementById("drive_btn");
   var bikeBtn = document.getElementById("bike_btn");
   var walkBtn = document.getElementById("walk_btn");
   var multiBtn = document.getElementById("multi_btn");
+  var elevationBtn = document.getElementById("elevation_btn");
+  var routeresponse;
   
   driveBtn.addEventListener('click', function (e) {
 	getEnvToken();
@@ -244,7 +245,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   bikeBtn.addEventListener('click', function (e) {
 	getEnvToken();
 	var bikeoptions = setBikeOptions();
-	rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
+    rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
   });
 
   walkBtn.addEventListener('click', function (e) {
@@ -256,6 +257,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	getEnvToken();
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
+  
+  elevationBtn.addEventListener('click', function (e) {
+	getEnvToken();
+    var elev = L.elevation(envToken, rr._routes[0].rrshape);
+    elev.profile(elev._rrshape);
+    document.getElementById('graph').style.display="block";
+  });
+
+  /*
+  function openWin(id) {
+    var divText = document.getElementById(id).innerHTML;
+    myWindow=window.open('','','height: 100; width:200;');
+    var doc = myWindow.document;
+    doc.open();
+    doc.write(divText);
+    doc.close();
+  }*/
 
   function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -267,7 +285,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
      	    day = splitDate[0];
      	    if (day < 10) {
       	      day = '0' + day;
-      	    } 
+      	    }
      	    month = GetMonthIndex(splitDate[1])+1;
      	   if (month < 10) {
      		  month = '0' + month;
@@ -331,4 +349,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  document.getElementById('options').style.display="none";
   });
 
+  $("#hidechart").on("click", function() {
+	  document.getElementById('graph').style.display="none";
+  });
 })

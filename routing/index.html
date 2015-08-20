@@ -10,13 +10,17 @@
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/valhalla.css" />
     <script src="conf/env.conf"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-    <script language="javascript" type="text/javascript" src="js/datetimepicker.js">
+    <script language="javascript" type="text/javascript" src="js/calendar/datetimepicker.js">
 		//Date Time Picker script- by TengYong Ng of http://www.rainforestnet.com
 		//Script featured on JavaScript Kit (http://www.javascriptkit.com)
 		//For this script, visit http://www.javascriptkit.com
 	</script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.symbol.min.js"></script>
+    <script type="text/javascript" src="http://raw.github.com/markrcote/flot-axislabels/master/jquery.flot.axislabels.js"></script>
+ 
      <style>
         body{
             width: 100%;
@@ -41,7 +45,7 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Bicyle Routing</h1>
+            <h1>Valhalla Routing<br>Test Tool</h1>
             <h4>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h4>
             <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
             <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
@@ -76,7 +80,6 @@
                   "hilliness" factor: <input type="textbox" id="hill_factor" value="0.0" class="biketextbox"/>
                   </span>
                   <br>
-				  <!--<input type="submit" id="bikebtn" name="bike1btn" value="submit"/> <p>-->
 				</form>
 		    </div>
 			<br>
@@ -87,21 +90,27 @@
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
             <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
           </div>
-          <div id="route_inst" ng-bind-html="renderHtml(route_instructions)">
-          </div>
+          <br>
+          <button id="elevation_btn" class = "transparent_btn" type="button">Get Elevation</button>
+          <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
+
+          <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
         </div>
-        
+        <div id="graph" style= "display:none; height:200px; width: 50%; float:center;"></div>
+	
         <div id="mapwrapper" class="col-md-10">
           <div id="map"></div>
         </div>
       </div>
     </div>
+    
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
     <script src="js/lrm/leaflet-routing-machine.js"></script>
     <script src="js/valhalla.js"></script>
     <script src="js/lrm/L.Routing.Valhalla.js"></script>
     <script src="js/lrm/L.Routing.Valhalla.Formatter.js"></script>
+    <script src="js/elevation/L.Elevation.js"></script>
     
     <!-- Adding a script block to post message to the parent container (think iframed demos) -->
     <script type="text/javascript">

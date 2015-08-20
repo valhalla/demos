@@ -1,4 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
 function corslite(url, callback, cors) {
     var sent = false;
 
@@ -192,7 +193,6 @@ if (typeof module !== undefined) module.exports = polyline;
   var L = (typeof window !== "undefined" ? window.L : typeof global !== "undefined" ? global.L : null);
   var corslite = require('corslite');
   var polyline = require('polyline');
-
   L.Routing = L.Routing || {};
 
   L.Routing.Valhalla = L.Class.extend({
@@ -211,60 +211,61 @@ if (typeof module !== undefined) module.exports = polyline;
       };
     },
     
-   route: function(waypoints, callback, context, options) {
-	      console.log(waypoints);
-	      console.log(options);
-	      var timedOut = false,
-	        wps = [],
-	        url,
-	        timer,
-	        wp,
-	        i;
-	
-	      options = options || {};
-	      //waypoints = options.waypoints || waypoints;
-	      console.log(waypoints);
-	      url = this.buildRouteUrl(waypoints, options);
-	
-	      timer = setTimeout(function() {
-	                timedOut = true;
-	                callback.call(context || callback, {
-	                  status: -1,
-	                  message: 'request timed out.'
-	                });
-	              }, this.options.timeout);
-	
-	      // Create a copy of the waypoints, since they
-	      // might otherwise be asynchronously modified while
-	      // the request is being processed.
-	      for (i = 0; i < waypoints.length; i++) {
-	        wp = waypoints[i];
-	        wps.push({
-	          latLng: wp.latLng,
-	          name: wp.name,
-	          options: wp.options
-	        });
-	      }
-	
-	      corslite(url, L.bind(function(err, resp) {
-	        var data;
-	
-	        clearTimeout(timer);
-	        if (!timedOut) {
-	          if (!err) {
-	            data = JSON.parse(resp.responseText);
-	            this._routeDone(data, wps, callback, context);
-	          } else {
-	            callback.call(context || callback, {
-	              status: -1,
-	              message: 'HTTP request failed: ' + err.response
-	            });
-	            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
-	          }
-	        }
-	      }, this), true);
-	
-	      return this;
+    route: function(waypoints, callback, context, options) {
+      console.log(waypoints);
+      console.log(options);
+      var timedOut = false,
+        wps = [],
+        url,
+        timer,
+        wp,
+        i;
+
+      options = options || {};
+      //waypoints = options.waypoints || waypoints;
+      console.log(waypoints);
+      url = this.buildRouteUrl(waypoints, options);
+
+      timer = setTimeout(function() {
+                timedOut = true;
+                callback.call(context || callback, {
+                  status: -1,
+                  message: 'request timed out.'
+                });
+              }, this.options.timeout);
+
+      // Create a copy of the waypoints, since they
+      // might otherwise be asynchronously modified while
+      // the request is being processed.
+      for (i = 0; i < waypoints.length; i++) {
+        wp = waypoints[i];
+        wps.push({
+          latLng: wp.latLng,
+          name: wp.name,
+          options: wp.options
+        });
+      }
+
+      corslite(url, L.bind(function(err, resp) {
+        var data;
+        var rrshape;
+        clearTimeout(timer);
+        if (!timedOut) {
+          if (!err) {
+            data = JSON.parse(resp.responseText);
+            this._rrshape = data.trip.legs[0].shape;
+            this._routeDone(data, wps, callback, context);
+          } else {
+            callback.call(context || callback, {
+              status: -1,
+              message: 'HTTP request failed: ' + err.response
+            });
+            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
+          }
+        }
+      }, this), true);
+
+      return this;
     },
 
     _routeDone: function(response, inputWaypoints, callback, context) {
@@ -281,8 +282,7 @@ if (typeof module !== undefined) module.exports = polyline;
           return;
         }
 
-  //if valhalla changes to array of objects
-
+       //if valhalla changes to array of objects
         var insts = [];
         var coordinates = [];
         var shapeIndex =  0;
@@ -302,8 +302,6 @@ if (typeof module !== undefined) module.exports = polyline;
 
           shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
         }
-        //coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-        //console.log(coordinates);
         actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
 
 
@@ -312,6 +310,9 @@ if (typeof module !== undefined) module.exports = polyline;
           name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
           unit: response.trip.units,
           transitmode: this._transitmode,
+          rrshape: this._rrshape,
+          graphdata: this.graphdata,
+          graphoptions: this.graphoptions,
           coordinates: coordinates,
           instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
           summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
@@ -319,29 +320,7 @@ if (typeof module !== undefined) module.exports = polyline;
           waypoints: actualWaypoints,
           waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
         }];
-   //     this._changeURL(this._transitmode, inputWaypoints[0].latLng.lat, inputWaypoints[0].latLng.lng, inputWaypoints[1].latLng.lat, inputWaypoints[1].latLng.lng);
 
-  /*
-        if (response.trip.legs[0].shape) {
-          for (i = 0; i < response.trip.legs[0].maneuvers; i++) {
-            coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-            alts.push({
-              name: 'km'
-              coordinates: coordinates,
-              instructions: insts[i],//response.alternative_instructions[i] ? this._convertInstructions(response.alternative_instructions[i]) : [],
-              summary: response.alternative_summaries[i] ? this._convertSummary(response.trip.summary) : [],
-              inputWaypoints: inputWaypoints,
-              waypoints: actualWaypoints,
-              waypointIndices: this._clampIndices(response.alternative_geometries.length === 1 ?
-                // Unsure if this is a bug in OSRM or not, but alternative_indices
-                // does not appear to be an array of arrays, at least not when there is
-                // a single alternative route.
-                response.alternative_indices : response.alternative_indices[i],
-                coordinates)
-            });
-          }
-        }
-  */
         // only versions <4.5.0 will support this flag
           if (response.hint_data) {
             this._saveHintData(response.hint_data, inputWaypoints);
