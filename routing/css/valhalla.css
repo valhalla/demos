@@ -49,3 +49,51 @@ div#route_inst table td.distance{
     white-space: -moz-pre-wrap;
 }
 
+.biketextbox {
+  width: 15%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  color: black;
+
+}
+
+#elevation_btn {
+  width: 120px;
+}
+
+#graph{
+  width: 20px;
+  height: 200px;
+  position: right;
+  margin: 0 auto;
+  background-color: #FFF;
+}
+
+.legend table, .legend > div {
+  height: 35px !important;
+  opacity: 1 !important;
+  right: -55px;
+  top: 10px;
+  width: 116px !important;
+}
+
+.legend table {
+  border: 1px solid #555;
+  padding: 5px;
+}
+
+#flot-tooltip {
+  font-size: 12px;
+  font-family: Verdana, Arial, sans-serif;
+  position: absolute;
+  display: none;
+  padding: 2px;
+  background-color: #FFF;
+  opacity: 1;
+  border: 1px solid #aaa;
+  -moz-box-shadow: 0px 1px 1px #ddd;
+  -webkit-box-shadow: 0px 1px 1px #ddd;
+  box-shadow: 0px 1px 2px #ddd;
+}
+

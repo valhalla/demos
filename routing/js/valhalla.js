@@ -53,14 +53,27 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-	  
-  $scope.route_instructions = '';
-  
+
+  var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'});
+
+  var baseMaps = {
+	"RoadMap": roadmap,
+	"CycleMap": cyclemap,
+	"TransitMap": transitmap
+  };
+ 
   var map = L.map('map', {
       zoom: $rootScope.geobase.zoom,
       zoomControl: false,
+      layers: [roadmap],
       center: [$rootScope.geobase.lat, $rootScope.geobase.lon]
   });
+
+  L.control.layers(baseMaps, null).addTo(map);
+	
+  $scope.route_instructions = '';
 
   var Locations = [];
   var mode = 'car';
@@ -84,10 +97,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	var getStartIcon = function(icon){
 	  return L.icon({
 	    iconUrl: 'resource/startmarker@2x.png',
-
 	    iconSize:     [44, 56], // size of the icon
 	    iconAnchor: [22, 50]
-
 	  });
 	};
 
@@ -98,11 +109,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	    iconAnchor: [22, 50]
 	  });
 	};
-
-	L.tileLayer('http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
-	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
-	    maxZoom: 18
-	}).addTo(map);
 
 	// Set up the hash
 	  var hash = new L.Hash(map);
@@ -133,15 +139,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
 	    if (locations == 0) {
 	      var marker = new L.marker(geo, {icon: getStartIcon(m || 'car')});
+	      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon + "&layers=Q target=_blank>Edit POI here<a/>");
 	    }
 	    else {
 	      var marker = new L.marker(geo, {icon: getEndIcon(m || 'car')});
+	      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon + "&layers=Q target=_blank>Edit POI here<a/>");
 	    }
 	    map.addLayer(marker);
 	    markers.push(marker);
-	    //marker.openPopup();
 	  });
-	  
+
 	  $scope.renderHtml = function(html_code){
 	    return $sce.trustAsHtml(html_code);
 	  };
@@ -216,7 +223,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           draggable: true,
           icon: iconV
         }
-        return L.marker(wp.latLng,options);
+        var dot = L.marker(wp.latLng,options);
+        return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon + "&layers=Q target=_blank>Edit POI here<a/>");
 	  },
 	  formatter: new L.Routing.Valhalla.Formatter(),
 	    pointMarkerStyle: {radius: 6,color: '#25A5FA',fillColor: '#5E6472',opacity: 1,fillOpacity: 1}
@@ -226,7 +234,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var bikeBtn = document.getElementById("bike_btn");
   var walkBtn = document.getElementById("walk_btn");
   var multiBtn = document.getElementById("multi_btn");
-  var datetime = document.getElementById("datetimepicker");
+  var elevationBtn = document.getElementById("elevation_btn");
+  var routeresponse;
   
   driveBtn.addEventListener('click', function (e) {
 	getEnvToken();
@@ -235,7 +244,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   bikeBtn.addEventListener('click', function (e) {
 	getEnvToken();
-    rr.route({transitmode: 'bicycle'});
+	var bikeoptions = setBikeOptions();
+    rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
   });
 
   walkBtn.addEventListener('click', function (e) {
@@ -247,6 +257,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	getEnvToken();
     rr.route({transitmode: 'multimodal', date_time: dateStr});
   });
+  
+  elevationBtn.addEventListener('click', function (e) {
+	getEnvToken();
+    var elev = L.elevation(envToken, rr._routes[0].rrshape);
+    elev.profile(elev._rrshape);
+    document.getElementById('graph').style.display="block";
+  });
+
+  /*
+  function openWin(id) {
+    var divText = document.getElementById(id).innerHTML;
+    myWindow=window.open('','','height: 100; width:200;');
+    var doc = myWindow.document;
+    doc.open();
+    doc.write(divText);
+    doc.close();
+  }*/
 
   function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -258,7 +285,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
      	    day = splitDate[0];
      	    if (day < 10) {
       	      day = '0' + day;
-      	    } 
+      	    }
      	    month = GetMonthIndex(splitDate[1])+1;
      	   if (month < 10) {
      		  month = '0' + month;
@@ -275,7 +302,27 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
    	    }
    	    multiBtn.click();	
        }
+  };
 
+  function setBikeOptions () {
+	var btype = document.getElementsByName("btype");
+	var bicycle_type = "Road";
+	  for (var i=0;i<btype.length;i++){
+	    if ( btype[i].checked ) {
+	    	bicycle_type = btype[i].value;
+	    }
+	  }
+	var use_roads = document.getElementById("use_roads").value;
+	var cycling_speed = document.getElementById("cycle_speed").value;
+	var hilliness_factor = document.getElementById("hill_factor").value;
+		
+	bikeoptions = {"bicycle":{
+	  bicycle_type: bicycle_type,
+	  use_roads: use_roads,
+	  cycling_speed: cycling_speed,
+	  hilliness_factor: hilliness_factor
+	}}
+	return bikeoptions;
   };
 
   $(document).on('mode-alert', function(e, m) {
@@ -292,6 +339,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $("#datepicker").on("click", function() {
 	datetimeUpdate(this.value);
   });
-  
+});
+
+  $("#showbtn").on("click", function() {
+	document.getElementById('options').style.display="block";
+  });
+
+  $("#hidebtn").on("click", function() {
+	  document.getElementById('options').style.display="none";
+  });
+
+  $("#hidechart").on("click", function() {
+	  document.getElementById('graph').style.display="none";
   });
 })
