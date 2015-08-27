@@ -84,14 +84,11 @@
 		    </div>
 			<br>
             <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
+
             <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
-            <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a>
-            <br><br>
-            <input type="file" id="inputFile" onchange="selectFiles(this.files)" style="color:white"/>
-            <select id="selector" class="select" style="width:50px; position:absolute;"></select><br><br>
-            <span style="color:white" class="load_desc">The test file sample <b>demo_routes.txt</b> can be loaded from the scripts directory of the Thor repo.</span>
+            <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
           </div>
           <br>
           <button id="elevation_btn" class = "transparent_btn" type="button">Get Elevation</button>
@@ -106,6 +103,7 @@
         </div>
       </div>
     </div>
+    
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
     <script src="js/lrm/leaflet-routing-machine.js"></script>
