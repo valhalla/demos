@@ -15,14 +15,6 @@ function selectEnv(){
   });
 }
 
-function handleChange(evt) {
-  var sel = document.getElementById('selector');
-  for (var i = 0; i < sel.options.length; i++) {
-    var results = sel.options[i].text + "  " + sel.options[i].value;
-    sel.options[i].innerHTML = results;
-  }
-}
-
 function getEnvToken(){
   switch (envServer) {
   case "localhost":
