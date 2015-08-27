@@ -104,7 +104,7 @@ app.run(function($rootScope) {
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
-      cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+      cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'}),
       transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'});
 
   var baseMaps = {
@@ -123,6 +123,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   L.control.layers(baseMaps, null).addTo(map);
 	
   $scope.route_instructions = '';
+
   var Locations = [];
   var mode = 'car';
 
@@ -444,22 +445,22 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var multiBtn = document.getElementById("multi_btn");
   var elevationBtn = document.getElementById("elevation_btn");
   var routeresponse;
-    
-    driveBtn.addEventListener('click', function (e) {
-   	  getEnvToken();
-      rr.route({transitmode: 'auto'});
-    });
+  
+  driveBtn.addEventListener('click', function (e) {
+	getEnvToken();
+    rr.route({transitmode: 'auto'});
+  });
 
-    bikeBtn.addEventListener('click', function (e) {
-	  getEnvToken();
-	  var bikeoptions = setBikeOptions();
-      rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
-   });
+  bikeBtn.addEventListener('click', function (e) {
+	getEnvToken();
+	var bikeoptions = setBikeOptions();
+    rr.route({transitmode: 'bicycle', costing_options: bikeoptions});
+  });
 
-    walkBtn.addEventListener('click', function (e) {
-	  getEnvToken();
-      rr.route({transitmode: 'pedestrian'});
-    }); 
+  walkBtn.addEventListener('click', function (e) {
+	getEnvToken();
+    rr.route({transitmode: 'pedestrian'});
+  }); 
 
   multiBtn.addEventListener('click', function (e) {
 	getEnvToken();
@@ -467,12 +468,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
   
   elevationBtn.addEventListener('click', function (e) {
-   // var elev = L.Routing.valhalla(envToken,rr._routes[0].coordinates);
-   var elev = L.Routing.valhalla(envToken, rr._routes[0].rrshape);
-   elev.profile(elev._rrshape);
+	getEnvToken();
+    var elev = L.elevation(envToken, rr._routes[0].rrshape);
+    elev.profile(elev._rrshape);
+    document.getElementById('graph').style.display="block";
   });
 
-    function datetimeUpdate(datetime) {
+  /*
+  function openWin(id) {
+    var divText = document.getElementById(id).innerHTML;
+    myWindow=window.open('','','height: 100; width:200;');
+    var doc = myWindow.document;
+    doc.open();
+    doc.write(divText);
+    doc.close();
+  }*/
+
+  function datetimeUpdate(datetime) {
       var changeDt = datetime;
       var inputDate, splitDate, year, month, day, time, hour, minute; 
        if(changeDt != null){
@@ -536,12 +548,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
   
   $(function () {
-	    $("#button1").click(function (evt) {
-	      evt.preventDefault();
-	      $('#file').trigger('click');
-	    });
-	    document.getElementById('inputFile').addEventListener('change', selectFiles, false);
-	 });
+    $("#button1").click(function (evt) {
+      evt.preventDefault();
+      $('#file').trigger('click');
+    });
+    document.getElementById('inputFile').addEventListener('change', selectFiles, false);
+  });
 });
 
   $("#showbtn").on("click", function() {
@@ -551,5 +563,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $("#hidebtn").on("click", function() {
 	  document.getElementById('options').style.display="none";
   });
-  
+
+  $("#hidechart").on("click", function() {
+	  document.getElementById('graph').style.display="none";
+  });
 })

@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-	  
+
 function corslite(url, callback, cors) {
     var sent = false;
 
@@ -206,222 +206,66 @@ if (typeof module !== undefined) module.exports = polyline;
       L.Util.setOptions(this, options);
       this._accessToken = accessToken;
       this._transitmode = transitmode;
-      this._rrshape = transitmode;
       this._hints = {
         locations: {}
       };
     },
     
-    profile: function(rrshape, callback, context, options) {
-	      var timedOut = false,
-	      options = options || {};
-	      //waypoints = options.waypoints || waypoints;
+    route: function(waypoints, callback, context, options) {
+      console.log(waypoints);
+      console.log(options);
+      var timedOut = false,
+        wps = [],
+        url,
+        timer,
+        wp,
+        i;
 
-	      var url = this.buildProfileUrl(rrshape, options);
-	
-	      var timer = setTimeout(function() {
-	                timedOut = true;
-	                callback.call(context || callback, {
-	                  status: -1,
-	                  message: 'request timed out.'
-	                });
-	              }, this.options.timeout);
-	
-	      // Create a copy of the waypoints, since they
-	      // might otherwise be asynchronously modified while
-	      // the request is being processed.
-	   /*   for (i = 0; < rrshape.length; i++) {
-	        shapept = rrshape[i];
-	        shapepts.push({
-	          latLng: shapept.latLng,
-	          name: shapept.name,
-	          options: shapept.options
-	        });
-	      }*/
+      options = options || {};
+      //waypoints = options.waypoints || waypoints;
+      console.log(waypoints);
+      url = this.buildRouteUrl(waypoints, options);
 
-	      corslite(url, L.bind(function(err, resp) {
-	        var elevresult;
-	        clearTimeout(timer);
-	        if (!timedOut) {
-	          if (!err) {
-	        	  elevresult = JSON.parse(resp.responseText);
-	        	  var data1 = [
-	                {label: "Elevation",  data: elevresult, points: { symbol: "circle", fillColor: "#058DC7" }, color: '#058DC7'}
-	              ];
-	        	 // getDataPoints(elevresult);
-	        	  showChart(data1);
-	          //  this._profileDonw(data, shapepts, callback, context);
-	          }/* else {
-	            callback.call(context || callback, {
-	              status: -1,
-	              message: 'HTTP request failed: ' + err.response
-	            });
-	           // alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
-	          }*/
-	        }
-	      }, this), true);
-	
-	      return this;
-  },
-  
-  _profileDone: function(response, inputShape, callback, context) {
-      var coordinates,
-          alts,
-          actualWaypoints,
-          i;
-      context = context || callback;
-      if (response.status !== 0) {
-        callback.call(context, {
-          status: response.status,
-          message: response.status_message
+      timer = setTimeout(function() {
+                timedOut = true;
+                callback.call(context || callback, {
+                  status: -1,
+                  message: 'request timed out.'
+                });
+              }, this.options.timeout);
+
+      // Create a copy of the waypoints, since they
+      // might otherwise be asynchronously modified while
+      // the request is being processed.
+      for (i = 0; i < waypoints.length; i++) {
+        wp = waypoints[i];
+        wps.push({
+          latLng: wp.latLng,
+          name: wp.name,
+          options: wp.options
         });
-        return;
       }
 
-//if valhalla changes to array of objects
-/*
-      var insts = [];
-      var coordinates = [];
-      var shapeIndex =  0;
-      for(var i = 0; i<response.trip.legs.length;  i++){
-        var coord = polyline.decode(response.trip.legs[i].shape, 6);
-
-        for(var k = 0; k < coord.length; k++){
-          coordinates.push(coord[k]);
-        }
-
-        for(var j =0; j < response.trip.legs[i].maneuvers.length; j++){
-          var res = response.trip.legs[i].maneuvers[j];
-          res.distance = response.trip.legs[i].maneuvers[j]["length"];
-          res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
-          insts.push(res);
-        }
-
-        shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
-      }
-      //coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-      //console.log(coordinates);
-      actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
-
-
-      alts = [{
-        ////gotta change
-        name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
-        unit: response.trip.units,
-        transitmode: this._transitmode,
-        coordinates: coordinates,
-        instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
-        summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
-        inputWaypoints: inputWaypoints,
-        waypoints: actualWaypoints,
-        waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
-      }];
-*/
-      // only versions <4.5.0 will support this flag
-        if (response.hint_data) {
-          this._saveHintData(response.hint_data, inputWaypoints);
-        }
-      callback.call(context, null, null);
-    },
-
-    ///mapzen example
-    buildProfileUrl: function(rrshape, options) {
-      var locs = [],
-          locationKey,
-          hint;
-   /*
-      var points = rrshape;
-      for (var i = 0; i < points.length; i++) {
-        var loc;
-        //locationKey = this._locationKey(points[i]).split(',');
-        if(i === 0 || i === points.length-1){
-          loc = {
-            lat: parseFloat(points[i][0]),
-            lon: parseFloat(points[i][1]),
-          }
-        }else{
-          loc = {
-		    lat: parseFloat(points[i][0]),
-            lon: parseFloat(points[i][1]),
+      corslite(url, L.bind(function(err, resp) {
+        var data;
+        var rrshape;
+        clearTimeout(timer);
+        if (!timedOut) {
+          if (!err) {
+            data = JSON.parse(resp.responseText);
+            this._rrshape = data.trip.legs[0].shape;
+            this._routeDone(data, wps, callback, context);
+          } else {
+            callback.call(context || callback, {
+              status: -1,
+              message: 'HTTP request failed: ' + err.response
+            });
+            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
           }
         }
-        locs.push(loc);
-      }*/
+      }, this), true);
 
-       var params = JSON.stringify({
-         encoded_polyline: rrshape
-       });
-
-       //reset service url & access token if environment has changed
-       (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=elevationServer.dev;
-       (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
-
-       console.log(this.options.serviceUrl + 'profile?json=' +
-              params + '&api_key=' + this._accessToken);
-       
-      return this.options.serviceUrl + 'profile?json=' +
-              params + '&api_key=' + this._accessToken;
-    },
-
-    _locationKey: function(location) {
-      return location[0] + ',' + location[1];
-    },
-    
-   route: function(waypoints, callback, context, options) {
-	      console.log(waypoints);
-	      console.log(options);
-	      var timedOut = false,
-	        wps = [],
-	        url,
-	        timer,
-	        wp,
-	        i;
-	
-	      options = options || {};
-	      //waypoints = options.waypoints || waypoints;
-	      console.log(waypoints);
-	      url = this.buildRouteUrl(waypoints, options);
-	
-	      timer = setTimeout(function() {
-	                timedOut = true;
-	                callback.call(context || callback, {
-	                  status: -1,
-	                  message: 'request timed out.'
-	                });
-	              }, this.options.timeout);
-	
-	      // Create a copy of the waypoints, since they
-	      // might otherwise be asynchronously modified while
-	      // the request is being processed.
-	      for (i = 0; i < waypoints.length; i++) {
-	        wp = waypoints[i];
-	        wps.push({
-	          latLng: wp.latLng,
-	          name: wp.name,
-	          options: wp.options
-	        });
-	      }
-	
-	      corslite(url, L.bind(function(err, resp) {
-	        var data;
-	        var rrshape;
-	        clearTimeout(timer);
-	        if (!timedOut) {
-	          if (!err) {
-	            data = JSON.parse(resp.responseText);
-	            this._rrshape = data.trip.legs[0].shape;
-	            this._routeDone(data, wps, callback, context);
-	          } else {
-	            callback.call(context || callback, {
-	              status: err.status,
-	              message: err.responseText
-	            });
-	            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.responseText);
-	          }
-	        }
-	      }, this), true);
-	
-	      return this;
+      return this;
     },
 
     _routeDone: function(response, inputWaypoints, callback, context) {
@@ -438,8 +282,7 @@ if (typeof module !== undefined) module.exports = polyline;
           return;
         }
 
-  //if valhalla changes to array of objects
-
+       //if valhalla changes to array of objects
         var insts = [];
         var coordinates = [];
         var shapeIndex =  0;
@@ -454,13 +297,12 @@ if (typeof module !== undefined) module.exports = polyline;
             var res = response.trip.legs[i].maneuvers[j];
             res.distance = response.trip.legs[i].maneuvers[j]["length"];
             res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
+            res.maneuvernum = j+1;
             insts.push(res);
           }
 
           shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
         }
-        //coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-        //console.log(coordinates);
         actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
 
 
@@ -470,6 +312,8 @@ if (typeof module !== undefined) module.exports = polyline;
           unit: response.trip.units,
           transitmode: this._transitmode,
           rrshape: this._rrshape,
+          graphdata: this.graphdata,
+          graphoptions: this.graphoptions,
           coordinates: coordinates,
           instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
           summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
@@ -477,29 +321,7 @@ if (typeof module !== undefined) module.exports = polyline;
           waypoints: actualWaypoints,
           waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
         }];
-   //     this._changeURL(this._transitmode, inputWaypoints[0].latLng.lat, inputWaypoints[0].latLng.lng, inputWaypoints[1].latLng.lat, inputWaypoints[1].latLng.lng);
 
-  /*
-        if (response.trip.legs[0].shape) {
-          for (i = 0; i < response.trip.legs[0].maneuvers; i++) {
-            coordinates = polyline.decode(response.trip.legs[0].shape, 6);
-            alts.push({
-              name: 'km'
-              coordinates: coordinates,
-              instructions: insts[i],//response.alternative_instructions[i] ? this._convertInstructions(response.alternative_instructions[i]) : [],
-              summary: response.alternative_summaries[i] ? this._convertSummary(response.trip.summary) : [],
-              inputWaypoints: inputWaypoints,
-              waypoints: actualWaypoints,
-              waypointIndices: this._clampIndices(response.alternative_geometries.length === 1 ?
-                // Unsure if this is a bug in OSRM or not, but alternative_indices
-                // does not appear to be an array of arrays, at least not when there is
-                // a single alternative route.
-                response.alternative_indices : response.alternative_indices[i],
-                coordinates)
-            });
-          }
-        }
-  */
         // only versions <4.5.0 will support this flag
           if (response.hint_data) {
             this._saveHintData(response.hint_data, inputWaypoints);
@@ -538,6 +360,7 @@ if (typeof module !== undefined) module.exports = polyline;
         var transitM = options.transitmode || this._transitmode;
         var streetName = options.street;
         this._transitmode = transitM;
+        var costing_options = options.costing_options;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
@@ -561,8 +384,9 @@ if (typeof module !== undefined) module.exports = polyline;
 
          var params = JSON.stringify({
            locations: locs,
+           street: streetName,
            costing: transitM,
-           street: streetName
+           costing_options: costing_options
          });
 
          //reset service url & access token if environment has changed
@@ -679,130 +503,6 @@ if (typeof module !== undefined) module.exports = polyline;
 
   module.exports = L.Routing.Valhalla;
 })();
-
-/*
-function showChart(elevresult) {
-    var chart = new CanvasJS.Chart("chartContainer",
-	    {
-	      zoomEnabled: true,
-	      title:{
-	        text: "Stress Test: 100,000 Data Points" 
-	      },
-	      animationEnabled: true,
-	      axisX:{
-	        labelAngle: 30
-	      },
-	      
-	      axisY :{
-	        includeZero:false
-	      },
-	      
-	    //  data: data  // random generator below
-	      
-	    });
-
-   var limit = 100000;    //increase number of dataPoints by increasing this
-   var y = 0;
-   var data = []; var dataSeries = { type: "line" };
-   var dataPoints = [];
-   for (var xy=0; xy<elevresult.profile.length; xy++){
-    //  showChart(elevresult.profile[xy][0],elevresult.profile[xy][1]);
-     // for (var i = 0; i < limit; i += 1) {
-    	    // y += (Math.random() * 10 - 5);
-    	     dataPoints.push({x:elevresult.profile[xy][0]!=null?elevresult.profile[xy][0]:0, y:elevresult.profile[xy][1]!=null?elevresult.profile[xy][1]:0});
-    //	   }
-    }
-   
-   dataSeries.dataPoints = dataPoints;
-
-   data["dataSeries"]=dataSeries;    
-   
-   //dataSeries.dataPoints = dataPoints;
-   //data.push(dataSeries);    
-   
-   chart.render();
- };*/
-
-  function getDataPoints(elevresult) {
-    var item = { type: "line" };
-    var dataPoints = [];
-		for (var xy=0; xy<elevresult.profile.length; xy++){
-	     dataPoints.push({x:elevresult.profile[xy][0]!=null?elevresult.profile[xy][0]:0, y:elevresult.profile[xy][1]!=null?elevresult.profile[xy][1]:0});
-		}
-		item.dataPoints = dataPoints;
-	    return item;
-  };
-
-  function showChart(data1) {
-  	var w = window.open();
-    $.plot($("#placeholder"), data1, {
-        xaxis: {
-            tickSize: [1, "range"],
-            tickLength: 0,
-            axisLabel: 'Range',
-            axisLabelUseCanvas: true,
-            axisLabelFontSizePixels: 12,
-            axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-            axisLabelPadding: 5
-        },
-        yaxis: {
-            axisLabel: 'Height',
-            axisLabelUseCanvas: true,
-            axisLabelFontSizePixels: 12,
-            axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-            axisLabelPadding: 5
-        },
-        series: {
-            lines: { show: true },
-            points: {
-                radius: 3,
-                show: true,
-                fill: true
-            },
-        },
-        grid: {
-            hoverable: true,
-            borderWidth: 1
-        },
-        legend: {
-            labelBoxBorderColor: "none",
-            position: "right"
-        }
-
-    });
-    
-    function showTooltip(x, y, contents, z) {
-        $('<div id="flot-tooltip">' + contents + '</div>').css({
-            top: y - 30,
-            left: x - 135,
-            'border-color': z,
-        }).appendTo("body").fadeIn(200);
-    }
- 
-    var previousPoint = null;
-    
-$("#placeholder").bind("plothover", function (event, pos, item) {
-    if (item) {
-        if ((previousPoint != item.dataIndex) || (previousLabel != item.series.label)) {
-            previousPoint = item.dataIndex;
-            previousLabel = item.series.label;
-
-            $("#flot-tooltip").remove();
-
-            var x = getDataPoints(item.dataPoints[0]),
-            y = item.dataPoints[1];
-            z = item.series.color;
-
-            showTooltip(item.pageX, item.pageY,
-                "<b>" + item.series.label + "</b><br /> " + x + " = " + y + "mm",
-                z);
-        }
-    } else {
-        $("#flot-tooltip").remove();
-        previousPoint = null;
-    }
-});
-};
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"corslite":1,"polyline":2}]},{},[3]);
