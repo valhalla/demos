@@ -297,6 +297,7 @@ if (typeof module !== undefined) module.exports = polyline;
             var res = response.trip.legs[i].maneuvers[j];
             res.distance = response.trip.legs[i].maneuvers[j]["length"];
             res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
+            res.maneuvernum = j+1;
             insts.push(res);
           }
 

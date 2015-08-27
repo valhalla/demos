@@ -8,11 +8,11 @@ var envToken;
 var envServer;
 
 function selectEnv(){
-	$( "option:selected" ).each(function() {
-	  envServer = $( this ).text();
-	  serviceUrl =  document.getElementById(envServer).value;
-	  getEnvToken();
-	});
+  $( "option:selected" ).each(function() {
+    envServer = $( this ).text();
+    serviceUrl =  document.getElementById(envServer).value;
+    getEnvToken();
+  });
 }
 
 function getEnvToken(){
@@ -37,19 +37,19 @@ function parseIsoDateTime(dtStr) {
 var dateStr = parseIsoDateTime(isoDateTime.toString());
 
 app.run(function($rootScope) {
-	  var hash_loc = hash_params ? hash_params : {'center': {'lat': 40.7486, 'lng': -73.9690}, 'zoom': 13};
-	  $rootScope.geobase = {
-	    'zoom': hash_loc.zoom,
-	    'lat' : hash_loc.center.lat,
-	    'lon' : hash_loc.center.lng
-	  }
-	  $(document).on('new-location', function(e){
-	    $rootScope.geobase = {
-	      'zoom': e.zoom,
-	      'lat' : e.lat,
-	      'lon' : e.lon
-	    };
-	  })
+  var hash_loc = hash_params ? hash_params : {'center': {'lat': 40.7486, 'lng': -73.9690}, 'zoom': 13};
+  $rootScope.geobase = {
+    'zoom': hash_loc.zoom,
+    'lat' : hash_loc.center.lat,
+    'lon' : hash_loc.center.lng
+  }
+  $(document).on('new-location', function(e){
+    $rootScope.geobase = {
+      'zoom': e.zoom,
+      'lat' : e.lat,
+      'lon' : e.lon
+    };
+  })
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
@@ -185,17 +185,29 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	      return;
 	    }
 
-	    var waypoints = [];
-	    Locations.forEach(function(gLoc) {
-	      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
-	    });
+  $scope.$on( 'setRouteInstruction', function( ev, instructions ) {
+    $scope.$apply(function(){
+      $scope.route_instructions = instructions;
+    });
+  });
 
-	    waypoints.push(L.latLng(geo.lat, geo.lon));
+  $scope.$on( 'resetRouteInstruction', function( ev ) {
+    $scope.$apply(function(){
+      $scope.route_instructions = '';
+    });
+  });
+			
+    var waypoints = [];
+    Locations.forEach(function(gLoc) {
+      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+    });
 
-	    $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], mode);
-	    locations++;
-	    
-	    valhalla_mode = mode_mapping[mode];
+    waypoints.push(L.latLng(geo.lat, geo.lon));
+
+    $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], mode);
+    locations++;
+    
+    valhalla_mode = mode_mapping[mode];
 
 	var rr = L.Routing.control({
 	  waypoints: waypoints,
