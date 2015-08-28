@@ -271,7 +271,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   
   elevationBtn.addEventListener('click', function (e) {
 	getEnvToken();
-    var elev = L.elevation(envToken, rr._routes[0].rrshape);
+	var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(envToken, rr._routes[0].rrshape) : 0;
+	elev.resetChart();
     elev.profile(elev._rrshape);
     document.getElementById('graph').style.display="block";
   });
