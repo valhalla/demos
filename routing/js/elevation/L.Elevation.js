@@ -208,6 +208,12 @@ if (typeof module !== undefined) module.exports = polyline;
 	    this._graphdata = [];
 	    this._graphoptions = {};
 	},
+ 
+    resetChart: function() {
+	  var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
+	  plot.destroy();
+	  $('#graph').empty();
+    },
     
     profile: function(rrshape, callback, context, options) {
 	  var timedOut = false,
@@ -370,7 +376,7 @@ if (typeof module !== undefined) module.exports = polyline;
 		  }
 	    });
 	  },
-	
+
 	  _locationKey: function(location) {
 	    return location[0] + ',' + location[1];
 	  }
