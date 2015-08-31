@@ -381,7 +381,12 @@ if (typeof module !== undefined) module.exports = polyline;
               type: "through"
             }
           }
-  	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
+	  	  if (i === 0 && transitM === "multimodal") {
+	  	  	if (typeof options.date_time != "undefined") 
+	  	      loc.date_time = options.date_time; 
+	  		//if loaded from file	  	    
+	  	    else loc.date_time = this.options.date_time;
+	  	  }
           locs.push(loc);
         }
 
