@@ -236,7 +236,7 @@ if (typeof module !== undefined) module.exports = polyline;
 	      if (!err) {
 	    	  elevresult = JSON.parse(resp.responseText);
 	    	  this._graphdata = [
-	            {"label": "Elevation", "data": elevresult.profile, "points": { "symbol": "circle", "fillColor": "#058DC7" }, "color": '#058DC7'}
+	            {"label": "Elevation", "data": elevresult.range_height, "points": { "symbol": "circle", "fillColor": "#058DC7" }, "color": '#058DC7'}
 	          ];
 	    	  this._graphoptions = {
 	    		         legend: { show: false },
@@ -321,24 +321,27 @@ if (typeof module !== undefined) module.exports = polyline;
 	        hint;
 	
 	     var params = JSON.stringify({
-	       encoded_polyline: rrshape
+	       encoded_polyline: rrshape,
+               range: true
 	     });
 	
 	     //reset service url & access token if environment has changed
 	     (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=elevationServer.dev;
 	     (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
 	
-	     console.log(this.options.serviceUrl + 'profile?json=' +
+	     console.log(this.options.serviceUrl + 'height?json=' +
 	            params + '&api_key=' + this._accessToken);
 	     
-	    return this.options.serviceUrl + 'profile?json=' +
+	    return this.options.serviceUrl + 'height?json=' +
 	            params + '&api_key=' + this._accessToken;
 	  },
 	  
 	  getDataPoints: function(elevresult) {
 	    var dataPoints = [];
-		for (var xy=0; xy<elevresult.profile.length; xy++){
-	     dataPoints.push({x:elevresult.profile[xy][0]!=null?elevresult.profile[xy][0]:0, y:elevresult.profile[xy][1]!=null?elevresult.profile[xy][1]:0});
+		for (var xy=0; xy<elevresult.range_height.length; xy++){
+	     dataPoints.push({ x:elevresult.range_height[xy][0]!=null?elevresult.range_height[xy][0]:0,
+                               y:elevresult.range_height[xy][1]!=null?elevresult.range_height[xy][1]:0
+                             });
 		}
 	    return dataPoints;
 	  },
