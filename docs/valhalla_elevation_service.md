@@ -63,7 +63,7 @@ The profile results are returned with the form of shape that was supplied in the
 | `shape` | The specified shape coordinates are returned from the input request. |
 | `encoded_polyline` | The specified encoded polyline coordinates are returned from the input request. |
 | `range_height` | The 2D array of range (x) and height (y) per lat,lng coordinate. |
-| `x coordinate` | x is generally range or distance along the path. It is the cumulative distance from the previous lat,lng coordinate in the shape to the current lat,lng coordinate.  x for the first coordinate in the shape will always be 0. |
+| `x coordinate` | x is the range or distance along the input locations. It is the cumulative distance along the previous lat,lng coordinates up to the current coordinate. x for the first coordinate in the shape will always be 0. |
 | `y coordinate` | y is the height or elevation of the associated lat,lng pair. The height will be returned as `null` if no height data exists for a given location. |
 | `height` | An array of height for the associated lat,lng coordinates. |
 
