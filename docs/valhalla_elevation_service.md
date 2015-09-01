@@ -63,9 +63,9 @@ The profile results are returned with the form of shape that was supplied in the
 | `shape` | The specified shape coordinates are returned from the input request. |
 | `encoded_polyline` | The specified encoded polyline coordinates are returned from the input request. |
 | `range_height` | The 2D array of range (x) and height (y) per lat,lng coordinate. |
-| x or 1st number in the profile array | x is generally range or distance along the path. It is the cumulative distance from the previous lat,lng coordinate in the shape to the current lat,lng coordinate.  x for the first coordinate in the shape will always be 0. |
-| y or 2nd number in the profile array | y is the height or elevation of the associated lat,lng pair. The height will be returned as `null` if no height data exists for a given location. |
-| 'height' | An array of height for the associated lat,lng coordinates. |
+| `x coordinate` | x is generally range or distance along the path. It is the cumulative distance from the previous lat,lng coordinate in the shape to the current lat,lng coordinate.  x for the first coordinate in the shape will always be 0. |
+| `y coordinate` | y is the height or elevation of the associated lat,lng pair. The height will be returned as `null` if no height data exists for a given location. |
+| `height` | An array of height for the associated lat,lng coordinates. |
 
 
 In the future, look for additional elevation services information to enhance navigation applications.
