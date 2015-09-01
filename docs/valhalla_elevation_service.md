@@ -46,13 +46,13 @@ The `encoded_polyline` parameter is simply a string of polyline encoded shape.
 
 | Encoded polyline parameters | Description |
 | :--------- | :----------- |
-| 'encoded_polyline' | A set of encoded lat,lng pairs of a line or shape.|
+| `encoded_polyline` | A set of encoded lat,lng pairs of a line or shape.|
 
 The `range` parameter is simply a boolean value which controls whether or not the returned array is 1 or 2 dimensional as described below.
 
 | Range parameters | Description |
 | :--------- | :----------- |
-| 'range' | `true` or `false`. Defaulted to `false`.|
+| `range` | `true` or `false`. Defaulted to `false`.|
 
 ### Output
 
