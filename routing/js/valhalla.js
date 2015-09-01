@@ -187,7 +187,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }
     markers = [];
   };
-
+	
   // Number of locations
   var locations = 0;
   
@@ -376,14 +376,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
  }, false); 
 			
   map.on('click', function(e) {
-	if (typeof e.latlng != "undefined")
-		resetFileLoader();
     var geo = {
       'lat': e.latlng.lat,
       'lon': e.latlng.lng
     };
     
     if (locations == 0) {
+      Locations = [];
+      resetFileLoader();
+      
       Locations.push({lat: geo.lat, lon: geo.lon })
       $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], mode);
       locations++;
