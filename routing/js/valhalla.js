@@ -371,8 +371,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 		  formatter: new L.Routing.Valhalla.Formatter(),
 		    pointMarkerStyle: {radius: 6,color: '#25A5FA',fillColor: '#5E6472',opacity: 1,fillOpacity: 1}
 			}).addTo(map);
+		  
+		  var elevationBtn = document.getElementById("elevation_btn");
+		  
+		  elevationBtn.addEventListener('click', function (e) {
+		  	getEnvToken();
+		  	var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(envToken, rr._routes[0].rrshape) : 0;
+		  	elev.resetChart();
+	        elev.profile(elev._rrshape);
+	        document.getElementById('graph').style.display="block";
+	      });
      }
    }
+   
  }, false); 
 			
   map.on('click', function(e) {
@@ -561,6 +572,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
     document.getElementById('inputFile').addEventListener('change', selectFiles, false);
   });
+
 });
 
   $("#showbtn").on("click", function() {
