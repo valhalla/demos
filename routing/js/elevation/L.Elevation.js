@@ -263,7 +263,7 @@ if (typeof module !== undefined) module.exports = polyline;
 	    			                radius: 0,
 	    			                show: true,
 	    			                fill: true
-	    			            },
+	    			            }
 	    			        },
 	    			        legend: {
 	    			            labelBoxBorderColor: "none",
