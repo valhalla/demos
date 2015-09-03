@@ -198,11 +198,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   // Set up the hash
   var hash = new L.Hash(map);
   var markers = [];
+  var locateMarkers = [];
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = [];
   };
 
   // Number of locations
@@ -245,6 +250,26 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     map.addLayer(marker);
     markers.push(marker);
   });
+  
+  //locate edge snap markers
+  var locateEdgeMarkers = function (locate_result) {
+    //clear it
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = []
+
+    //mark all the results for that spot
+    locate_result.ways.forEach(function (element, index, array) {
+      var marker = new L.marker(
+        {lat: element.correlated_lat, lon: element.correlated_lon},
+        {icon: getFileViaIcon(null)}
+      );
+      map.addLayer(marker);
+      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();      
+      locateMarkers.push(marker);
+    });
+  };
 
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, m) {
     if (locations == 0) {
@@ -654,6 +679,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('inputFile').addEventListener('change', selectFiles, false);
     });
 
+  });
+  
+  //ask the service for information about this location
+  map.on("contextmenu", function(e) {
+    var ll = {
+      lat: e.latlng.lat,
+      lon: e.latlng.lng
+    };
+    getEnvToken();
+    var locate = L.locate(envToken);
+    locate.locate(ll, locateEdgeMarkers);
   });
 
   $("#showbtn").on("click", function() {
