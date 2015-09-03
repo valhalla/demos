@@ -5,7 +5,9 @@ var date = new Date();
 var isoDateTime = date.toISOString();  //"2015-06-12T15:28:46.493Z"
 var serviceUrl;
 var envToken;
+var elevToken;
 var envServer;
+var elevServiceUrl;
 
 function selectEnv(){
   $( "option:selected" ).each(function() {
@@ -15,17 +17,23 @@ function selectEnv(){
   });
 }
 
-function getEnvToken(){
+function getEnvToken() {
   switch (envServer) {
   case "localhost":
-	  envToken = accessToken.local;
-	  break;
+    envToken = accessToken.local;
+    elevServiceUrl = elevationServer.local;
+    elevToken = elevAccessToken.local;
+    break;
   case "development":
-	  envToken = accessToken.dev;
-	  break;
+    envToken = accessToken.dev;
+    elevServiceUrl = elevationServer.dev;
+    elevToken = elevAccessToken.dev;
+    break;
   case "production":
-	  envToken = accessToken.prod;
-	  break;
+    envToken = accessToken.prod;
+    elevServiceUrl = elevationServer.prod;
+    elevToken = elevAccessToken.prod;
+    break;
   }
 }
 
@@ -270,9 +278,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
   
   elevationBtn.addEventListener('click', function (e) {
-	getEnvToken();
-	var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(envToken, rr._routes[0].rrshape) : 0;
-	elev.resetChart();
+    selectEnv();
+    var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+    elev.resetChart();
     elev.profile(elev._rrshape);
     document.getElementById('graph').style.display="block";
   });

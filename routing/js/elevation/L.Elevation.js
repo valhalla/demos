@@ -197,7 +197,7 @@ if (typeof module !== undefined) module.exports = polyline;
 
   L.Elevation = L.Class.extend({
     options: {
-      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : elevationServer.dev,
+      elevServiceUrl : (typeof elevServiceUrl != "undefined" || elevServiceUrl != null) ? elevServiceUrl : elevationServer.dev,
       timeout: 30 * 1000
     },
 
@@ -326,14 +326,12 @@ if (typeof module !== undefined) module.exports = polyline;
 	     });
 	
 	     //reset service url & access token if environment has changed
-	     (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=elevationServer.dev;
-	     (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
-	
-	     console.log(this.options.serviceUrl + 'height?json=' +
-	            params + '&api_key=' + this._accessToken);
-	     
-	    return this.options.serviceUrl + 'height?json=' +
-	            params + '&api_key=' + this._accessToken;
+	     (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.elevServiceUrl = elevServiceUrl : this.options.elevServiceUrl = elevationServer.dev;
+	     (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
+
+	     console.log(this.options.elevServiceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
+
+	     return this.options.elevServiceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
 	  },
 	  
 	  getDataPoints: function(elevresult) {
