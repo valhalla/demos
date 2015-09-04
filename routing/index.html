@@ -31,9 +31,8 @@
             padding:0;
         }
         .transparent_btn{
-            width:100%;
             height:30px;
-            margin-bottom:20px;
+            margin-bottom:10px;
         }
         .transparent_btn:hover{
             background-color:#ccc;
@@ -45,12 +44,12 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Routing<br>Test Tool</h1>
-            <h4>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h4>
-            <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
-            <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
+            <h3>Valhalla Routing<br>Test Tool</h3>
+            <h6>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h6>
+            <h6>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h6>
+            <h6>NOTE: Transit defaults to 12:15 on current date.</h6>
             <hr>
-            <span style="color:white" class="dropdown">Select an environment:</span><br>
+            <span style="color:white" class="descriptions">Select an environment:</span><br>
 			<select id = "env_dropdown" onchange="selectEnv()">
 				  <option id=localhost value="http://localhost:8002/">localhost</option>
 				  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
@@ -58,7 +57,7 @@
 				</select>
 		    <br>
 		    <div>
-		    <h5 style="color:white">Routing Options: </h5>
+		    <span style="color:white" class="descriptions">Routing Options: </span><br>
 				<form>
 					 <input type="button" id="showbtn" name="showbtn"  value="Show"/>
 					 <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
@@ -66,7 +65,10 @@
 			</div>
             <br>
 
-            <button id="drive_btn" class = "transparent_btn" type="button">Drive Me!</button>
+            <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
+            <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
+            <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
+            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 
              <div id="options" name="options" style="display:none">
 				<form id="bike" name="bike" ><span style="color:white"
@@ -83,9 +85,6 @@
 				</form>
 		    </div>
 			<br>
-            <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
-            <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
-            <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
             <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
           </div>
