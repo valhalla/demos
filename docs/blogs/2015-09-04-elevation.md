@@ -29,23 +29,27 @@ Just zoom in to a desired area and point and click on the map to generate an ele
 <script type="text/javascript" src="../../routing/js/elevation/flot/jquery.colorhelpers.js"></script>
 <script type="text/javascript" src="../../routing/js/elevation/flot/jquery.flot.canvas.js"></script>
 <script type="text/javascript" src="../../routing/js/elevation/flot/jquery.flot.stack.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script type="text/javascript" src="../../routing/js/leaflet-hash.js"></script>
+<script src="js/elevation-blog-demo.js"></script>
+<script src="js/L.Elevation.Blog.js"></script>
 
 <style>
 body{
-width: 100%;
-height: 100%;
-overflow: hidden;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 #mapwrapper{
-padding:0;
+  padding:0;
 }
 .transparent_btn{
-width:100%;
-height:30px;
-margin-bottom:20px;
+  width:100%;
+  height:30px;
+  margin-bottom:20px;
 }
 .transparent_btn:hover{
-background-color:#ccc;
+  background-color:#ccc;
 }
 </style>
 
@@ -54,11 +58,6 @@ background-color:#ccc;
 <button id="clearbtn" class = "transparent_btn" type="button">clear</button>
 <div id="map"></div>
 </div>
-
-<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-<script type="text/javascript" src="../../routing/js/leaflet-hash.js"></script>
-<script src="js/elevation-blog-demo.js"></script>
-<script src="js/L.Elevation.Blog.js"></script>
 
 <script type="text/javascript">
 window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
