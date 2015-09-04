@@ -275,6 +275,9 @@
                     "color" : '#2E2EFE'
                   } ];
                   this._graphoptions = {
+                    axislabels : {
+                      show : true
+                    },
                     threshold : {
                       below : 0,
                       color : "#c00000"
@@ -282,22 +285,34 @@
                     legend : {
                       show : false
                     },
-                    // series: { /* set based on button in drawGraph */ },
                     grid : {
-                      hoverable : true,
-                      clickable : true,
-                      autoHighlight : true
+                     // hoverable : true,
+                     /// clickable : true,
+                     // autoHighlight : true
+                      borderWidth: 1,
+                      minBorderMargin: 20,
+                      labelMargin: 10,
+                      backgroundColor: {
+                          colors: ["#fff", "#e4f4f4"]
+                      },
+                      margin: {
+                          top: 8,
+                          bottom: 25,
+                          left: 20
+                      }
                     },
                     xaxis : {
                       min : 0,
-                      axisLabel : 'Range',
+                      //axisLabel : 'Range',
+                      labelWidth: 30,
                       axisLabelUseCanvas : true,
                       axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
                       axisLabelPadding : 10
                     },
                     yaxis : {
-                      axisLabel : 'Height',
+                     // axisLabel : 'Height',
+                      labelWidth: 30,
                       axisLabelUseCanvas : true,
                       axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
@@ -323,21 +338,23 @@
                     lines : {
                       fill : true,
                       lineWidth : 3,
-                      
                     }
-
                   };
-                  $.plot($('#graph'), this._graphdata, this._graphoptions);
 
+                  $.plot($('#graph'), this._graphdata, this._graphoptions);
+                  var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+                  var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+                  yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
+                  
                   // this._profileDone(elevresult, callback, context);
                   // this.bindEvents(plot);
 
                 }/*
-                   * else { callback.call(context || callback, { status: -1,
-                   * message: 'HTTP request failed: ' + err.response }); //
-                   * alert("Travel Mode: "+ this._transitmode + ", status code: " +
-                   * err.status + ", " + err.response); }
-                   */
+                 * else { callback.call(context || callback, { status: -1,
+                 * message: 'HTTP request failed: ' + err.response }); //
+                 * alert("Travel Mode: "+ this._transitmode + ", status code: " +
+                 * err.status + ", " + err.response); }
+                 */
               }
             }, this), true);
 
