@@ -9,10 +9,10 @@ var elev;
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
-      'lat' : 20.76,
-      'lng' : -21.09
+      'lat' : 47.2200,
+      'lng' :  9.3357
     },
-    'zoom' : 4
+    'zoom' : 13
   };
   $rootScope.geobase = {
     'zoom' : hash_loc.zoom,
@@ -52,32 +52,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   L.control.layers(baseMaps, null).addTo(map);
 
-  var Locations = [];
-
   var getElevationServiceUrl = function() {
     elevServiceUrl = elevationServer.prod;
     elevToken = elevAccessToken.prod;
   }
-
-  var displayElevation = function() {
-    elev = (typeof Locations != "undefined") ? L.Elevation.blog(elevToken, Locations) : 0;
-    elev.resetChart();
-    elev.profile(elev._rrshape, marker_update);
-    document.getElementById('graph').style.display = "block";
-    $("#clearbtn").show();
-  }
-
-  var locationPt = function(icon) {
-    return L.icon({
-      iconUrl : '../../../routing/resource/dot.png',
-      iconSize : [ 20, 20 ], // size of the icon
-      iconAnchor : [ 10, 10]
-    });
-  };
   
   var resampledPt = function(icon) {
     return L.icon({
-      iconUrl : '../../../routing/resource/dot.png',
+      iconUrl : '../../../routing/resource/bluedot.png',
       iconSize : [ 10, 10 ], // size of the icon
       iconAnchor : [ 5, 5 ]
     });
@@ -97,29 +79,42 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }
     resampled = [];
   };
+  
+  var displayElevation = function() {
+    //get the locations
+    var locations = [];
+    markers.forEach(function(e,i,a){
+      locations.push({lon: e._latlng.lng, lat: e._latlng.lat})
+    });
+    
+    elev = L.Elevation.blog(elevToken, locations);
+    elev.resetChart();
+    elev.profile(elev._rrshape, marker_update);
+    document.getElementById('graph').style.display = "block";
+    $("#clearbtn").show();
+  }
 
-  // Number of locations
-  var locations = 0;
+  var locationPt = function(icon) {
+    return L.icon({
+      iconUrl : '../../../routing/resource/bluedot.png',
+      iconSize : [ 20, 20 ], // size of the icon
+      iconAnchor : [ 10, 10]
+    });
+  };
 
   var reset = function() {
     $('svg').html('');
     $('.leaflet-routing-container').remove();
     $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
-    $scope.$emit('resetRouteInstruction');
     remove_markers();
-    locations = 0;
   };
-
-  $rootScope.$on('map.setView', function(ev, geo, zoom) {
-    map.setView(geo, zoom || 8);
-  });
 
   $rootScope.$on('map.elevationMarker', function(ev, latlng) {
     var marker = new L.marker(latlng, { icon : locationPt() });
     map.addLayer(marker);
     markers.push(marker);
   });
-  
+   
   var marker_update = function(elevation) {
     //get the input locations
     var locations = []
@@ -151,67 +146,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     return $sce.trustAsHtml(html_code);
   };
 
-  $scope.$on('setRouteInstruction', function(ev, instructions) {
-    $scope.$apply(function() {
-      $scope.route_instructions = instructions;
-    });
-  });
-
-  $scope.$on('resetRouteInstruction', function(ev) {
-    $scope.$apply(function() {
-      $scope.route_instructions = '';
-    });
-  });
-
   map.on('click', function(e) {
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
-
-    if (locations == 0) {
-      Locations.push({
-        lat : geo.lat,
-        lon : geo.lon
-      })
-      $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
-
-      locations++;
-    } else if (locations > 1) {
-      Locations.push({
-        lat : geo.lat,
-        lon : geo.lon
-      })
-      $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
-      locations++;
-    }
-
+    $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
     getElevationServiceUrl();
     displayElevation();
-
-    $scope.$on('setRouteInstruction', function(ev, instructions) {
-      $scope.$apply(function() {
-        $scope.route_instructions = instructions;
-      });
-    });
-
-    $scope.$on('resetRouteInstruction', function(ev) {
-      $scope.$apply(function() {
-        $scope.route_instructions = '';
-      });
-    });
-
-    var waypoints = [];
-    Locations.forEach(function(gLoc) {
-      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
-    });
-
-    waypoints.push(L.latLng(geo.lat, geo.lon));
-
-    $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
-    locations++;
-
   });
+  
+  //TODO: something with hashing url stuff is makign this not work
+  map.on('load', function(e) {
+    $rootScope.$emit('map.elevationMarker', [ 47.20365107869972, 9.352025985717773 ]);
+    $rootScope.$emit('map.elevationMarker', [ 47.27002789823629, 9.341468811035154 ]);
+    getElevationServiceUrl();
+    displayElevation();
+  });  
 
   $("#clearbtn").on("click", function() {
     remove_markers();
