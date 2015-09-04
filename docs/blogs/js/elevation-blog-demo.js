@@ -1,4 +1,4 @@
-var app = angular.module('routing', []);
+var app = angular.module('elevation', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
 var elevToken;
