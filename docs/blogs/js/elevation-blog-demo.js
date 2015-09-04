@@ -1,4 +1,4 @@
-var app = angular.module('routing', []);
+var app = angular.module('elevation', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
 var elevToken;
@@ -69,7 +69,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var locationPt = function(icon) {
     return L.icon({
-      iconUrl : '../../routing/resource/dot.png',
+      iconUrl : '../../../routing/resource/dot.png',
       iconSize : [ 20, 20 ], // size of the icon
       iconAnchor : [ 10, 10]
     });
@@ -77,7 +77,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   
   var resampledPt = function(icon) {
     return L.icon({
-      iconUrl : '../../routing/resource/dot.png',
+      iconUrl : '../../../routing/resource/dot.png',
       iconSize : [ 10, 10 ], // size of the icon
       iconAnchor : [ 5, 5 ]
     });
