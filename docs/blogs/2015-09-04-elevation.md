@@ -18,7 +18,7 @@ You can check it out using our leaflet Route Testing Tool or clone the valhalla 
 #### Check it out!
 Just zoom in to a desired area and point and click on the map to generate an elevation chart.
 
-<insert demo here> (/docs/blogs/demos/elevation-blog-index.html)
+{% include "demos/elevation-blog-index.html" %}
 
 For more detail about the service please read over our [Elevation service documentation](https://github.com/valhalla/valhalla-docs.git) or drop us a line at [routing@mapzen.com] if you have an questions or suggestions!
 
