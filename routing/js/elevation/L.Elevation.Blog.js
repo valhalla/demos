@@ -270,9 +270,9 @@
                     "data" : elevresult.range_height,
                     "points" : {
                       "symbol" : "circle",
-                      "fillColor" : "#058DC7"
+                      "fillColor" : "#2E2EFE"
                     },
-                    "color" : '#058DC7'
+                    "color" : '#2E2EFE'
                   } ];
                   this._graphoptions = {
                     threshold : {
@@ -292,20 +292,22 @@
                       min : 0,
                       axisLabel : 'Range',
                       axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 12,
+                      axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 5
+                      axisLabelPadding : 10
                     },
                     yaxis : {
                       axisLabel : 'Height',
                       axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 12,
+                      axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 5
+                      axisLabelPadding : 10
                     },
                     series : {
+                      stack : true,
                       lines : {
-                        show : true
+                        show : true,
+                        fill : true
                       },
                       points : {
                         radius : 0,
@@ -318,6 +320,11 @@
                       labelBoxBorderColor : "none",
                       position : "right"
                     },
+                    lines : {
+                      fill : true,
+                      lineWidth : 3,
+                      
+                    }
 
                   };
                   $.plot($('#graph'), this._graphdata, this._graphoptions);

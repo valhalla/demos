@@ -9,10 +9,10 @@ var elev;
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
-      'lat' : 22.35,
-      'lng' : -14.15
+      'lat' : 20.76,
+      'lng' : -21.09
     },
-    'zoom' : 3
+    'zoom' : 4
   };
   $rootScope.geobase = {
     'zoom' : hash_loc.zoom,
@@ -70,7 +70,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var getElevationPt = function(icon) {
     return L.icon({
       iconUrl : 'resource/startmarker@2x.png',
-      iconSize : [ 30, 35 ], // size of the icon
+      iconSize : [ 35, 40 ], // size of the icon
       iconAnchor : [ 12, 22 ]
     });
   };

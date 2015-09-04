@@ -64,7 +64,7 @@ div#route_inst table td.distance{
 
 #graph{
   width: 20px;
-  height: 200px;
+  height: 225px;
   position: right;
   margin: 0 auto;
   background-color: #FFF;
@@ -84,7 +84,7 @@ div#route_inst table td.distance{
 }
 
 #flot-tooltip {
-  font-size: 12px;
+  font-size: 14px;
   font-family: Verdana, Arial, sans-serif;
   position: absolute;
   display: none;
