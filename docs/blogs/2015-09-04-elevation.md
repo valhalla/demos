@@ -17,7 +17,9 @@ It would have been nice to be able to see what the journey ahead might look like
 Just zoom in to a desired area and point and click on the map to generate an elevation chart.
 
 <script type="text/javascript">
-alert('blah');
+
+  alert('blah');
+  
 </script>
 
 #### There's an API for that
