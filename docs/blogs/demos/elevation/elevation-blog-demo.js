@@ -69,7 +69,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var getElevationPt = function(icon) {
     return L.icon({
-      iconUrl : 'resource/startmarker@2x.png',
+      iconUrl : '../../../routing/resource/startmarker@2x.png',
       iconSize : [ 35, 40 ], // size of the icon
       iconAnchor : [ 12, 22 ]
     });
