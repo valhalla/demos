@@ -163,7 +163,7 @@
             $('#graph').empty();
           },
 
-          profile : function(rrshape, callback, context, options) {
+          profile : function(rrshape, marker_update, callback, context, options) {
             var timedOut = false, options = options || {};
 
             var url = this.buildProfileUrl(rrshape, options);
@@ -182,6 +182,7 @@
               if (!timedOut) {
                 if (!err) {
                   elevresult = JSON.parse(resp.responseText);
+                  marker_update(elevresult);
                   this._graphdata = [ {
                     "label" : "Elevation",
                     "data" : elevresult.range_height,
@@ -284,7 +285,7 @@
             var params = JSON.stringify({
               shape : rrshape,
               range : true,
-              resample_distance : 30
+              resample_distance : 100
             });
 
             // reset service url & access token if environment has changed
