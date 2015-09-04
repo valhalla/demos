@@ -62,27 +62,40 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var displayElevation = function() {
     elev = (typeof Locations != "undefined") ? L.Elevation.blog(elevToken, Locations) : 0;
     elev.resetChart();
-    elev.profile(elev._rrshape);
+    elev.profile(elev._rrshape, marker_update);
     document.getElementById('graph').style.display = "block";
     $("#clearbtn").show();
   }
 
-  var getElevationPt = function(icon) {
+  var locationPt = function(icon) {
     return L.icon({
-      iconUrl : '../../../routing/resource/startmarker@2x.png',
-      iconSize : [ 35, 40 ], // size of the icon
-      iconAnchor : [ 12, 22 ]
+      iconUrl : '../../../routing/resource/dot.png',
+      iconSize : [ 20, 20 ], // size of the icon
+      iconAnchor : [ 10, 10]
+    });
+  };
+  
+  var resampledPt = function(icon) {
+    return L.icon({
+      iconUrl : '../../../routing/resource/dot.png',
+      iconSize : [ 10, 10 ], // size of the icon
+      iconAnchor : [ 5, 5 ]
     });
   };
 
   // Set up the hash
   var hash = new L.Hash(map);
   var markers = [];
+  var resampled = []
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
+    for (i = 0; i < resampled.length; i++) {
+      map.removeLayer(resampled[i]);
+    }
+    resampled = [];
   };
 
   // Number of locations
@@ -101,16 +114,38 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     map.setView(geo, zoom || 8);
   });
 
-  $rootScope.$on('map.elevationMarker', function(ev, geo) {
-    var marker = new L.marker(geo, {
-      icon : getElevationPt()
-    });
-    marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-        + "&layers=Q target=_blank>Edit POI here<a/>");
-
+  $rootScope.$on('map.elevationMarker', function(ev, latlng) {
+    var marker = new L.marker(latlng, { icon : locationPt() });
     map.addLayer(marker);
     markers.push(marker);
   });
+  
+  var marker_update = function(elevation) {
+    //get the input locations
+    var locations = []
+    markers.forEach(function(e,i,a){
+      locations.push(e._latlng);
+    });
+    
+    //undraw everything
+    remove_markers();
+    
+    //draw locations
+    locations.forEach(function(e,i,a) {
+      var marker = new L.marker( e, {icon : locationPt()});
+      marker.bindPopup('<pre class="loc_point">input location</pre>');
+      map.addLayer(marker);
+      markers.push(marker);
+    });
+
+    //draw interpolations
+    for(var i = 0; i < elevation.shape.length; i++) {
+      var marker = new L.marker( [elevation.shape[i].lat, elevation.shape[i].lon], {icon : resampledPt()});
+      marker.bindPopup('<pre class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
+      map.addLayer(marker);
+      resampled.push(marker);
+    }
+  };
 
   $scope.renderHtml = function(html_code) {
     return $sce.trustAsHtml(html_code);
