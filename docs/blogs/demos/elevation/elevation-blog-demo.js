@@ -133,7 +133,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     //draw locations
     locations.forEach(function(e,i,a) {
       var marker = new L.marker( e, {icon : locationPt()});
-      marker.bindPopup('<pre class="loc_point">input location</pre>');
+      marker.bindPopup('<pre style="display:inline" class="loc_point">input location</pre>');
       map.addLayer(marker);
       markers.push(marker);
     });
@@ -141,7 +141,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     //draw interpolations
     for(var i = 0; i < elevation.shape.length; i++) {
       var marker = new L.marker( [elevation.shape[i].lat, elevation.shape[i].lon], {icon : resampledPt()});
-      marker.bindPopup('<pre class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
+      marker.bindPopup('<pre style="display:inline" class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
       map.addLayer(marker);
       resampled.push(marker);
     }
