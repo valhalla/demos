@@ -34,25 +34,6 @@ Just zoom in to a desired area and point and click on the map to generate an ele
 <script src="js/elevation-blog-demo.js"></script>
 <script src="js/L.Elevation.Blog.js"></script>
 
-<style>
-body{
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-#mapwrapper{
-  padding:0;
-}
-.transparent_btn{
-  width:100%;
-  height:30px;
-  margin-bottom:20px;
-}
-.transparent_btn:hover{
-  background-color:#ccc;
-}
-</style>
-
 <div class="container-fluid" data-ng-controller="RouteController">
 <div id="graph" style= "display:none; height:225 	px; width: 50%; float:center;"></div>
 <button id="clearbtn" class = "transparent_btn" type="button">clear</button>
