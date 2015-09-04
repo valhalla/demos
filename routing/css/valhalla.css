@@ -1,5 +1,5 @@
 body {
-  font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0px;
   margin: 0px;
   background-color: black;
@@ -18,7 +18,7 @@ body {
   height:20px;
 }
 
-#instructions h1, h4 {
+#instructions h1, h2, h3, h4, h5, h6 {
     color:white;
 }
 
