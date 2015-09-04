@@ -2,13 +2,13 @@
 
 How often have you ended up on a spontaneous hiking/biking adventure on a path/trail that you’ve never been to before? At first you were thinking to yourself...
 
+    Sweet, this is going to be a story for the ages!
 ![Sure Let's Go!](images/sure.jpg "Sweet, this is going to be a story for the ages!")
-Sweet, this is going to be a story for the ages!
 
 But then you quickly realized...
 
+    Holy $h!t will I even survive to tell it!?
 ![I don't know about this...](images/unsure.jpg "Holy $h!t will I even survive to tell it!?")
-Holy $h!t will I even survive to tell it!?
 
 It would have been nice to be able to see what the journey ahead might look like. Maybe even an elevation chart to look at before deciding to plunge into your adventure? We have some tools to help you with that on your next outing, start clicking!
 
