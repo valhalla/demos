@@ -143,16 +143,15 @@
 
         L.Elevation = L.Elevation || {};
 
-        L.Elevation.Blog = L.Class.extend({
+        L.Elevation.Demo = L.Class.extend({
           options : {
-            elevServiceUrl : (typeof elevServiceUrl != "undefined" || elevServiceUrl != null) ? elevServiceUrl : elevationServer.dev,
+            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
             timeout : 30 * 1000
           },
 
-          initialize : function(accessToken, rrshape, options) {
+          initialize : function(accessToken, options) {
             L.Util.setOptions(this, options);
             this._accessToken = accessToken;
-            this._rrshape = rrshape;
             this._graphdata = [];
             this._graphoptions = {};
           },
@@ -263,22 +262,13 @@
                   var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
                   var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
                   yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
-
-                  // this.bindEvents(plot);
-
-                }/*
-                 * else { callback.call(context || callback, { status: -1,
-                 * message: 'HTTP request failed: ' + err.response }); //
-                 * alert("Travel Mode: "+ this._transitmode + ", status code: " +
-                 * err.status + ", " + err.response); }
-                 */
+                }
               }
             }, this), true);
 
             return this;
           },
-
-          // /mapzen example
+          
           buildProfileUrl : function(rrshape, options) {
             var locs = [], locationKey, hint;
 
@@ -289,12 +279,12 @@
             });
 
             // reset service url & access token if environment has changed
-            (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.elevServiceUrl = elevServiceUrl : this.options.elevServiceUrl = elevationServer.dev;
-            (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
+            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.dev;
+            (typeof token != "undefined" || token != null) ? this._accessToken = token : this._accessToken = accessToken.dev;
 
-            console.log(this.options.elevServiceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
+            console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
 
-            return this.options.elevServiceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
+            return this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
           },
 
           getDataPoints : function(elevresult) {
@@ -346,28 +336,12 @@
           }
         });
 
-        L.Elevation.blog = function(accessToken, shape, options) {
-          return new L.Elevation.Blog(accessToken, shape, options);
+        L.Elevation.demo = function(accessToken, options) {
+          return new L.Elevation.Demo(accessToken, options);
         };
 
         module.exports = L.Elevation;
       })();
-
-      /*
-       * var previousPoint = null; $("#placeholder").bind("plothover", function
-       * (event, pos, item) { alert(item); if (item) { if ((previousPoint !=
-       * item.dataIndex) || (previousLabel != item.series.label)) {
-       * previousPoint = item.dataIndex; previousLabel = item.series.label;
-       * 
-       * $("#flot-tooltip").remove();
-       * 
-       * var x = getDataPoints(item.dataPoints[0]), y = item.dataPoints[1]; z =
-       * item.series.color;
-       * 
-       * showTooltip(item.pageX, item.pageY, "<b>" + item.series.label + "</b><br /> " +
-       * x + " = " + y + "mm", z); } } else { $("#flot-tooltip").remove();
-       * previousPoint = null; } } );
-       */
 
     }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
   }, {

@@ -358,21 +358,22 @@
             var locs = [], locationKey, hint;
 
             var params = JSON.stringify({
-              encoded_polyline : rrshape
+              encoded_polyline : rrshape,
+              range: true
             });
 
             //reset service url & access token if environment has changed
-            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = elevationServer.dev;
-            (typeof envToken != "undefined" || envToken != null) ? this._accessToken = envToken : this._accessToken = accessToken.dev;
+            (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.serviceUrl = elevServiceUrl : this.options.serviceUrl = elevationServer.dev;
+            (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
 
-            console.log(this.options.serviceUrl + 'profile?json=' + params + '&api_key=' + this._accessToken);
+            console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
 
-            return this.options.serviceUrl + 'profile?json=' + params + '&api_key=' + this._accessToken;
+            return this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
           },
 
           getDataPoints : function(elevresult) {
             var dataPoints = [];
-            for (var xy = 0; xy < elevresult.profile.length; xy++) {
+            for (var xy = 0; xy < elevresult.range_height.length; xy++) {
               dataPoints.push({
                 x : elevresult.profile[xy][0] != null ? elevresult.profile[xy][0] : 0,
                 y : elevresult.profile[xy][1] != null ? elevresult.profile[xy][1] : 0
