@@ -1,10 +1,8 @@
 var app = angular.module('elevation', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
-var elevToken;
-var elevServiceUrl;
-var shape = new Array();
-var elev;
+serviceUrl = server.prod;
+token = accessToken.prod;
 
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
@@ -28,7 +26,7 @@ app.run(function($rootScope) {
   })
 });
 
-app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
+app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
   var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
@@ -51,15 +49,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   L.control.layers(baseMaps, null).addTo(map);
-
-  var getElevationServiceUrl = function() {
-    elevServiceUrl = elevationServer.prod;
-    elevToken = elevAccessToken.prod;
-  }
   
   var resampledPt = function(icon) {
     return L.icon({
-      iconUrl : '../../../routing/resource/bluedot.png',
+      iconUrl : 'resource/bluedot.png',
       iconSize : [ 10, 10 ], // size of the icon
       iconAnchor : [ 5, 5 ]
     });
@@ -87,26 +80,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       locations.push({lon: e._latlng.lng, lat: e._latlng.lat})
     });
     
-    elev = L.Elevation.blog(elevToken, locations);
+    elev = L.Elevation.demo(token);
     elev.resetChart();
-    elev.profile(elev._rrshape, marker_update);
+    elev.profile(locations, marker_update);
     document.getElementById('graph').style.display = "block";
     $("#clearbtn").show();
   }
 
   var locationPt = function(icon) {
     return L.icon({
-      iconUrl : '../../../routing/resource/bluedot.png',
+      iconUrl : 'resource/bluedot.png',
       iconSize : [ 20, 20 ], // size of the icon
       iconAnchor : [ 10, 10]
     });
-  };
-
-  var reset = function() {
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
-    remove_markers();
   };
 
   $rootScope.$on('map.elevationMarker', function(ev, latlng) {
@@ -152,7 +138,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       'lon' : e.latlng.lng
     };
     $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
-    getElevationServiceUrl();
     displayElevation();
   });
   
@@ -160,7 +145,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   map.on('load', function(e) {
     $rootScope.$emit('map.elevationMarker', [ 47.20365107869972, 9.352025985717773 ]);
     $rootScope.$emit('map.elevationMarker', [ 47.27002789823629, 9.341468811035154 ]);
-    getElevationServiceUrl();
     displayElevation();
   });  
 

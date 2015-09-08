@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/valhalla.css" />
+    <link rel="stylesheet" href="../elevation/css/elevation.css" />
     <script src="conf/env.conf"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
@@ -17,11 +18,14 @@
 		//Script featured on JavaScript Kit (http://www.javascriptkit.com)
 		//For this script, visit http://www.javascriptkit.com
 	</script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.symbol.min.js"></script>
-    <script type="text/javascript" src="http://raw.github.com/markrcote/flot-axislabels/master/jquery.flot.axislabels.js"></script>
- 
-     <style>
+    <script type = "text/javascript" src="../flot/jquery.flot.min.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.symbol.min.js"></script>
+    <script type="text/javascript" src="../flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="../flot/jquery.colorhelpers.js"></script>
+    <script type="text/javascript" src="../flot/jquery.flot.canvas.js"></script>
+    <script type="text/javascript" src="../flot/jquery.flot.stack.js"></script>
+  
+    <style>
         body{
             width: 100%;
             height: 100%;
@@ -65,27 +69,26 @@
 				</form>
 			</div>
             <br>
-
-            <button id="drive_btn" class = "transparent_btn" type="button">Drive Me!</button>
-
-             <div id="options" name="options" style="display:none">
-				<form id="bike" name="bike" ><span style="color:white"
-				  road: <p>road: <input type="radio" name="btype" value="Road" checked/>
+            <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
+              <div id="options" name="options" style="display:none">
+			  <form id="bike" name="bike" ><span style="color:white"
+				<h2><b>Bike Options:</b></h2><br>
+				  road: <input type="radio" name="btype" value="Road" checked/>
 				  cross: <input style="color:white" type="radio" name="btype" value="Cross" />
                   hybrid: <input type="radio" name="btype" value="Hybrid" />
                   mountain: <input type="radio" name="btype" value="Mountain"/>
                   <br>
                   use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
                   cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
-                  "hilliness" factor: <input type="textbox" id="hill_factor" value="0.0" class="biketextbox"/>
+                  use hills (0-1): <input type="textbox" id="use_hills" value="0.5" class="biketextbox"/>
                   </span>
                   <br>
-				</form>
+			  </form>
 		    </div>
+		    <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
+            <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
+            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 			<br>
-            <button id="bike_btn" class = "transparent_btn" type="button">Bike Me!</button>
-            <button id="walk_btn" class = "transparent_btn" type="button">Walk Me!</button>
-            <button id="multi_btn" class = "transparent_btn" type="button">Transport Me!</button>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
             <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
           </div>
