@@ -263,94 +263,88 @@
                   elevresult = JSON.parse(resp.responseText);
                   this._graphdata = [ {
                     "label" : "Elevation",
-                    "data" : elevresult.profile,
+                    "data" : elevresult.range_height,
                     "points" : {
                       "symbol" : "circle",
-                      "fillColor" : "#058DC7"
+                      "fillColor" : "#2E2EFE"
                     },
-                    "color" : '#058DC7'
+                    "color" : '#2E2EFE'
                   } ];
                   this._graphoptions = {
+                    axislabels : {
+                      show : true
+                    },
+                    threshold : {
+                      below : 0,
+                      color : "#c00000"
+                    },
                     legend : {
                       show : false
                     },
-                    //series: { /* set based on button in drawGraph */ },
                     grid : {
-                      hoverable : true,
-                      clickable : true,
-                      autoHighlight : true
+                     // hoverable : true,
+                     /// clickable : true,
+                     // autoHighlight : true
+                      borderWidth: 1,
+                      minBorderMargin: 20,
+                      labelMargin: 10,
+                      backgroundColor: {
+                          colors: ["#fff", "#e4f4f4"]
+                      },
+                      margin: {
+                          top: 8,
+                          bottom: 25,
+                          left: 20
+                      }
                     },
                     xaxis : {
                       min : 0,
-                      axisLabel : 'Range',
+                      //axisLabel : 'Range',
+                      labelWidth: 30,
                       axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 12,
+                      axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 5
+                      axisLabelPadding : 10
                     },
                     yaxis : {
-                      axisLabel : 'Height',
+                     // axisLabel : 'Height',
+                      labelWidth: 30,
                       axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 12,
+                      axisLabelFontSizePixels : 14,
                       axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 5
+                      axisLabelPadding : 10
                     },
                     series : {
+                      stack : true,
                       lines : {
-                        show : true
+                        show : true,
+                        fill : true
                       },
                       points : {
                         radius : 0,
                         show : true,
-                        fill : true
+                        fill : true,
+                        fillColor : '#83ce16'
                       },
                     },
                     legend : {
                       labelBoxBorderColor : "none",
                       position : "right"
                     },
-
+                    lines : {
+                      fill : true,
+                      lineWidth : 3,
+                    }
                   };
+
                   $.plot($('#graph'), this._graphdata, this._graphoptions);
-
-                  // this._profileDone(elevresult, callback, context);
-                  //this.bindEvents(plot);
-
-                }/* else {
-                                callback.call(context || callback, {
-                                  status: -1,
-                                  message: 'HTTP request failed: ' + err.response
-                                });
-                               // alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
-                              }*/
+                  var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+                  var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+                  yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
+                }
               }
             }, this), true);
-
             return this;
-          },
-
-          _profileDone : function(response, callback, context) {
-            var alts, i;
-            context = context || callback;
-            /*      if (response.profile.status !== 0) {
-              callback.call(context, {
-                status: response.status,
-                message: response.status_message
-              });
-              return;
-            }*/
-
-            alts = [ {
-              rrshape : this._rrshape,
-              graphdata : this.graphdata,
-              graphoptions : this.graphoptions
-            } ];
-
-            // only versions <4.5.0 will support this flag
-            if (response.hint_data) {
-              this._saveHintData(response.hint_data, alts);
-            }
-            callback.call(context, null, alts);
           },
 
           ///mapzen example

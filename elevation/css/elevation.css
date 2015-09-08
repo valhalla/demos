@@ -13,60 +13,10 @@ body {
   margin:0;*/
 }
 
-.modes {
-  width:20px;
-  height:20px;
-}
-
-#instructions h1, h2, h3, h4, h5, h6 {
-    color:white;
-}
-
-div#route_inst {
-  height: 50vh;
-  overflow: auto;
-  color: #ccc;
-}
-
-div#route_inst table td.distance{
-  width: 60px;
-  text-align: right;
-}
-
-.leaflet-control td.guide {
-    padding: 3px;
-    word-wrap: break-word;
-    width: 270px;
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-}
-
-.leaflet-control td.measure {
-    padding: 3px;
-    word-wrap: break-word;
-    width: 60px;
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-}
-
-.biketextbox {
-  width: 15%;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  color: black;
-
-}
-
-#elevation_btn {
-  width: 120px;
-}
-
 #clearbtn {
   width: 120px;
   text-align: center;
 }
-
 
 .axisLabel {
     position: absolute;
