@@ -4,6 +4,7 @@ var hash_params = L.Hash.parseHash(location.hash);
 serviceUrl = server.prod;
 token = accessToken.prod;
 
+//??
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
@@ -26,98 +27,75 @@ app.run(function($rootScope) {
   })
 });
 
+//hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
-  var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-    attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-  }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
-    attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-  });
-
+  //various tile sets
   var baseMaps = {
-    "RoadMap" : roadmap,
-    "CycleMap" : cyclemap,
-    "TransitMap" : transitmap
+    RoadMap : L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+      attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
+    }),
+    CycleMap : L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+      attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }),
+    TransitMap : L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
+      attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
+    })
   };
 
+  //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : false,
-    layers : [ cyclemap ],
+    layers : [ baseMaps.CycleMap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
 
+  //add the tile set chooser to the map
   L.control.layers(baseMaps, null).addTo(map);
   
+  //??
+  $scope.renderHtml = function(html_code) {
+    return $sce.trustAsHtml(html_code);
+  };
+  
+  //icon for point on the map
   var resampledPt = function(icon) {
     return L.icon({
       iconUrl : 'resource/bluedot.png',
-      iconSize : [ 10, 10 ], // size of the icon
+      iconSize : [ 10, 10 ],
       iconAnchor : [ 5, 5 ]
     });
   };
 
-  // Set up the hash
+  //allow hash links
   var hash = new L.Hash(map);
-  var markers = [];
+  //place to store clicked locations
+  var locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, 
+                    {lat: 47.27002789823629, lon: 9.341468811035154} ]
+  //place to store results
   var resampled = []
-  var remove_markers = function() {
-    for (i = 0; i < markers.length; i++) {
-      map.removeLayer(markers[i]);
-    }
-    markers = [];
-    for (i = 0; i < resampled.length; i++) {
-      map.removeLayer(resampled[i]);
-    }
+  
+  //undraw all the points
+  var clear = function() {
+    resampled.forEach(function (e,i,a) {
+      map.removeLayer(e);
+    });
     resampled = [];
   };
   
-  var displayElevation = function() {
-    //get the locations
-    var locations = [];
-    markers.forEach(function(e,i,a){
-      locations.push({lon: e._latlng.lng, lat: e._latlng.lat})
-    });
-    
+  //make the request to get the elevation
+  var getElevation = function() {    
     elev = L.Elevation.demo(token);
     elev.resetChart();
     elev.profile(locations, marker_update);
     document.getElementById('graph').style.display = "block";
     $("#clearbtn").show();
   }
-
-  var locationPt = function(icon) {
-    return L.icon({
-      iconUrl : 'resource/bluedot.png',
-      iconSize : [ 20, 20 ], // size of the icon
-      iconAnchor : [ 10, 10]
-    });
-  };
-
-  $rootScope.$on('map.elevationMarker', function(ev, latlng) {
-    var marker = new L.marker(latlng, { icon : locationPt() });
-    map.addLayer(marker);
-    markers.push(marker);
-  });
-   
-  var marker_update = function(elevation) {
-    //get the input locations
-    var locations = []
-    markers.forEach(function(e,i,a){
-      locations.push(e._latlng);
-    });
-    
+  
+  //call back for use when a result comes back
+  var marker_update = function(elevation) {    
     //undraw everything
-    remove_markers();
-    
-    //draw locations
-    locations.forEach(function(e,i,a) {
-      var marker = new L.marker( e, {icon : locationPt()});
-      marker.bindPopup('<pre style="display:inline" class="loc_point">input location</pre>');
-      map.addLayer(marker);
-      markers.push(marker);
-    });
+    clear();
 
     //draw interpolations
     for(var i = 0; i < elevation.shape.length; i++) {
@@ -128,32 +106,25 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     }
   };
 
-  $scope.renderHtml = function(html_code) {
-    return $sce.trustAsHtml(html_code);
-  };
-
+  //someone clicked, store the spot and show something
   map.on('click', function(e) {
-    var geo = {
+    locations.push({
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
-    };
-    $rootScope.$emit('map.elevationMarker', [ geo.lat, geo.lon ]);
-    displayElevation();
+    });
+    getElevation();
   });
   
-  //TODO: something with hashing url stuff is makign this not work
-  map.on('load', function(e) {
-    $rootScope.$emit('map.elevationMarker', [ 47.20365107869972, 9.352025985717773 ]);
-    $rootScope.$emit('map.elevationMarker', [ 47.27002789823629, 9.341468811035154 ]);
-    displayElevation();
-  });  
-
+  //someone clicked the clear button so reset
   $("#clearbtn").on("click", function() {
-    remove_markers();
-    Locations = [];
+    clear();
+    locations = [];
     elev.resetChart();
-    document.getElementById('graph').style.display = "none";
-    $("#clearbtn").hide();
   });
-
+  
+  //TODO: something with hashing url stuff is making this not work
+  map.on('load', function(e) {
+    getElevation();
+  });
+  
 })

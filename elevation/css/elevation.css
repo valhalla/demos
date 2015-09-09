@@ -48,9 +48,9 @@ body {
 }
 
 #graph{
-  width: 20px;
-  height: 225px;
-  position: right;
+  width: 200px;
+  height: 300px;
+  position: center;
   margin: 0 auto;
   background-color: #FFF;
 }
