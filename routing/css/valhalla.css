@@ -59,31 +59,15 @@ div#route_inst table td.distance{
 }
 
 #drive_btn, #bike_btn, #walk_btn, #multi_btn {
-  width: 70px;
+  min-width: 40px;
+  text-align: center;
 }
 #elevation_btn {
   width: 120px;
 }
-
-#graph{
-  width: 20px;
-  height: 200px;
-  position: right;
-  margin: 0 auto;
-  background-color: #FFF;
-}
-
-.legend table, .legend > div {
-  height: 35px !important;
-  opacity: 1 !important;
-  right: -55px;
-  top: 10px;
-  width: 116px !important;
-}
-
-.legend table {
-  border: 1px solid #555;
-  padding: 5px;
+#clearbtn {
+  width: 120px;
+  text-align: center;
 }
 
 #flot-tooltip {
