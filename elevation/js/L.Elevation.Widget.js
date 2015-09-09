@@ -76,7 +76,8 @@
       }
 
       // Both `onreadystatechange` and `onload` can fire. `onreadystatechange`
-      // has [been supported for longer](http://stackoverflow.com/a/9181508/229001).
+      // has [been supported for
+      // longer](http://stackoverflow.com/a/9181508/229001).
       if ('onload' in x) {
         x.onload = loaded;
       } else {
@@ -87,7 +88,8 @@
         };
       }
 
-      // Call the callback with the XMLHttpRequest object as an error and prevent
+      // Call the callback with the XMLHttpRequest object as an error and
+      // prevent
       // it from ever being called again by reassigning it to `noop`
       x.onerror = function error(evt) {
         // XDomainRequest provides no evt parameter
@@ -125,8 +127,10 @@
 
     if (typeof module !== 'undefined')
       module.exports = corslite;
+
   }, {} ],
   2 : [ function(require, module, exports) {
+   
   }, {} ],
   3 : [ function(require, module, exports) {
     (function(global) {
@@ -139,16 +143,15 @@
 
         L.Elevation = L.Elevation || {};
 
-        L.Elevation = L.Class.extend({
+        L.Elevation.Demo = L.Class.extend({
           options : {
-            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : elevationServer.dev,
+            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
             timeout : 30 * 1000
           },
 
-          initialize : function(accessToken, rrshape, options) {
+          initialize : function(accessToken, options) {
             L.Util.setOptions(this, options);
             this._accessToken = accessToken;
-            this._rrshape = rrshape;
             this._graphdata = [];
             this._graphoptions = {};
           },
@@ -159,7 +162,7 @@
             $('#graph').empty();
           },
 
-          profile : function(rrshape, callback, context, options) {
+          profile : function(rrshape, marker_update, callback, context, options) {
             var timedOut = false, options = options || {};
 
             var url = this.buildProfileUrl(rrshape, options);
@@ -178,6 +181,7 @@
               if (!timedOut) {
                 if (!err) {
                   elevresult = JSON.parse(resp.responseText);
+                  marker_update(elevresult);
                   this._graphdata = [ {
                     "label" : "Elevation",
                     "data" : elevresult.range_height,
@@ -261,21 +265,22 @@
                 }
               }
             }, this), true);
+
             return this;
           },
-
-          ///mapzen example
+          
           buildProfileUrl : function(rrshape, options) {
             var locs = [], locationKey, hint;
 
             var params = JSON.stringify({
-              encoded_polyline : rrshape,
-              range: true
+              shape : rrshape,
+              range : true,
+              resample_distance : 100
             });
 
-            //reset service url & access token if environment has changed
-            (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.serviceUrl = elevServiceUrl : this.options.serviceUrl = elevationServer.dev;
-            (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
+            // reset service url & access token if environment has changed
+            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.dev;
+            (typeof token != "undefined" || token != null) ? this._accessToken = token : this._accessToken = accessToken.dev;
 
             console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
 
@@ -286,8 +291,8 @@
             var dataPoints = [];
             for (var xy = 0; xy < elevresult.range_height.length; xy++) {
               dataPoints.push({
-                x : elevresult.profile[xy][0] != null ? elevresult.profile[xy][0] : 0,
-                y : elevresult.profile[xy][1] != null ? elevresult.profile[xy][1] : 0
+                x : elevresult.range_height[xy][0] != null ? elevresult.range_height[xy][0] : 0,
+                y : elevresult.range_height[xy][1] != null ? elevresult.range_height[xy][1] : 0
               });
             }
             return dataPoints;
@@ -331,8 +336,8 @@
           }
         });
 
-        L.elevation = function(accessToken, shape, options) {
-          return new L.Elevation(accessToken, shape, options);
+        L.Elevation.demo = function(accessToken, options) {
+          return new L.Elevation.Demo(accessToken, options);
         };
 
         module.exports = L.Elevation;
