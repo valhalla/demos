@@ -5,7 +5,7 @@ How often have you ended up on a spontaneous hiking/biking adventure on a path/t
 <div id="main">
 <div id="fig1" style="float:left">
 <figure>
-<img src="images/sure.jpg" alt="Yay!" width="250" height="270">
+<img src="images/sure.jpg" alt="Yay!" width="250" height="230">
 <figcaption>This will be a story for the ages!</figcaption>
 </figure>
 </div>
@@ -14,7 +14,7 @@ But then you quickly realized...
 </div>
 <div id="fig2" style="float:right">
 <figure>
-<img src="images/unsure.jpg" alt="Bleh.." width="250" height="270">
+<img src="images/unsure.jpg" alt="Bleh.." width="250" height="230">
 <figcaption>Holy $h!t will I survive to tell it!?</figcaption>
 </figure>
 </div>
