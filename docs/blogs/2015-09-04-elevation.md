@@ -14,7 +14,7 @@ But then you quickly realized...
 </div>
 <div id="fig2" style="float:right">
 <figure>
-<img src="images/sure.jpg" alt="Bleh.." width="304" height="228">
+<img src="images/unsure.jpg" alt="Bleh.." width="304" height="228">
 <figcaption>Holy $h!t will I survive to tell it!?</figcaption>
 </figure>
 </div>
