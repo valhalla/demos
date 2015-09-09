@@ -143,7 +143,7 @@
 
         L.Elevation = L.Elevation || {};
 
-        L.Elevation.Demo = L.Class.extend({
+        L.Elevation.Widget = L.Class.extend({
           options : {
             serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
             timeout : 30 * 1000
@@ -336,8 +336,8 @@
           }
         });
 
-        L.Elevation.demo = function(accessToken, options) {
-          return new L.Elevation.Demo(accessToken, options);
+        L.Elevation.widget = function(accessToken, options) {
+          return new L.Elevation.Widget(accessToken, options);
         };
 
         module.exports = L.Elevation;

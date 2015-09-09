@@ -72,6 +72,12 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //place to store clicked locations
   var locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, 
                     {lat: 47.27002789823629, lon: 9.341468811035154} ]
+    
+  //TODO: something with hashing url stuff is making this not work
+  $(window).load(function(e) {
+    getElevation();
+  });
+  
   //place to store results
   var resampled = []
   
@@ -85,7 +91,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //make the request to get the elevation
   var getElevation = function() {    
-    elev = L.Elevation.demo(token);
+    elev = L.Elevation.widget(token);
     elev.resetChart();
     elev.profile(locations, marker_update);
     document.getElementById('graph').style.display = "block";
@@ -120,11 +126,6 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     clear();
     locations = [];
     elev.resetChart();
-  });
-  
-  //TODO: something with hashing url stuff is making this not work
-  map.on('load', function(e) {
-    getElevation();
   });
   
 })
