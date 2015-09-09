@@ -25,21 +25,20 @@
   #mapwrapper{
     padding:0;
   }
-  .transparent_btn{
-    width:100%;
-    height:30px;
-    margin-bottom:20px;
-  }
-  .transparent_btn:hover{
-    background-color:#ccc;
-  }
   </style>
 </head>
 <body>
-  <div class="container-fluid" data-ng-controller="ElevationController">
-    <div id="graph" style= "display:none; height:225px; width: 50%; float:center;"></div>
-    <button id="clearbtn" class = "transparent_btn" style="display:none; type="button">clear</button>
-    <div id="map"></div>
+  <div class="container-fluid" style="background-color:#fff;" data-ng-controller="ElevationController">
+  	<div id="graph_controls" class="clear">
+  	    <div id="graph" style="height:200px; width:75%; float:right;"></div>
+	    <div id="controls" style="background-color:#fff; height:200px; width: 25%; float:left;">
+	    	<div id="sampling_text" style="color:#000"><h5>Sampling Distance:</h5></div>
+	        <input id="resample_distance" style="text-align: top;" min="10" max="1000" value="100" type="range"></input>
+	        <button id="updatebtn" style="min-width:10px" type="button">update</button>
+		    <button id="clearbtn" style="min-width:50px" type="button">clear</button>
+	    </div>
+    </div>
+    <div id="map" style="background-color:#fff;"></div>
   </div>
   
   <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
