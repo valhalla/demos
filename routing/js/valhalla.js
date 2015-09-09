@@ -398,7 +398,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       }
       var use_roads = document.getElementById("use_roads").value;
       var cycling_speed = document.getElementById("cycle_speed").value;
-      var hilliness_factor = document.getElementById("hill_factor").value;
+      var hilliness_factor = document.getElementById("use_hills").value;
 
       bikeoptions = {
         "bicycle" : {
