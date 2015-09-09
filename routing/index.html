@@ -59,31 +59,30 @@
 		    <div>
 		    <span style="color:white" class="descriptions">Routing Options: </span><br>
 				<form>
-					 <input type="button" id="showbtn" name="showbtn"  value="Show"/>
-					 <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
+				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
+				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
 				</form>
 			</div>
             <br>
-
             <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
-            <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
-            <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
-            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
-
-             <div id="options" name="options" style="display:none">
-				<form id="bike" name="bike" ><span style="color:white"
-				  road: <p>road: <input type="radio" name="btype" value="Road" checked/>
+            <div id="options" name="options" style="display:none">
+			  <form id="bike" name="bike" ><span style="color:white"
+				<h2><b>Bike Options:</b></h2><br>
+				  road: <input type="radio" name="btype" value="Road" checked/>
 				  cross: <input style="color:white" type="radio" name="btype" value="Cross" />
                   hybrid: <input type="radio" name="btype" value="Hybrid" />
                   mountain: <input type="radio" name="btype" value="Mountain"/>
                   <br>
                   use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
                   cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
-                  "hilliness" factor: <input type="textbox" id="hill_factor" value="0.0" class="biketextbox"/>
+                  use hills (0-1): <input type="textbox" id="use_hills" value="0.5" class="biketextbox"/>
                   </span>
                   <br>
-				</form>
+			  </form>
 		    </div>
+		    <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
+            <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
+            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 			<br>
             <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
             <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>

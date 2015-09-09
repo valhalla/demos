@@ -58,6 +58,9 @@ div#route_inst table td.distance{
 
 }
 
+#drive_btn, #bike_btn, #walk_btn, #multi_btn {
+  width: 70px;
+}
 #elevation_btn {
   width: 120px;
 }

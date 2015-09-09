@@ -334,13 +334,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 	  }
 	var use_roads = document.getElementById("use_roads").value;
 	var cycling_speed = document.getElementById("cycle_speed").value;
-	var hilliness_factor = document.getElementById("hill_factor").value;
+	var use_hills = document.getElementById("use_hills").value;
 		
 	bikeoptions = {"bicycle":{
 	  bicycle_type: bicycle_type,
 	  use_roads: use_roads,
 	  cycling_speed: cycling_speed,
-	  hilliness_factor: hilliness_factor
+	  use_hills: use_hills
 	}}
 	return bikeoptions;
   };
@@ -363,13 +363,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   $("#showbtn").on("click", function() {
 	document.getElementById('options').style.display="block";
+	document.getElementById('options').appendChild(document.createElement("br"));
   });
 
   $("#hidebtn").on("click", function() {
-	  document.getElementById('options').style.display="none";
+	document.getElementById('options').style.display="none";
   });
 
   $("#hidechart").on("click", function() {
-	  document.getElementById('graph').style.display="none";
+	document.getElementById('graph').style.display="none";
   });
 })
