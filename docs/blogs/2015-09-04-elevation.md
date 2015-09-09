@@ -2,11 +2,23 @@
 
 How often have you ended up on a spontaneous hiking/biking adventure on a path/trail that you’ve never been to before? At first you were thinking to yourself...
 
-{% include image.html url="images/sure.jpg" description="Sweet, this is going to be a story for the ages!" %}
-
+<div id="main">
+<div id="fig1" style="float:left">
+<figure>
+<img src="images/sure.jpg" alt="Yay!" width="304" height="228">
+<figcaption>This will be a story for the ages!</figcaption>
+</figure>
+</div>
+<div id="segway" style="float:center">
 But then you quickly realized...
-
-{% include image.html url="images/unsure.jpg" description="Holy $h!t will I even survive to tell it!?" %}
+</div>
+<div id="fig2" style="float:right">
+<figure>
+<img src="images/sure.jpg" alt="Bleh.." width="304" height="228">
+<figcaption>Holy $h!t will I survive to tell it!?</figcaption>
+</figure>
+</div>
+</div>
 
 It would have been nice to be able to see what the journey ahead might look like. Maybe even an elevation chart to look at before deciding to plunge into your adventure? We have some tools to help you with that on your next outing, start clicking!
 
@@ -14,7 +26,7 @@ It would have been nice to be able to see what the journey ahead might look like
 
 Just zoom in to a desired area and point and click on the map to generate an elevation chart.
 
-{% include elevation_widget.html %}
+<iframe src="http://valhalla.github.io/demos/elevation/" style="background-color:#fff; height:600px; width:75%; float:center;"></iframe>
 
 #### There's an API for that
 
