@@ -35,9 +35,8 @@
             padding:0;
         }
         .transparent_btn{
-            width:100%;
             height:30px;
-            margin-bottom:20px;
+            margin-bottom:10px;
         }
         .transparent_btn:hover{
             background-color:#ccc;
@@ -49,12 +48,12 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h1>Valhalla Routing<br>Test Tool</h1>
-            <h4>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h4>
-            <h4>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h4>
-            <h4>NOTE: Transit defaults to 12:15 on current date.</h4>
+            <h3>Valhalla Routing<br>Test Tool</h3>
+            <h6>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h6>
+            <h6>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h6>
+            <h6>NOTE: Transit defaults to 12:15 on current date.</h6>
             <hr>
-            <span style="color:white" class="dropdown">Select an environment:</span><br>
+            <span style="color:white" class="descriptions">Select an environment:</span><br>
 			<select id = "env_dropdown" onchange="selectEnv()">
 				  <option id=localhost value="http://localhost:8002/">localhost</option>
 				  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
@@ -62,16 +61,16 @@
 				</select>
 		    <br>
 		    <div>
-		    <h5 style="color:white">Routing Options: </h5>
+		    <span style="color:white" class="descriptions">Routing Options: </span><br>
 				<form>
-					 <input type="button" id="showbtn" name="showbtn"  value="Show"/>
-					 <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
+				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
+				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
 				</form>
 			</div>
             <br>
             <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
-              <div id="options" name="options" style="display:none">
-			  <form id="bike" name="bike" ><span style="color:white"
+            <div id="options" name="options" style="display:none">
+			  <form id="bike" name="bike" ><span style="color:white">
 				<h2><b>Bike Options:</b></h2><br>
 				  road: <input type="radio" name="btype" value="Road" checked/>
 				  cross: <input style="color:white" type="radio" name="btype" value="Cross" />

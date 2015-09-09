@@ -314,22 +314,39 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       });
     });
 
-    multiBtn.addEventListener('click', function(e) {
-      getEnvToken();
-      rr.route({
-        transitmode : 'multimodal',
-        date_time : dateStr
-      });
-    });
+  multiBtn.addEventListener('click', function (e) {
+	getEnvToken();
+    rr.route({transitmode: 'multimodal', date_time: dateStr});
+  });
+  
+  elevationBtn.addEventListener('click', function (e) {
+    selectEnv();
+    var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+    elev.resetChart();
+    elev.profile(elev._rrshape);
+    document.getElementById('graph').style.display="block";
+  });
 
-    elevationBtn.addEventListener('click', function(e) {
-      selectEnv();
-      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
-      elev.resetChart();
-      elev.profile(elev._rrshape);
-      document.getElementById('graph').style.display = "block";
-    });
-
+  function setBikeOptions () {
+	var btype = document.getElementsByName("btype");
+	var bicycle_type = "Road";
+	  for (var i=0;i<btype.length;i++){
+	    if ( btype[i].checked ) {
+	    	bicycle_type = btype[i].value;
+	    }
+	  }
+	var use_roads = document.getElementById("use_roads").value;
+	var cycling_speed = document.getElementById("cycle_speed").value;
+	var use_hills = document.getElementById("use_hills").value;
+		
+	bikeoptions = {"bicycle":{
+	  bicycle_type: bicycle_type,
+	  use_roads: use_roads,
+	  cycling_speed: cycling_speed,
+	  use_hills: use_hills
+	}}
+	return bikeoptions;
+  };
 
     /*
     function openWin(id) {
