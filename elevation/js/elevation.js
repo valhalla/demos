@@ -30,7 +30,7 @@ app.run(function($rootScope) {
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
   //cycle map with terrain
-  var cycleMap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+  var cycleMap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   })
   
@@ -50,7 +50,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //icon for point on the map
   var resampledPt = function(icon) {
     return L.icon({
-      iconUrl : 'resource/bluedot.png',
+      iconUrl : 'resource/reddot.png',
       iconSize : [ 10, 10 ],
       iconAnchor : [ 5, 5 ]
     });
