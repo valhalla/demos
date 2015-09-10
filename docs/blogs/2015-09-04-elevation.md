@@ -1,24 +1,11 @@
 ## Moving On Up! ... and over and down and up again!?
 
-How often have you ended up on a spontaneous hiking/biking adventure on a path/trail that you’ve never been to before? At first you were thinking to yourself...
+How often have you ended up on a spontaneous hiking/biking adventure on a path/trail that you’ve never been to before? You only live once right? You may never have the chance to take this hike again. Did it go a little something like this maybe?
 
-<div id="main">
-<div id="fig1" style="float:left">
 <figure>
-<img src="images/sure.jpg" alt="Yay!" width="250" height="230">
-<figcaption>This will be a story for the ages!</figcaption>
+<img src="images/hike.jpg" alt="Spontaneous Hike" width="500" height="225">
+<figcaption>Fig 1. Moments from your spontaneous hike. (a) This will be a story for the ages! (b) Holy $h!t will I survive to tell it!?</figcaption>
 </figure>
-</div>
-<div id="segway" style="float:center">
-But then you quickly realized...
-</div>
-<div id="fig2" style="float:right">
-<figure>
-<img src="images/unsure.jpg" alt="Bleh.." width="250" height="230">
-<figcaption>Holy $h!t will I survive to tell it!?</figcaption>
-</figure>
-</div>
-</div>
 
 It would have been nice to be able to see what the journey ahead might look like. Maybe even an elevation chart to look at before deciding to plunge into your adventure? We have some tools to help you with that on your next outing, start clicking!
 
