@@ -63,11 +63,12 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
+    document.getElementById('resample_distance').value = "100";
+    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
+    
     var href = window.location.href
     if(href.contains('?show_sample')) {
       window.location.href = href.slice(0, href.lastIndexOf('?show_sample') + '?show_sample'.length) + '#loc=12,47.2200,9.3357';
-      document.getElementById('resample_distance').value = "100";
-      document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
       locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, {lat: 47.27002789823629, lon: 9.341468811035154} ]
       getElevation();
     }
