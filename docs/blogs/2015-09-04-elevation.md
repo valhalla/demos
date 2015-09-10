@@ -26,7 +26,7 @@ It would have been nice to be able to see what the journey ahead might look like
 
 Just zoom in to a desired area and point and click on the map to generate an elevation chart.
 
-<iframe src="http://valhalla.github.io/demos/elevation/" style="background-color:#fff; height:600px; width:75%; float:center;"></iframe>
+<iframe src="http://valhalla.github.io/demos/elevation/index.html?show_sample#loc=12,47.2204,9.3355" style="background-color:#fff; height:600px; width:75%; float:center;"></iframe>
 
 #### There's an API for that
 
