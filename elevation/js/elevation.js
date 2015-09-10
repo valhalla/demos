@@ -29,29 +29,18 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
-  //various tile sets
-  var baseMaps = {
-    RoadMap : L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-      attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-    }),
-    CycleMap : L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-      attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-    }),
-    TransitMap : L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
-      attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-    })
-  };
-
+  //cycle map with terrain
+  var cycleMap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  })
+  
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : false,
-    layers : [ baseMaps.CycleMap ],
+    layers : [ cycleMap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
-
-  //add the tile set chooser to the map
-  L.control.layers(baseMaps, null).addTo(map);
   
   //??
   $scope.renderHtml = function(html_code) {
@@ -70,14 +59,18 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //allow hash links
   var hash = new L.Hash(map);
   //place to store clicked locations
-  var locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, 
-                    {lat: 47.27002789823629, lon: 9.341468811035154} ]
+  var locations = [ ]
     
-  //show something to start with
+  //show something to start with but only if it was requested
   $(window).load(function(e) {
-    document.getElementById('resample_distance').value = "100";
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
-    getElevation();
+    var href = window.location.href
+    if(href.contains('?show_sample')) {
+      window.location.href = href.slice(0, href.lastIndexOf('?show_sample') + '?show_sample'.length) + '#loc=12,47.2200,9.3357';
+      document.getElementById('resample_distance').value = "100";
+      document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
+      locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, {lat: 47.27002789823629, lon: 9.341468811035154} ]
+      getElevation();
+    }
   });
   
   //place to store results
