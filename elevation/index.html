@@ -4,6 +4,7 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="css/elevation.css" />
+  <link rel="stylesheet" href="css/mapzen-common.css" />
   
   <script src="conf/env.conf"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -11,36 +12,34 @@
   <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="../flot/jquery.flot.min.js"></script>
   <script type="text/javascript" src="../flot/jquery.flot.symbol.min.js"></script>
-  <script type="text/javascript" src="../flot/jquery.flot.js"></script>
   <script type="text/javascript" src="../flot/jquery.colorhelpers.js"></script>
   <script type="text/javascript" src="../flot/jquery.flot.canvas.js"></script>
   <script type="text/javascript" src="../flot/jquery.flot.stack.js"></script>
-  
-  <style>
-  body{
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  #mapwrapper{
-    padding:0;
-  }
-  </style>
 </head>
 <body>
-  <div class="container-fluid" style="background-color:#fff;" data-ng-controller="ElevationController">
-  	<div id="graph_controls" class="clear">
-  	    <div id="graph" style="height:200px; width:75%; float:right;"></div>
-	    <div id="controls" style="background-color:#fff; height:200px; width: 25%; float:left;">
-	    	<div id="sampling_text" style="color:#000"><h5>Sampling Distance:</h5></div>
-	        <input id="resample_distance" style="text-align: top;" min="10" max="1000" value="100" type="range"></input>
-	        <button id="updatebtn" style="min-width:10px" type="button">update</button>
-		    <button id="clearbtn" style="min-width:50px" type="button">clear</button>
-	    </div>
+  <div class="container-fluid" data-ng-controller="ElevationController">
+    <div class = "row not-map-part">
+      <div id="graph_controls" class = "clear">
+        <div id="controls" class = "col-md-4">
+          <div id="sampling_text"><h5>Sampling Distance:</h5></div>
+          <input id="resample_distance" class = "range-bar" min="10" max="1000" value="100" type="range"></input>
+          <button id="updatebtn" class = "btn btn-mapzen" type="button">update</button>
+          <button id="clearbtn" class ="btn btn-mapzen" type="button">clear</button>
+          <div class = "instruction">
+            <p>
+              Some instructions here
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class = "col-md-8">
+        <div id="graph" style = "width: 100%; height: 300px">
+      </div>
     </div>
-    <div id="map" style="background-color:#fff;"></div>
   </div>
-  
+  <div id="map"></div>
+
+</div>
   <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
   <script type="text/javascript" src="js/elevation.js"></script>
   <script type="text/javascript" src="js/L.Elevation.Widget.js"></script>
