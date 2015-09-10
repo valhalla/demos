@@ -10,6 +10,10 @@ body {
   height: 100%;
 }
 
+.container-fluid {
+  height: 100%;
+}
+
 #map {
   height: calc( 100% - 300px ); 
   width: 100%;
