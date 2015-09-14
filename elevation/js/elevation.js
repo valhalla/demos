@@ -49,11 +49,14 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //icon for point on the map
   var resampledPt = function(icon) {
-    return L.icon({
-      iconUrl : 'resource/reddot.png',
-      iconSize : [ 10, 10 ],
-      iconAnchor : [ 5, 5 ]
-    });
+    return {
+
+      color: '#444',
+      opacity: 1,
+      fill: true,
+      fillColor: '#eee',
+      fillOpacity: 1
+    }
   };
 
   //allow hash links
@@ -63,10 +66,11 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
+
     document.getElementById('resample_distance').value = "100";
     document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
-    
-    var href = window.location.href
+    elev = L.Elevation.widget(token);
+    var href = window.location.href;
     if(href.contains('?show_sample')) {
       window.location.href = href.slice(0, href.lastIndexOf('?show_sample') + '?show_sample'.length) + '#loc=12,47.2200,9.3357';
       locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, {lat: 47.27002789823629, lon: 9.341468811035154} ]
@@ -87,10 +91,8 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //make the request to get the elevation
   var getElevation = function() {    
-    elev = L.Elevation.widget(token);
     elev.resetChart();
     elev.profile(locations, document.getElementById('resample_distance').value, marker_update);
-    document.getElementById('graph').style.display = "block";
     $("#clearbtn").show();
   }
   
@@ -101,7 +103,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
 
     //draw interpolations
     for(var i = 0; i < elevation.shape.length; i++) {
-      var marker = new L.marker( [elevation.shape[i].lat, elevation.shape[i].lon], {icon : resampledPt()});
+      var marker = new L.circle( [elevation.shape[i].lat, elevation.shape[i].lon], 10, resampledPt());
       marker.bindPopup('<pre style="display:inline" class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
       map.addLayer(marker);
       resampled.push(marker);
@@ -138,6 +140,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     clear();
     locations = [];
     elev.resetChart();
+    elev = L.Elevation.widget(token);
   });
   
   //someone clicked to get elevation

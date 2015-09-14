@@ -153,50 +153,13 @@
             L.Util.setOptions(this, options);
             this._accessToken = accessToken;
             this._graphdata = [];
-            this._graphoptions = {};
-          },
-
-          resetChart : function() {
-            var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
-            plot.destroy();
-            $('#graph').empty();
-          },
-
-          profile : function(locations, sampling, marker_update, callback, context, options) {
-            var timedOut = false, options = options || {};
-
-            var url = this.buildProfileUrl(locations, sampling, options);
-
-            var timer = setTimeout(function() {
-              timedOut = true;
-              callback.call(context || callback, {
-                status : -1,
-                message : 'request timed out.'
-              });
-            }, this.options.timeout);
-
-            corslite(url, L.bind(function(err, resp) {
-              var elevresult;
-              clearTimeout(timer);
-              if (!timedOut) {
-                if (!err) {
-                  elevresult = JSON.parse(resp.responseText);
-                  marker_update(elevresult);
-                  this._graphdata = [ {
-                    "data" : elevresult.range_height,
-                    "points" : {
-                      "symbol" : "circle",
-                      "fillColor" : "#2E2EFE"
-                    },
-                    "color" : '#2E2EFE'
-                  } ];
-                  this._graphoptions = {
+            this._graphoptions = {
                     axislabels : {
                       show : true
                     },
                     threshold : {
                       below : 0,
-                      color : "#c00000"
+                      color : "#eee"
                     },
                     legend : {
                       show : false
@@ -209,7 +172,7 @@
                       minBorderMargin: 20,
                       labelMargin: 10,
                       backgroundColor: {
-                          colors: ["#fff", "#e4f4f4"]
+                          colors: ["#fff", "#eee"]
                       },
                       margin: {
                           top: 8,
@@ -256,7 +219,47 @@
                       lineWidth : 3,
                     }
                   };
+            //initilizing placeholder graph so that user knows there is graph
+            $.plot($('#graph'), [[]], this._graphoptions);
+            var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+            var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+            yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
+          },
 
+          resetChart : function() {
+            var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
+            plot.destroy();
+            $('#graph').empty();
+          },
+
+          profile : function(locations, sampling, marker_update, callback, context, options) {
+            var timedOut = false, options = options || {};
+
+            var url = this.buildProfileUrl(locations, sampling, options);
+
+            var timer = setTimeout(function() {
+              timedOut = true;
+              callback.call(context || callback, {
+                status : -1,
+                message : 'request timed out.'
+              });
+            }, this.options.timeout);
+
+            corslite(url, L.bind(function(err, resp) {
+              var elevresult;
+              clearTimeout(timer);
+              if (!timedOut) {
+                if (!err) {
+                  elevresult = JSON.parse(resp.responseText);
+                  marker_update(elevresult);
+                  this._graphdata = [ {
+                    "data" : elevresult.range_height,
+                    "points" : {
+                      "symbol" : "circle",
+                      "fillColor" : "#eee"
+                    },
+                    "color" : '#444'
+                  } ];
                   $.plot($('#graph'), this._graphdata, this._graphoptions);
                   var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
                   var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
