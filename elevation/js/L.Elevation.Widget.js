@@ -161,9 +161,6 @@
                       below : 0,
                       color : "#eee"
                     },
-                    legend : {
-                      show : false
-                    },
                     grid : {
                      // hoverable : true,
                      /// clickable : true,
