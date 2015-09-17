@@ -117,7 +117,14 @@
     .leaflet-routing-alt td.measure {
       min-width:60px;
     }
-
+    
+    .leaflet-routing-alt ul.verbal_alert, ul.verbal_pre, ul.verbal_post {
+      color: #2E64FE;
+      font-style: italic;
+      font-size: 12px;
+      margin: 5px;
+    }
+    
     .leaflet-routing-alt::-webkit-scrollbar {
       width: 8px;
     }

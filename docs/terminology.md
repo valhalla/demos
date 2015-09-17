@@ -12,10 +12,11 @@ The Valhalla organization is comprised of several repositories each responsible 
 - [Thor](https://github.com/valhalla/thor) - Library used to generate a path through the graph tile hierarchy. This path can be used as input to `odin`. Depends on `midgard`, `baldr`, `sif`, `loki` and `odin`
 - [Odin](https://github.com/valhalla/odin) - Library used to generate maneuvers and narrative based on a path. This set of directions information can be used as input to `tyr`. Depends on `midgard` and `baldr`
 - [Tyr](https://github.com/valhalla/tyr) - Service used to handle http requests for a route communicating with all of the other valhalla APIs. The service will format output from `odin` and support json (and eventually protocol buffer) output. Depends on `midgard`, `baldr`, `sif`, `mjolnir`, `loki`, `thor` and `odin`
+- [Skadi](https://github.com/valhalla/skadi) - Library used to access digital elevation model data which is useful in computing steepness of edges in the route graph or generating an elevation profile along a computed route.  Depends on `midgard` and `baldr`.
 
 (definitions are in progress)
 
-###Common Valhalla and routing terms
+###Common Valhalla, Routing & Elevation terms
 * break location - the start or end point of a route.
 * cost - fixed costs in seconds that are added to both the path cost and the estimated time.
 * costing model - set of costs for particular methods of travel, such as automobile or pedestrian.
@@ -33,3 +34,5 @@ The Valhalla organization is comprised of several repositories each responsible 
 * tiled routing - method of building a path on graph data that has been split into square cells.
 * time - the number of seconds estimated to complete a maneuver or trip, including any additional costs.
 * trip - results of an entire route, including locations, legs, and maneuvers.
+* elevation - the height above sea level at a specific location (lat,lng).
+* elevation profile - computing the range and height for a series of lat,lng pairs of a line or shape.  This is very useful for charting/graphing.

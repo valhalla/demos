@@ -24,7 +24,7 @@ Limits may be increased in the future, but you can contact routing@mapzen.com if
 
 The route request takes the form of `valhalla.mapzen.com/route?json={}&api_key=`, where the JSON inputs inside the ``{}`` include location information, name and options for the costing model, and output options. Here is an example request:
 
-`valhalla.mapzen.com/route?json={"locations":[{"lat":42.358528,"lon":-83.271400,"street":"Appleton"},{"lat":42.996613,"lon":-78.749855,"street":"Ranch Trail"}],"costing":"auto","costing_options":{"auto":{"country_crossing_penalty":2000.0}},"directions_options":{"units":"miles"}}&api_key= `
+`valhalla.mapzen.com/route?json={"locations":[{"lat":42.358528,"lon":-83.271400,"street":"Appleton"},{"lat":42.996613,"lon":-78.749855,"street":"Ranch Trail"}],"costing":"auto","costing_options":{"auto":{"country_crossing_penalty":2000.0}},"directions_options":{"units":"miles"}}&api_key=valhalla-xxxxxx`
 
 This request provides automobile routing between the Detroit, Michigan area and Buffalo, New York, with an optional street name parameter to improve navigation at the start and end points. It attempts to avoid routing north through Canada by adding a penalty for crossing international borders. The resulting route is displayed in miles.
 
@@ -66,7 +66,7 @@ Valhalla uses dynamic, run-time costing to generate the route path. The route re
 | :----------------- | :----------- |
 | `auto` | Standard costing for driving routes by car, motorcycle, truck, and so on that obeys automobile driving rules, such as access and turn restrictions. `Auto` provides a short time path (though not guaranteed to be shortest time) and uses intersection costing to minimize turns and maneuvers or road name changes. Routes also tend to favor highways and higher classification roads, such as motorways and trunks. |
 | `auto_shorter` | Alternate costing for driving that provides a short path (though not guaranteed to be shortest distance) that obeys driving rules for access and turn restrictions. |
-| `bicycle` | A default bicycle costing method has been implemented, but its options are currently being evaluated. |
+| `bicycle` | Standard costing for travel by bicycle, with a slight preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes follow regular roads when needed, but avoid roads without bicycle access. |
 | `bus` | Standard costing for bus routes. Bus costing inherits the auto costing behaviors, but checks for bus access on the roads. |
 | `pedestrian` | Standard walking route that excludes roads without pedestrian access. In general, pedestrian routes are shortest distance with the following exceptions: walkways and footpaths are slightly favored, while and steps or stairs and alleys are slightly avoided. |
 
@@ -92,21 +92,21 @@ These options are available for `auto`, `auto_shorter`, and `bus` costing method
 | `country_crossing_penalty` | A penalty applied for a country crossing. This penalty can be used to create paths that avoid spanning country boundaries. The default penalty is 0. |
 
 ##### Bicycle costing options
-The default bicycle costing is tuned toward road bicycles with a slight preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. The costing model recognizes several factors unique to bicycle travel and offers several options for tuning bicycle routes. Factors influencing bicycle routes include:
-*	The types of roads suitable for bicycling depend on the type of bicycle. Road bicycles (skinny tires) generally are suited to paved roads or perhaps very short sections of compacted gravel. They are not suited for riding on coarse gravel or most paths and tracks through wooded areas or farmland. Mountain bikes on the other hand are able to traverse a wider set of surfaces.
-*	Average travel speed can be highly variable and can depend on bicycle type, fitness and experience of the cyclist, road surface, and hilliness. The costing model assumes a default speed on smooth, flat roads for each supported bicycle type. This speed can be overriden by an input option. The "base" speed is modulated by surface type (in conjunction with the bicycle type). Coming Soon: We will soon include logic to modify speed based on the hilliness of a road section.
-*	Bicyclists vary in their tolerance for riding on roads. Most novice bicyclists and even other bicyclists want to avoid all but the quietest neighborhood roads and prefer cycleways and dedicated cycling paths. Other cyclists may be experienced riding on roads and prefer to take roadways since they often provide the fastest way to get between two places. The bicycle costing model accounts for this with a `use_roads` factor to indicate a cyclists tolerance for riding on roads.
-*	Bicyclists vary in their fitness level and experience level and many wish to avoid hill roads and especially roads with very steep uphill or even downhill sections. Even if the fastest path is over a mountain, many cyclists will prefer a flatter path that avoids the climb and descent up and over the mountain.
+The default bicycle costing is tuned toward road bicycles with a slight preference for using [cycleways](http://wiki.openstreetmap.org/wiki/Key:cycleway) or roads with bicycle lanes. Bicycle routes use regular roads where needed or where no direct bicycle lane options exist, but avoid roads without bicycle access. The costing model recognizes several factors unique to bicycle travel and offers several options for tuning bicycle routes. Several factors unique to travel by bicycle influence the resulting route.
+*	The types of roads suitable for bicycling depend on the type of bicycle. Road bicycles (skinny or narrow tires) generally are suited to paved roads or perhaps very short sections of compacted gravel. They are not designed for riding on coarse gravel or most paths and tracks through wooded areas or farmland. Mountain bikes, on the other hand, are able to traverse a wider set of surfaces.
+*	Average travel speed can be highly variable and can depend on bicycle type, fitness and experience of the cyclist, road surface, and hills. The costing model assumes a default speed on smooth, flat roads for each supported bicycle type. This speed can be overriden by an input option. The base speed is modulated by surface type (in conjunction with the bicycle type). Coming Soon: Logic to modify speed based on the hilliness of a road section.
+*	Bicyclists vary in their tolerance for riding on roads. Most novice bicyclists, and even other bicyclists, prefer cycleways and dedicated cycling paths and would rather avoid all but the quietest neighborhood roads. Other cyclists may be experienced riding on roads and prefer to take roadways because they often provide the fastest way to get between two places. The bicycle costing model accounts for this with a `use_roads` factor to indicate a cyclist's tolerance for riding on roads.
+*	Bicyclists vary in their fitness level and experience level, and many want to avoid hilly roads, and especially roads with very steep uphill or even downhill sections. Even if the fastest path is over a mountain, many cyclists prefer a flatter path that avoids the climb and descent up and over the mountain.
 
-The following options are available for bicycle costing methods.
+These options are available for bicycle costing methods.
 
 | Bicycle options | Description |
 | :-------------------------- | :----------- |
-| `bicycle_type` | This is the type of bicycle. Accepted values are `Road` - a road bicycle with narrow tires, `Hybrid` or `City` - a bicycle made mostly for city riding or casual riding on roads and paths with good surfaces, `Cross` - a cyclo-cross bicycle which is similar to a road bicycle but with wider tires suitable to rougher surfaces, and `Mountain` - mountain bike suitable for most surfaces but generally heavier and slower on paved surfaces. |
-| `cycling_speed` | Cycling speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjuction with bicycle type and (Coming Soon) by hilliness of the road section. Default speeds (when no speed is explicitly provided) depend on the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
-| `use_roads` | A cyclist's propensity to use roads. Range of values from 0 (avoid roads - try to stay on cycleways and paths) to 1 (totally comfortable riding on roads). Based on the useroads factor, roads with certain classifications and above certain speeds are penalized (try to avoid) when finding the best path. |
+| `bicycle_type` | The type of bicycle. <ul><li>`Road`: a road-style bicycle with narrow tires that is generally lightweight and designed for speed on paved sufaces.</li><li>`Hybrid` or `City`: a bicycle made mostly for city riding or casual riding on roads and paths with good surfaces.</li><li>`Cross`: a cyclo-cross bicycle, which is similar to a road bicycle but with wider tires suitable to rougher surfaces.</li><li>`Mountain`: a mountain bicycle suitable for most surfaces but generally heavier and slower on paved surfaces.</li><ul> |
+| `cycling_speed` | Cycling speed is the average travel speed along smooth, flat roads. This is meant to be the speed a rider can comfortably maintain over the desired distance of the route. It can be modified (in the costing method) by surface type in conjuction with bicycle type and (Coming Soon) by hilliness of the road section. When no speed is specifically provided, the default speed is determined by the bicycle type and are as follows: Road = 25 KPH (15.5 MPH), Cross = 20 KPH (13 MPH), Hybrid/City = 18 KPH (11.5 MPH), and Mountain = 16 KPH (10 MPH). |
+| `use_roads` | A cyclist's propensity to use roads alongside other vehicles. This is a range of values from 0 to 1, where 0 attempts to avoid roads and stay on cycleways and paths, and 1 indicates the rider is more comfortable riding on roads. Based on the `use_roads` factor, roads with certain classifications and higher speeds are penalized in an attempt to avoid them when finding the best path. |
 
-Coming Soon: we will soon be offering options to avoid hills and tune the bicycle route costing based on elevation change and steepness.
+Coming Soon: options to avoid hills and tune the bicycle route costing based on elevation change and steepness.
 
 ##### Pedestrian costing options
 
@@ -160,10 +160,10 @@ Each maneuver includes:
 | :--------- | :---------- |
 | `type` | Type of maneuver. See below for a list. |
 | `instruction` | Written maneuver instruction. Describes the maneuver, such as "Turn right onto Main Street". |
-| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. Further details are TBD. |
-| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. Further details are TBD. |
-| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. Further details are TBD. |
-| `street_names` | List of street names. |
+| `verbal_transition_alert_instruction` | Text suitable for use as a verbal alert in a navigation application. The transition alert instruction will prepare the user for the forthcoming transition. For example: "Turn right onto North Prince Street". |
+| `verbal_pre_transition_instruction` | Text suitable for use as a verbal message immediately prior to the maneuver transition. For example "Turn right onto North Prince Street, US 222". |
+| `verbal_post_transition_instruction` | Text suitable for use as a verbal message immediately after the maneuver transition. For example "Continue on US 222 for 3.9 miles". |
+| `street_names` | List of street names that are consistent along the entire maneuver. |
 | `begin_street_names` | When present, these are the street names at the beginning of the maneuver (if they are different than the names that are consistent along the entire maneuver). |
 | `time` | Estimated time along the maneuver in seconds. |
 | `length` | Maneuver length in the units specified. |
@@ -214,7 +214,7 @@ In the future, look for additional maneuver information to enhance navigation ap
 
 #### Return Codes and Conditions
 
-The following is a table of error conditions that may occur for a particular request. In general we follow the http specification. That is to say that `5xx` returns are generally ephemeral server problems that should be resolved shortly or are the result of a bug. `4xx` returns are used to mark requests that cannot be carried out generally due to bad input in the request or problems with the underlying data. A `2xx` return is expected when we have a successful route result or `trip`, as described above.
+The following is a table of error conditions that may occur for a particular request. In general, Valhalla follows the http specification. That is to say that `5xx` returns are generally ephemeral server problems that should be resolved shortly or are the result of a bug. `4xx` returns are used to mark requests that cannot be carried out, generally due to bad input in the request or problems with the underlying data. A `2xx` return is expected when there is a successful route result or `trip`, as described above.
 
 | Code | Body | Description |
 | :--------- | :---------- | :---------- |

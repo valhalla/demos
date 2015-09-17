@@ -1,5 +1,5 @@
 body {
-  font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0px;
   margin: 0px;
   background-color: black;
@@ -18,7 +18,7 @@ body {
   height:20px;
 }
 
-#instructions h1, h4 {
+#instructions h1, h2, h3, h4, h5, h6 {
     color:white;
 }
 
@@ -49,3 +49,37 @@ div#route_inst table td.distance{
     white-space: -moz-pre-wrap;
 }
 
+.biketextbox {
+  width: 15%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  color: black;
+
+}
+
+#drive_btn, #bike_btn, #walk_btn, #multi_btn {
+  min-width: 40px;
+  text-align: center;
+}
+#elevation_btn {
+  width: 120px;
+}
+#clearbtn {
+  width: 120px;
+  text-align: center;
+}
+
+#flot-tooltip {
+  font-size: 12px;
+  font-family: Verdana, Arial, sans-serif;
+  position: absolute;
+  display: none;
+  padding: 2px;
+  background-color: #FFF;
+  opacity: 1;
+  border: 1px solid #aaa;
+  -moz-box-shadow: 0px 1px 1px #ddd;
+  -webkit-box-shadow: 0px 1px 1px #ddd;
+  box-shadow: 0px 1px 2px #ddd;
+}

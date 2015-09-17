@@ -956,16 +956,22 @@ if (typeof module !== undefined) module.exports = polyline;
           step,
           distance,
           text,
+          verbal_alert,
+          verbal_pre,
+          verbal_post,
           icon;
 
       container.appendChild(steps);
-
+      
       for (i = 0; i < r.instructions.length; i++) {
         instr = r.instructions[i];
-        text = this._formatter.formatInstruction(instr, i);
+        text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+        verbal_alert = (typeof instr.verbal_transition_alert_instruction != "undefined" ?  "VERBAL_ALERT: " + instr.verbal_transition_alert_instruction : "");
+        verbal_pre =  (typeof instr.verbal_pre_transition_instruction != "undefined" ? "VERBAL_PRE: " + instr.verbal_pre_transition_instruction : "");
+        verbal_post = (typeof instr.verbal_post_transition_instruction != "undefined" ? "VERBAL_POST: " + instr.verbal_post_transition_instruction : "");
         distance = this._formatter.formatDistance(instr.distance);
         icon = this._formatter.getIconName(instr, i);
-        step = this._itineraryBuilder.createStep(text, distance, icon, steps);
+        step = this._itineraryBuilder.createStep(text, verbal_alert, verbal_pre, verbal_post, distance, icon, steps);
 
         this._addRowListeners(step, r.coordinates[instr.index]);
       }
@@ -1067,15 +1073,25 @@ if (typeof module !== undefined) module.exports = polyline;
       return L.DomUtil.create('tbody', '');
     },
 
-    createStep: function(text, distance, icon, steps) {
+    createStep: function(text, verbal_alert, verbal_pre, verbal_post, distance, icon, steps) {
       var row = L.DomUtil.create('tr', '', steps),
         span,
-        td;
+        td,
+        ul;
       td = L.DomUtil.create('td', '', row);
       span = L.DomUtil.create('span', 'leaflet-routing-icon leaflet-routing-icon-'+icon, td);
       td.appendChild(span);
-      td = L.DomUtil.create('td', '', row);
+      td = L.DomUtil.create('td', 'text', row);
       td.appendChild(document.createTextNode(text));
+        ul = L.DomUtil.create('ul', 'verbal_alert', row);
+        ul.appendChild(document.createTextNode(verbal_alert));
+        td.appendChild(ul);
+        ul = L.DomUtil.create('ul', 'verbal_pre', row);
+        ul.appendChild(document.createTextNode(verbal_pre));
+        td.appendChild(ul);
+        ul = L.DomUtil.create('ul', 'verbal_post', row);
+        ul.appendChild(document.createTextNode(verbal_post));
+      td.appendChild(ul);
       td = L.DomUtil.create('td', '', row);
       td.appendChild(document.createTextNode(distance));
       return row;
