@@ -65,7 +65,6 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
-
     document.getElementById('resample_distance').value = "100";
     document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
     elev = L.Elevation.widget(token);
@@ -111,51 +110,51 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
 
   //someone clicked, store the spot and show something
   map.on('click', function(e) {
-      locations.push({
-        'lat' : e.latlng.lat,
-        'lon' : e.latlng.lng
-      });
-      
-      //check the total number to see if its bonkers
-      var length = 0.0;
-      locations.forEach(function(e,i,a) {
-        if(i != 0) {
-          var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-          var current = L.latLng(e.lat, e.lon);
-          length += previous.distanceTo(current);
-        }
-      });
-
-      if(length / document.getElementById('resample_distance').value > 2500) {
-        alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-        locations.pop();
+    locations.push({
+      'lat' : e.latlng.lat,
+      'lon' : e.latlng.lng
+    });
+    
+    //check the total number to see if its bonkers
+    var length = 0.0;
+    locations.forEach(function(e,i,a) {
+      if(i != 0) {
+        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+        var current = L.latLng(e.lat, e.lon);
+        length += previous.distanceTo(current);
       }
-      else
-        getElevation();
+    });
+
+    if(length / document.getElementById('resample_distance').value > 2500) {
+      alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
+      locations.pop();
+    }
+    else
+      getElevation();
   });
 
-    map.on('touchEnd', function(e) {
-      locations.push({
-        'lat' : e.latlng.lat,
-        'lon' : e.latlng.lng
-      });
-      
-      //check the total number to see if its bonkers
-      var length = 0.0;
-      locations.forEach(function(e,i,a) {
-        if(i != 0) {
-          var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-          var current = L.latLng(e.lat, e.lon);
-          length += previous.distanceTo(current);
-        }
-      });
-
-      if(length / document.getElementById('resample_distance').value > 2500) {
-        alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-        locations.pop();
+  map.on('touchEnd', function(e) {
+    locations.push({
+      'lat' : e.latlng.lat,
+      'lon' : e.latlng.lng
+    });
+    
+    //check the total number to see if its bonkers
+    var length = 0.0;
+    locations.forEach(function(e,i,a) {
+      if(i != 0) {
+        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+        var current = L.latLng(e.lat, e.lon);
+        length += previous.distanceTo(current);
       }
-      else
-        getElevation();
+    });
+
+    if(length / document.getElementById('resample_distance').value > 2500) {
+      alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
+      locations.pop();
+    }
+    else
+      getElevation();
   });
 
   
