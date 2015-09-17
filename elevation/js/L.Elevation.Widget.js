@@ -208,8 +208,7 @@
                       },
                     },
                     legend : {
-                      labelBoxBorderColor : "none",
-                      position : "right"
+                      show: false
                     },
                     lines : {
                       fill : true,
