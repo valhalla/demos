@@ -29,7 +29,7 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
-  //cycle map with terrain
+  //hiking map with terrain
   var cycleMap = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   })
@@ -48,9 +48,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   };
   
   //icon for point on the map
-  var resampledPt = function(icon) {
+  var resampledPt = function() {
     return {
       color: '#444',
+      size: '90%',
       opacity: 1,
       fill: true,
       fillColor: '#eee',
@@ -61,12 +62,32 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //allow hash links
   var hash = new L.Hash(map);
   //place to store clicked locations
-  var locations = [ ]
+  var locations = [ ];
+  var pathLength = 0;
+  var updateLength = function() {
+    pathLength = 0;
+    locations.forEach(function(e,i,a) {
+      if(i != 0) {
+        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+        var current = L.latLng(e.lat, e.lon);
+        pathLength += previous.distanceTo(current);
+      }
+    })
+    return pathLength;
+  };
+  
+  var updateSlider = function(low, high) {
+    var slider = document.getElementById('resample_distance');
+    slider.value = Math.max(slider.value, low);
+    slider.value = Math.min(slider.value, high);
+    slider.min = low;
+    slider.max = high;
+    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>';
+  };
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
-    document.getElementById('resample_distance').value = "100";
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
+    updateSlider(100, 10, 1000);
     elev = L.Elevation.widget(token);
     var href = window.location.href;
     if(href.contains('?show_sample')) {
@@ -107,56 +128,32 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
       resampled.push(marker);
     }
   };
+  
+  //adding a point
+  var addPoint = function(e) {
+    //update the locations and length along them
+    locations.push({
+      'lat' : e.latlng.lat,
+      'lon' : e.latlng.lng
+    });
+    updateLength();
+    
+    //update the sampling limits based on the total length
+    var low = 10;
+    var high = 1000;
+    if(pathLength > 1000 * 10) {
+      low = Math.floor(pathLength / 2000) * 10;
+      high = Math.ceil(pathLength / 100) * 10;  
+    }    
+    updateSlider(low, high);
+    
+    //show it
+    getElevation();
+  };
 
   //someone clicked, store the spot and show something
-  map.on('click', function(e) {
-    locations.push({
-      'lat' : e.latlng.lat,
-      'lon' : e.latlng.lng
-    });
-    
-    //check the total number to see if its bonkers
-    var length = 0.0;
-    locations.forEach(function(e,i,a) {
-      if(i != 0) {
-        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-        var current = L.latLng(e.lat, e.lon);
-        length += previous.distanceTo(current);
-      }
-    });
-
-    if(length / document.getElementById('resample_distance').value > 2500) {
-      alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-      locations.pop();
-    }
-    else
-      getElevation();
-  });
-
-  map.on('touchEnd', function(e) {
-    locations.push({
-      'lat' : e.latlng.lat,
-      'lon' : e.latlng.lng
-    });
-    
-    //check the total number to see if its bonkers
-    var length = 0.0;
-    locations.forEach(function(e,i,a) {
-      if(i != 0) {
-        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-        var current = L.latLng(e.lat, e.lon);
-        length += previous.distanceTo(current);
-      }
-    });
-
-    if(length / document.getElementById('resample_distance').value > 2500) {
-      alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-      locations.pop();
-    }
-    else
-      getElevation();
-  });
-
+  map.on('click', addPoint);
+  map.on('touchEnd', addPoint);
   
   //someone clicked the clear button so reset
   $("#clearbtn").on("click", function() {
@@ -176,10 +173,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //someone changed sampling
   $("#resample_distance").on("change", function() {
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + this.value + 'm</h5>';
+    updateSlider(this.min, this.max);
   });
   $("#resample_distance").on("input", function() {
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + this.value + 'm</h5>';
+    updateSlider(this.min, this.max);
   });
   
 })
