@@ -75,7 +75,16 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     return pathLength;
   };
   
-  var updateSlider = function(low, high) {
+  var updateSlider = function() {
+    //update the sampling limits based on the total length
+    var low = 10;
+    var high = 100;
+    if(pathLength > 100 * 10) {
+      low = Math.floor(pathLength / 1000) * 10;
+      high = Math.ceil(pathLength / 100) * 10;  
+    }  
+    
+    //apply them
     var slider = document.getElementById('resample_distance');
     slider.value = Math.max(slider.value, low);
     slider.value = Math.min(slider.value, high);
@@ -86,12 +95,14 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
-    updateSlider(100, 10, 1000);
+    updateSlider();
     elev = L.Elevation.widget(token);
     var href = window.location.href;
-    if(href.contains('?show_sample')) {
-      window.location.href = href.slice(0, href.lastIndexOf('?show_sample') + '?show_sample'.length) + '#loc=12,47.2200,9.3357';
-      locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, {lat: 47.27002789823629, lon: 9.341468811035154} ]
+    if(href.contains('?sample=')) {
+      var sample_index = href.lastIndexOf('?sample=') + '?sample='.length;
+      var hash_index = href.lastIndexOf('#');
+      var sample = decodeURIComponent(href.slice(sample_index, hash_index));
+      locations = JSON.parse(sample);
       getElevation();
     }
   });
@@ -108,7 +119,11 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   };
   
   //make the request to get the elevation
-  var getElevation = function() {    
+  var getElevation = function() {
+    //massage the input in case its nonsense
+    updateLength();
+    updateSlider();
+    
     elev.resetChart();
     elev.profile(locations, document.getElementById('resample_distance').value, marker_update);
     $("#clearbtn").show();
@@ -130,23 +145,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //adding a point
   var addPoint = function(e) {
-    //update the locations and length along them
     locations.push({
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     });
-    updateLength();
-    
-    //update the sampling limits based on the total length
-    var low = 10;
-    var high = 1000;
-    if(pathLength > 1000 * 10) {
-      low = Math.floor(pathLength / 2000) * 10;
-      high = Math.ceil(pathLength / 100) * 10;  
-    }    
-    updateSlider(low, high);
-    
-    //show it
     getElevation();
   };
 
@@ -172,10 +174,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //someone changed sampling
   $("#resample_distance").on("change", function() {
-    updateSlider(this.min, this.max);
+    updateSlider();
   });
   $("#resample_distance").on("input", function() {
-    updateSlider(this.min, this.max);
+    updateSlider();
   });
   
 })
