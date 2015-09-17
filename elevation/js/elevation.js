@@ -51,7 +51,6 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   var resampledPt = function() {
     return {
       color: '#444',
-      size: '90%',
       opacity: 1,
       fill: true,
       fillColor: '#eee',
@@ -122,7 +121,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
 
     //draw interpolations
     for(var i = 0; i < elevation.shape.length; i++) {
-      var marker = new L.circle( [elevation.shape[i].lat, elevation.shape[i].lon], 10, resampledPt());
+      var marker = new L.circle( [elevation.shape[i].lat, elevation.shape[i].lon], 5, resampledPt());
       marker.bindPopup('<pre style="display:inline" class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
       map.addLayer(marker);
       resampled.push(marker);
