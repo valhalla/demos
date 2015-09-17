@@ -6,13 +6,13 @@ Bicycle routing presents several unique challenges. Among the challenges are the
 
 #### Addition of Elevation Factors into Valhalla Routing Tiles
 
-In order to get an idea of the particular difficulty to assign to a given segment of road, we've built a library (and service) called [Skadi](https://github.com/valhalla/skadi); the godess of the mountains. Skadi has the ability to efficiently query world-wide digital elevation model data. We use this library when building routing tiles to estimate an approximate most important or prevalent grade/slope of a given section of road. We call this the weighted grade. Here's how it works.
+In order to measure the change in elevation over a given segment of road, we've built a library (and service) called [Skadi](https://github.com/valhalla/skadi); the godess of the mountains. Skadi has the ability to efficiently query world-wide digital elevation model data. We use this library when building routing tiles to estimate an approximate most important or prevalent grade/slope of a given section of road. We call this the weighted grade. Here's how it works.
 
 ![Weighting Function](images/weighted_grade.png "Weight Per Grade")
 
 Given a segment of road, we evenly sample points (at 60m apart) along it. At each sample, we measure the elevation. We then compute the grade/slope between each pair of sample points and weight it using the above function. This is essentially a linear combination designed to approximate the overall grade/slope of a given segment of road. You'll notice that sections with higher upward slope are weighted more and that conversely higher downward slopes are weighted less.
 
-The intuition is that steeper sections will require more "cost" to traverse whether walking, biking or driving. If you're biking the unit of cost might be time, since you can't ride as fast up steep hills. When driving the unit of cost might be the fuel used to overcome inertia. In any case, we are attempting to measure approximately how much energy will you be using to traverse a given section of road so that we can minimize it (along with other factors) when computing your path!
+The intuition is that steeper sections will require more "cost" to traverse whether walking, biking or driving. If you're biking the unit of cost might be time, since you can't ride as fast up steep hills. When driving the unit of cost might be the fuel used to overcome inertia. In any case, we are attempting to measure approximately how much energy might be needed to traverse a given section of road so that we can minimize (or maximize!?) it, along with other factors, when computing your path!
 
 #### Adding Grade Factors to Dynamic Costing
 
