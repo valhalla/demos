@@ -150,44 +150,7 @@
             this._accessToken = accessToken;
             this._rrshape = rrshape;
             this._graphdata = [];
-            this._graphoptions = {};
-          },
-
-          resetChart : function() {
-            var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
-            plot.destroy();
-            $('#graph').empty();
-          },
-
-          profile : function(rrshape, callback, context, options) {
-            var timedOut = false, options = options || {};
-
-            var url = this.buildProfileUrl(rrshape, options);
-
-            var timer = setTimeout(function() {
-              timedOut = true;
-              callback.call(context || callback, {
-                status : -1,
-                message : 'request timed out.'
-              });
-            }, this.options.timeout);
-
-            corslite(url, L.bind(function(err, resp) {
-              var elevresult;
-              clearTimeout(timer);
-              if (!timedOut) {
-                if (!err) {
-                  elevresult = JSON.parse(resp.responseText);
-                  this._graphdata = [ {
-                    "label" : "Elevation",
-                    "data" : elevresult.range_height,
-                    "points" : {
-                      "symbol" : "circle",
-                      "fillColor" : "#2E2EFE"
-                    },
-                    "color" : '#2E2EFE'
-                  } ];
-                  this._graphoptions = {
+            this._graphoptions = {
                     axislabels : {
                       show : true
                     },
@@ -253,7 +216,46 @@
                       lineWidth : 3,
                     }
                   };
+           //initilizing placeholder graph so that user knows there is graph
+             $.plot($('#graph'), this._graphdata, this._graphoptions);
+             var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+             var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+             yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
+           },
+           resetChart : function() {
+            var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
+            plot.destroy();
+            $('#graph').empty();
+          },
 
+          profile : function(rrshape, callback, context, options) {
+            var timedOut = false, options = options || {};
+
+            var url = this.buildProfileUrl(rrshape, options);
+
+            var timer = setTimeout(function() {
+              timedOut = true;
+              callback.call(context || callback, {
+                status : -1,
+                message : 'request timed out.'
+              });
+            }, this.options.timeout);
+
+            corslite(url, L.bind(function(err, resp) {
+              var elevresult;
+              clearTimeout(timer);
+              if (!timedOut) {
+                if (!err) {
+                  elevresult = JSON.parse(resp.responseText);
+                  this._graphdata = [ {
+                    "label" : "Elevation",
+                    "data" : elevresult.range_height,
+                    "points" : {
+                      "symbol" : "circle",
+                      "fillColor" : "#2E2EFE"
+                    },
+                    "color" : '#2E2EFE'
+                  } ];
                   $.plot($('#graph'), this._graphdata, this._graphoptions);
                   var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
                   var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
@@ -261,10 +263,10 @@
                 }
               }
             }, this), true);
+
             return this;
           },
 
-          ///mapzen example
           buildProfileUrl : function(rrshape, options) {
             var locs = [], locationKey, hint;
 
@@ -286,8 +288,8 @@
             var dataPoints = [];
             for (var xy = 0; xy < elevresult.range_height.length; xy++) {
               dataPoints.push({
-                x : elevresult.profile[xy][0] != null ? elevresult.profile[xy][0] : 0,
-                y : elevresult.profile[xy][1] != null ? elevresult.profile[xy][1] : 0
+                x : elevresult.range_height[xy][0] != null ? elevresult.range_height[xy][0] : 0,
+                y : elevresult.range_height[xy][1] != null ? elevresult.range_height[xy][1] : 0
               });
             }
             return dataPoints;
