@@ -76,6 +76,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
+    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
   });
@@ -83,6 +85,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
+    "ElevationMap" : elevationmap,
     "TransitMap" : transitmap
   };
 

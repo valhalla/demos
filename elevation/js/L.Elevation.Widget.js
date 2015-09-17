@@ -76,8 +76,7 @@
       }
 
       // Both `onreadystatechange` and `onload` can fire. `onreadystatechange`
-      // has [been supported for
-      // longer](http://stackoverflow.com/a/9181508/229001).
+      // has [been supported for longer](http://stackoverflow.com/a/9181508/229001).
       if ('onload' in x) {
         x.onload = loaded;
       } else {
@@ -88,8 +87,7 @@
         };
       }
 
-      // Call the callback with the XMLHttpRequest object as an error and
-      // prevent
+      // Call the callback with the XMLHttpRequest object as an error and prevent
       // it from ever being called again by reassigning it to `noop`
       x.onerror = function error(evt) {
         // XDomainRequest provides no evt parameter
@@ -127,10 +125,8 @@
 
     if (typeof module !== 'undefined')
       module.exports = corslite;
-
   }, {} ],
   2 : [ function(require, module, exports) {
-   
   }, {} ],
   3 : [ function(require, module, exports) {
     (function(global) {
