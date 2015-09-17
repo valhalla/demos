@@ -29,7 +29,7 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
-  //cycle map with terrain
+  //hiking map with terrain
   var cycleMap = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   })
@@ -48,7 +48,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   };
   
   //icon for point on the map
-  var resampledPt = function(icon) {
+  var resampledPt = function() {
     return {
       color: '#444',
       opacity: 1,
@@ -61,18 +61,48 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //allow hash links
   var hash = new L.Hash(map);
   //place to store clicked locations
-  var locations = [ ]
+  var locations = [ ];
+  var pathLength = 0;
+  var updateLength = function() {
+    pathLength = 0;
+    locations.forEach(function(e,i,a) {
+      if(i != 0) {
+        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+        var current = L.latLng(e.lat, e.lon);
+        pathLength += previous.distanceTo(current);
+      }
+    })
+    return pathLength;
+  };
+  
+  var updateSlider = function() {
+    //update the sampling limits based on the total length
+    var low = 10;
+    var high = 100;
+    if(pathLength > 100 * 10) {
+      low = Math.floor(pathLength / 1000) * 10;
+      high = Math.ceil(pathLength / 100) * 10;  
+    }  
+    
+    //apply them
+    var slider = document.getElementById('resample_distance');
+    slider.value = Math.max(slider.value, low);
+    slider.value = Math.min(slider.value, high);
+    slider.min = low;
+    slider.max = high;
+    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>';
+  };
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
-
-    document.getElementById('resample_distance').value = "100";
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + document.getElementById('resample_distance').value + 'm</h5>';
+    updateSlider();
     elev = L.Elevation.widget(token);
     var href = window.location.href;
-    if(href.contains('?show_sample')) {
-      window.location.href = href.slice(0, href.lastIndexOf('?show_sample') + '?show_sample'.length) + '#loc=12,47.2200,9.3357';
-      locations = [ {lat: 47.20365107869972, lon: 9.352025985717773 }, {lat: 47.27002789823629, lon: 9.341468811035154} ]
+    if(href.contains('?sample=')) {
+      var sample_index = href.lastIndexOf('?sample=') + '?sample='.length;
+      var hash_index = href.lastIndexOf('#');
+      var sample = decodeURIComponent(href.slice(sample_index, hash_index));
+      locations = JSON.parse(sample);
       getElevation();
     }
   });
@@ -89,7 +119,11 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   };
   
   //make the request to get the elevation
-  var getElevation = function() {    
+  var getElevation = function() {
+    //massage the input in case its nonsense
+    updateLength();
+    updateSlider();
+    
     elev.resetChart();
     elev.profile(locations, document.getElementById('resample_distance').value, marker_update);
     $("#clearbtn").show();
@@ -102,62 +136,25 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
 
     //draw interpolations
     for(var i = 0; i < elevation.shape.length; i++) {
-      var marker = new L.circle( [elevation.shape[i].lat, elevation.shape[i].lon], 10, resampledPt());
+      var marker = new L.circle( [elevation.shape[i].lat, elevation.shape[i].lon], 5, resampledPt());
       marker.bindPopup('<pre style="display:inline" class="elv_point">height: ' + elevation.range_height[i][1] + 'm range: ' + elevation.range_height[i][0] + 'm</pre>');
       map.addLayer(marker);
       resampled.push(marker);
     }
   };
+  
+  //adding a point
+  var addPoint = function(e) {
+    locations.push({
+      'lat' : e.latlng.lat,
+      'lon' : e.latlng.lng
+    });
+    getElevation();
+  };
 
   //someone clicked, store the spot and show something
-  map.on('click', function(e) {
-      locations.push({
-        'lat' : e.latlng.lat,
-        'lon' : e.latlng.lng
-      });
-      
-      //check the total number to see if its bonkers
-      var length = 0.0;
-      locations.forEach(function(e,i,a) {
-        if(i != 0) {
-          var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-          var current = L.latLng(e.lat, e.lon);
-          length += previous.distanceTo(current);
-        }
-      });
-
-      if(length / document.getElementById('resample_distance').value > 2500) {
-        alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-        locations.pop();
-      }
-      else
-        getElevation();
-  });
-
-    map.on('touchEnd', function(e) {
-      locations.push({
-        'lat' : e.latlng.lat,
-        'lon' : e.latlng.lng
-      });
-      
-      //check the total number to see if its bonkers
-      var length = 0.0;
-      locations.forEach(function(e,i,a) {
-        if(i != 0) {
-          var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
-          var current = L.latLng(e.lat, e.lon);
-          length += previous.distanceTo(current);
-        }
-      });
-
-      if(length / document.getElementById('resample_distance').value > 2500) {
-        alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
-        locations.pop();
-      }
-      else
-        getElevation();
-  });
-
+  map.on('click', addPoint);
+  map.on('touchEnd', addPoint);
   
   //someone clicked the clear button so reset
   $("#clearbtn").on("click", function() {
@@ -177,10 +174,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //someone changed sampling
   $("#resample_distance").on("change", function() {
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + this.value + 'm</h5>';
+    updateSlider();
   });
   $("#resample_distance").on("input", function() {
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + this.value + 'm</h5>';
+    updateSlider();
   });
   
 })
