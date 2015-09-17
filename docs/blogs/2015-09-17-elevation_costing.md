@@ -1,12 +1,18 @@
 ## Elevation Influenced Bicycle Routing
 
-Mapzen and the Valhalla team recently announced updates to their bicycle routing service: [Bcycle Routing with Valhalla](https://mapzen.com/blog/valhalla-bicycle-routing-options). Now we have taken it to greater heights by adding "elevation influenced" bicycle routing. We are pleased to announce the addition of elevation and grade factors into the bicycle costing model. How badly do you want to avoid those steep hills on your next ride!
+Mapzen and the Valhalla team recently announced updates to their bicycle routing service: [Bicycle Routing with Valhalla](https://mapzen.com/blog/valhalla-bicycle-routing-options). Now we have taken it to greater heights by adding "elevation influenced" bicycle routing. We are pleased to announce the addition of elevation and grade factors into the bicycle costing model. How badly do you want to avoid those steep hills on your next ride!?
 
-Bicycle routing presents several unique challenges. Among the challenges are the wide range of user abilities, preferences, and equipment. Bicyclists vary in their experience and comfort level using roadways shared with larger vehicles (e.g. automobiles, buses, trucks). Different bicycle types are more or less suitable to the wide variety of road and path surfaces. The wide range of physical ability of bicyclists also comes into play when selecting routes in locations where hills and steep grades might be present. The Valhalla team at Mapzen feels these factors all play into one of the strengths of the Valhalla routing engine - its dynamic, run-time costing module known as SIF. Further background on SIF can be found in our prior blog post: [Dynamic Costing in Valhalla](https://mapzen.com/blog/dynamic-costing-via-sif).
+Bicycle routing presents several unique challenges. Among the challenges are the wide range of user abilities, preferences, and equipment. Bicyclists vary in their experience and comfort level using roadways shared with larger vehicles (e.g. automobiles, buses, trucks). Different bicycle types are more or less suitable to the wide variety of road and path surfaces. The wide range of physical ability of bicyclists also comes into play when selecting routes in locations where hills and steep grades might be present. The Valhalla team at Mapzen feels these factors all play into one of the strengths of the Valhalla routing engine - its dynamic, run-time costing module known as [Sif](https://github.com/valhalla/sif). Further background on Sif can be found in our prior blog post: [Dynamic Costing in Valhalla](https://mapzen.com/blog/dynamic-costing-via-sif).
 
 #### Addition of Elevation Factors into Valhalla Routing Tiles
 
-KEVIN TODO
+In order to measure the change in elevation over a given segment of road, we've built a library (and service) called [Skadi](https://github.com/valhalla/skadi); the godess of the mountains. Skadi has the ability to efficiently query world-wide digital elevation model data. We use this library when building routing tiles to estimate an approximate most important or prevalent grade/slope of a given section of road. We call this the weighted grade. Here's how it works.
+
+![Weighting Function](images/weighted_grade.png "Weight Per Grade")
+
+Given a segment of road, we evenly sample points (at 60m apart) along it. At each sample, we measure the elevation. We then compute the grade/slope between each pair of sample points and weight it using the above function. This is essentially a linear combination designed to approximate the overall grade/slope of a given segment of road. You'll notice that sections with higher upward slope are weighted more and that conversely higher downward slopes are weighted less.
+
+The intuition is that steeper sections will require more "cost" to traverse whether walking, biking or driving. If you're biking the unit of cost might be time, since you can't ride as fast up steep hills. When driving the unit of cost might be the fuel used to overcome inertia. In any case, we are attempting to measure approximately how much energy might be needed to traverse a given section of road so that we can minimize (or maximize!?) it, along with other factors, when computing your path!
 
 #### Adding Grade Factors to Dynamic Costing
 
