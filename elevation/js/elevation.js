@@ -41,6 +41,12 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     layers : [ cycleMap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
+
+  // If iframed, we're going to have to disable some of the touch interaction
+  // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
+  if (window.self !== window.top) {
+    map.scrollWheelZoom.disable();
+  }
   
   //??
   $scope.renderHtml = function(html_code) {
@@ -98,7 +104,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     updateSlider();
     elev = L.Elevation.widget(token);
     var href = window.location.href;
-    if(href.contains('?sample=')) {
+    if(href.indexOf('?sample=') > 0) {
       var sample_index = href.lastIndexOf('?sample=') + '?sample='.length;
       var hash_index = href.lastIndexOf('#');
       var sample = decodeURIComponent(href.slice(sample_index, hash_index));
@@ -179,5 +185,14 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   $("#resample_distance").on("input", function() {
     updateSlider();
   });
-  
+
+  // Resize graph when viewport changes
+  $(window).on('resize', function() {
+    if (locations.length === 0) {
+      elev.resetChart();
+      elev = L.Elevation.widget(token);
+    } else {
+      getElevation();
+    }
+  });
 })
