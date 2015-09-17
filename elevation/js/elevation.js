@@ -30,14 +30,14 @@ app.run(function($rootScope) {
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
   //cycle map with terrain
-  var cycleMap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  var cycleMap = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
+    attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   })
   
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
-    zoomControl : false,
+    zoomControl : true,
     layers : [ cycleMap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
@@ -50,7 +50,6 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //icon for point on the map
   var resampledPt = function(icon) {
     return {
-
       color: '#444',
       opacity: 1,
       fill: true,
@@ -134,6 +133,31 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
       else
         getElevation();
   });
+
+    map.on('touchEnd', function(e) {
+      locations.push({
+        'lat' : e.latlng.lat,
+        'lon' : e.latlng.lng
+      });
+      
+      //check the total number to see if its bonkers
+      var length = 0.0;
+      locations.forEach(function(e,i,a) {
+        if(i != 0) {
+          var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+          var current = L.latLng(e.lat, e.lon);
+          length += previous.distanceTo(current);
+        }
+      });
+
+      if(length / document.getElementById('resample_distance').value > 2500) {
+        alert("You seem to be getting carried away. Try less locations closer together or increase the resampling distance");
+        locations.pop();
+      }
+      else
+        getElevation();
+  });
+
   
   //someone clicked the clear button so reset
   $("#clearbtn").on("click", function() {

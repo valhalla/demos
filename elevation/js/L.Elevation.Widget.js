@@ -161,9 +161,6 @@
                       below : 0,
                       color : "#eee"
                     },
-                    legend : {
-                      show : false
-                    },
                     grid : {
                      // hoverable : true,
                      /// clickable : true,
@@ -211,8 +208,7 @@
                       },
                     },
                     legend : {
-                      labelBoxBorderColor : "none",
-                      position : "right"
+                      show: false
                     },
                     lines : {
                       fill : true,
