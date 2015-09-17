@@ -80,3 +80,19 @@ body {
   -webkit-box-shadow: 0px 1px 1px #ddd;
   box-shadow: 0px 1px 2px #ddd;
 }
+
+html.is-iframed-demo .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 767px) {
+  html.is-iframed-demo #map {
+    height: calc( 100% - 550px );
+  }
+}
+
+html.is-iframed-demo .not-map-part {
+  max-width: 900px;
+  margin: 0 auto;
+}
