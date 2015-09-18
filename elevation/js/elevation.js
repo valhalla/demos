@@ -137,7 +137,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     
     //shape
     if(parameters.shape !== undefined)
-      parameters.shape = JSON.parse(parameters.shape);
+      shape = JSON.parse(parameters.shape);
     //sampling distance
     if(parameters.resample_distance !== undefined) {
       var slider = document.getElementById('resample_distance');
@@ -160,6 +160,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //show something to start with but only if it was requested
   $(window).load(function(e) {
     elev = L.Elevation.widget(token);
+    force = true;
     hashElevation();
   });
   
@@ -220,8 +221,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //someone changed sampling
   $("#resample_distance").on("change", function() {
-    var slider = document.getElementById('resample_distance');
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>'
+    update(true);
   });
   $("#resample_distance").on("input", function() {
     var slider = document.getElementById('resample_distance');
