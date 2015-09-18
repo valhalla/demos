@@ -22,15 +22,17 @@
   <div class = "row not-map-part">
     <div id="graph_controls" class = "clear">
       <div id="controls" class = "col-sm-4 col-md-4">
-        <div id="sampling_text"><h5>Sampling Distance:</h5></div>
+        <div id="sampling_text"><h5>Sampling Distance: 50</h5></div>
         <input id="resample_distance" class = "range-bar" min="10" max="100" value="50" type="range"></input>
-        <button id="updatebtn" class = "btn btn-mapzen" type="button">update</button>
-        <button id="clearbtn" class ="btn btn-mapzen" type="button">clear</button>
         <div class = "instruction">
           <p>
             The sampling distance controls how often other points than the ones you've clicked will be sampled.
             Clicking on a displayed marker will show its height and distance along the course of input points.
           </p>
+          <div>
+            <button id="clearbtn" class ="btn btn-mapzen" type="button" style='margin-right: 1em;'>clear</button>
+            <div id='permalink' style='display:inline-block;'></div>
+          </div>
         </div>
       </div>
     </div>
