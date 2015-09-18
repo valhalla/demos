@@ -155,7 +155,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     if(shape.length > 0)
       elev.profile(shape, document.getElementById('resample_distance').value, marker_update);
     document.getElementById('permalink').innerHTML = 
-      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "'>permalink</a>";
+      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "' target='_top'>permalink</a>";
   };
 
   //if the hash changes
