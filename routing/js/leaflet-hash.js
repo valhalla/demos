@@ -13,12 +13,11 @@
   };
 
   L.Hash.triggerEvent = function(center, zoom) {
-    var precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
     $(document).trigger({
       'type' : "new-location",
       'zoom' : zoom,
-      'lat' : center.lat.toFixed(precision),
-      'lon' : center.lng.toFixed(precision)
+      'lat' : center.lat.toFixed(6),
+      'lon' : center.lng.toFixed(6)
     });
   };
 
@@ -71,11 +70,11 @@
   };
 
   L.Hash.formatHash = function(map) {
-    var center = map.getCenter(), zoom = map.getZoom(), precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+    var center = map.getCenter(), zoom = map.getZoom();
 
     this.triggerEvent(center, zoom);
 
-    var loc = "#loc=" + [ zoom, center.lat.toFixed(precision), center.lng.toFixed(precision) ].join(",");
+    var loc = "#loc=" + [ zoom, center.lat.toFixed(6), center.lng.toFixed(6) ].join(",");
 
     var query = this.lastSearchQuery ? "&q=" + this.lastSearchQuery : "";
 
