@@ -67,13 +67,13 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //allow hash links
   var hash = new L.Hash(map);
   //place to store clicked locations
-  var locations = [ ];
-  var pathLength = 0;
+  var shape = [ ];
+  var pathLength;
   var updateLength = function() {
     pathLength = 0;
-    locations.forEach(function(e,i,a) {
+    shape.forEach(function(e,i,a) {
       if(i != 0) {
-        var previous = L.latLng(locations[i - 1].lat, locations[i - 1].lon);
+        var previous = L.latLng(shape[i - 1].lat, shape[i - 1].lon);
         var current = L.latLng(e.lat, e.lon);
         pathLength += previous.distanceTo(current);
       }
@@ -104,12 +104,28 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     updateSlider();
     elev = L.Elevation.widget(token);
     var href = window.location.href;
-    if(href.indexOf('?sample=') > 0) {
-      var sample_index = href.lastIndexOf('?sample=') + '?sample='.length;
-      var hash_index = href.lastIndexOf('#');
-      var sample = decodeURIComponent(href.slice(sample_index, hash_index));
-      locations = JSON.parse(sample);
-      getElevation();
+    var start_index = href.indexOf('?');
+    if(start_index > 0) {
+      //peel out the interesting bit
+      var end_index = href.lastIndexOf('#');
+      var parameters = decodeURIComponent(href.slice(start_index, end_index));
+      //turn it into json
+      parameters = '{"' + parameters.slice(1) + '}';
+      parameters = parameters.replace(/=/g, '":');
+      parameters = parameters.replace(/&/g, ',"');
+      //copy out the parameters
+      parameters = JSON.parse(parameters);
+      if(parameters.shape !== undefined) {
+        shape = parameters.shape;
+        if(parameters.resample_distance !== undefined) {
+          var slider = document.getElementById('resample_distance');
+          slider.min = parameters.resample_distance - 1;
+          slider.max = parameters.resample_distance + 1;
+          slider.value = parameters.resample_distance;
+        }
+        //show something interesting
+        getElevation();
+      }
     }
   });
   
@@ -131,7 +147,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     updateSlider();
     
     elev.resetChart();
-    elev.profile(locations, document.getElementById('resample_distance').value, marker_update);
+    elev.profile(shape, document.getElementById('resample_distance').value, marker_update);
     $("#clearbtn").show();
   }
   
@@ -151,7 +167,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //adding a point
   var addPoint = function(e) {
-    locations.push({
+    shape.push({
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     });
@@ -165,14 +181,14 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   //someone clicked the clear button so reset
   $("#clearbtn").on("click", function() {
     clear();
-    locations = [];
+    shape = [];
     elev.resetChart();
     elev = L.Elevation.widget(token);
   });
   
   //someone clicked to get elevation
   $("#updatebtn").on("click", function() {
-    if(locations.length == 0)
+    if(shape.length == 0)
       alert("Click a few places on the map first");
     else
       getElevation();
@@ -188,7 +204,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
 
   // Resize graph when viewport changes
   $(window).on('resize', function() {
-    if (locations.length === 0) {
+    if (shape.length === 0) {
       elev.resetChart();
       elev = L.Elevation.widget(token);
     } else {
