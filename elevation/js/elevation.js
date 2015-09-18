@@ -81,7 +81,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     return pathLength;
   };
   
-  var updateSlider = function() {
+  var updateControls = function() {
     //update the sampling limits based on the total length
     var low = 10;
     var high = 100;
@@ -97,12 +97,24 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     slider.min = low;
     slider.max = high;
     document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>';
+    
+    //update the permalink
+    var href = window.location.href;
+    var hash_index = href.lastIndexOf('#');
+    var hash = href.slice(hash_index);
+    href = href.slice(0, hash_index);
+    var parameter_index = href.indexOf('?');
+    if(parameter_index != -1)
+      href = href.slice(0, parameter_index);
+    var parameter = '?shape=' + JSON.stringify(shape) + '&resample_distance=' + slider.value;
+    //location.replace(href + parameter + hash);
   };
     
   //show something to start with but only if it was requested
   $(window).load(function(e) {
-    updateSlider();
     elev = L.Elevation.widget(token);
+    
+    //do we have a permalink
     var href = window.location.href;
     var start_index = href.indexOf('?');
     if(start_index > 0) {
@@ -123,10 +135,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
           slider.max = parameters.resample_distance + 1;
           slider.value = parameters.resample_distance;
         }
-        //show something interesting
-        getElevation();
       }
     }
+    //show something interesting
+    getElevation();
   });
   
   //place to store results
@@ -144,11 +156,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   var getElevation = function() {
     //massage the input in case its nonsense
     updateLength();
-    updateSlider();
-    
+    updateControls();
     elev.resetChart();
-    elev.profile(shape, document.getElementById('resample_distance').value, marker_update);
-    $("#clearbtn").show();
+    if(shape.length > 0)
+      elev.profile(shape, document.getElementById('resample_distance').value, marker_update);
   }
   
   //call back for use when a result comes back
@@ -182,6 +193,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   $("#clearbtn").on("click", function() {
     clear();
     shape = [];
+    updateControls();
     elev.resetChart();
     elev = L.Elevation.widget(token);
   });
@@ -196,10 +208,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   
   //someone changed sampling
   $("#resample_distance").on("change", function() {
-    updateSlider();
+    updateControls();
   });
   $("#resample_distance").on("input", function() {
-    updateSlider();
+    updateControls();
   });
 
   // Resize graph when viewport changes

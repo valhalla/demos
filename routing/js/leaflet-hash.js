@@ -86,7 +86,18 @@
 		].join(",");
 
 		var query = this.lastSearchQuery ? "&q=" + this.lastSearchQuery : "";
-		return loc + query;
+		
+		//don't smash any other hash parameters
+		var hash = location.hash;
+		if(hash.indexOf('#') === 0)
+			hash = hash.substr(1);
+		pieces = hash.split('&');
+		extra = '';
+		pieces.forEach(function(e,i,a) {
+			if(e.length && e.slice(0, 'loc='.length) != 'loc=' && e.slice(0, 'q='.length) != 'q=')
+				extra = extra + '&' + e;
+		});
+		return loc + query + extra;
 	},
 
 	L.Hash.prototype = {
