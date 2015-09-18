@@ -125,6 +125,9 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     var parameter = (extra.length ? '&shape=' : 'shape=') + JSON.stringify(shape) + '&resample_distance=' + slider_value;
     force = show;
     window.location.hash = '#' + extra + parameter;
+
+    document.getElementById('permalink').innerHTML = 
+      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "'>permalink</a>";
   };
   
   var hashElevation = function() {
@@ -151,6 +154,8 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     elev.resetChart();
     if(shape.length > 0)
       elev.profile(shape, document.getElementById('resample_distance').value, marker_update);
+    document.getElementById('permalink').innerHTML = 
+      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "'>permalink</a>";
   };
   
   //if the hash changes
@@ -206,17 +211,9 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   $("#clearbtn").on("click", function() {
     clear();
     shape = [];
-    updateControls();
+    update(false);
     elev.resetChart();
     elev = L.Elevation.widget(token);
-  });
-  
-  //someone clicked to get elevation
-  $("#updatebtn").on("click", function() {
-    if(shape.length == 0)
-      alert("Click a few places on the map first");
-    else
-      update(true);
   });
   
   //someone changed sampling
