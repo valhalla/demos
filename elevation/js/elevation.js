@@ -127,7 +127,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     window.location.hash = '#' + extra + parameter;
 
     document.getElementById('permalink').innerHTML = 
-      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "'>permalink</a>";
+      "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "' target='_top'>permalink</a>";
   };
   
   var hashElevation = function() {
@@ -157,11 +157,10 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     document.getElementById('permalink').innerHTML = 
       "<a href='https://valhalla.github.io/demos/elevation/index.html" + window.location.hash + "'>permalink</a>";
   };
-  
+
   //if the hash changes
   L.DomEvent.addListener(window, "hashchange", hashElevation);
-  
-    
+
   //show something to start with but only if it was requested
   $(window).load(function(e) {
     elev = L.Elevation.widget(token);

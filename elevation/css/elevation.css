@@ -97,3 +97,7 @@ html.is-iframed-demo .not-map-part {
   max-width: 900px;
   margin: 0 auto;
 }
+
+html.is-iframed-demo .hide-if-iframed {
+  display: none;
+}
