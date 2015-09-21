@@ -31,7 +31,7 @@ app.run(function($rootScope) {
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
   //hiking map with terrain
   var cycleMap = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest</a> | Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   })
   
   //leaflet slippy map
