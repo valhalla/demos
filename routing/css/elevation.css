@@ -5,10 +5,9 @@ html {
 
 body {
   font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: #eee;
-  width: 100%;
-  height: 100%;
-  min-height: 600px;
+  padding: 0px;
+  margin: 0px;
+  background-color: black;
 }
 
 .container-fluid {
@@ -16,7 +15,7 @@ body {
 }
 
 #map {
-  height: calc( 100% - 300px ); 
+  height:100vh;
   width: 100%;
 /*  position: absolute;
   background: #fff;
@@ -54,6 +53,13 @@ body {
     -webkit-transform-origin: 0 0;
 }
 
+#graph{
+  width: 200px;
+  height: 300px;
+  position: center;
+  margin: 0 auto;
+  background-color: #FFF;
+}
 
 .legend table, .legend > div {
   height: 35px !important;
@@ -80,24 +86,4 @@ body {
   -moz-box-shadow: 0px 1px 1px #ddd;
   -webkit-box-shadow: 0px 1px 1px #ddd;
   box-shadow: 0px 1px 2px #ddd;
-}
-
-html.is-iframed-demo .container-fluid {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-@media (max-width: 767px) {
-  html.is-iframed-demo #map {
-    height: calc( 100% - 550px );
-  }
-}
-
-html.is-iframed-demo .not-map-part {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-html.is-iframed-demo .hide-if-iframed {
-  display: none;
 }
