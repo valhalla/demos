@@ -77,13 +77,12 @@
           if (resp.status >= 200 && resp.status < 400) {
             loaded();
             sent = true;
-            console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
           } else {
             errback(new Error('Response returned with non-OK status'));
           }
         }
       });
-
+      console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
       return resp;
     };
 
