@@ -54,33 +54,38 @@
           callback.call(resp, resp, null);
       }
 
+      // reset service url & access token if environment has changed
+      (typeof this.elevServiceUrl != 'undefined' || this.elevServiceUrl != null) ? this.options.serviceUrl = this.elevServiceUrl : this.options.serviceUrl = this.elevationServer.dev;
+      (typeof this.elevToken != "undefined" || this.elevToken != null) ? this._accessToken = this.elevToken : this._accessToken = this.elevAccessToken.dev;
+
       var params = JSON.stringify({
         encoded_polyline : rrshape,
         range : true
-      })
+      });
 
       var resp = $.ajax({
+        crossDomain : true,
         type : "POST",
         url : this.elevServiceUrl + 'height?api_key=' + this.elevToken,
         data : params,
         success : "success",
-        dataType : 'text'
-      })
+        dataType : 'json'
+      });
 
       resp.done(function() {
         if (resp.readyState === 4) {
           if (resp.status >= 200 && resp.status < 400) {
             loaded();
+            sent = true;
+            console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
           } else {
             errback(new Error('Response returned with non-OK status'));
           }
         }
       });
 
-      sent = true;
       return resp;
-    }
-    ;
+    };
 
     if (typeof module !== 'undefined')
       module.exports = corslite;
@@ -121,9 +126,6 @@
                 show : false
               },
               grid : {
-                // hoverable : true,
-                // / clickable : true,
-                // autoHighlight : true
                 borderWidth : 1,
                 minBorderMargin : 20,
                 labelMargin : 10,
@@ -190,8 +192,6 @@
           profile : function(rrshape, callback, context, options) {
             var timedOut = false, options = options || {};
 
-            var url = this.buildProfileUrl(rrshape, options);
-
             var timer = setTimeout(function() {
               timedOut = true;
               callback.call(context || callback, {
@@ -224,23 +224,6 @@
             }, this), true);
 
             return this;
-          },
-
-          buildProfileUrl : function(rrshape, options) {
-            var locs = [], locationKey, hint;
-
-            var params = JSON.stringify({
-              encoded_polyline : rrshape,
-              range : true
-            });
-
-            // reset service url & access token if environment has changed
-            (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.serviceUrl = elevServiceUrl : this.options.serviceUrl = elevationServer.dev;
-            (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
-
-            console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
-
-            return this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
           },
 
           getDataPoints : function(elevresult) {
