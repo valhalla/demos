@@ -26,7 +26,8 @@
   return s
 })({
   1 : [ function(require, module, exports) {
-    function corslite(url, callback, cors) {
+
+    function corslite(rrshape, callback, cors) {
       var sent = false;
 
       if (typeof window.XMLHttpRequest === 'undefined') {
@@ -38,90 +39,48 @@
         cors = m && (m[0] !== location.protocol + '//' + location.domain + (location.port ? ':' + location.port : ''));
       }
 
-      var x = new window.XMLHttpRequest();
-
       function isSuccessful(status) {
         return status >= 200 && status < 300 || status === 304;
       }
 
-      if (cors && !('withCredentials' in x)) {
-        // IE8-9
-        x = new window.XDomainRequest();
-
-        // Ensure callback is never called synchronously, i.e., before
-        // x.send() returns (this has been observed in the wild).
-        // See https://github.com/mapbox/mapbox.js/issues/472
-        var original = callback;
-        callback = function() {
-          if (sent) {
-            original.apply(this, arguments);
-          } else {
-            var that = this, args = arguments;
-            setTimeout(function() {
-              original.apply(that, args);
-            }, 0);
-          }
-        }
-      }
-
       function loaded() {
         if (
-        // XDomainRequest
-        x.status === undefined ||
+        // ajax POST request
+        resp.status === undefined ||
         // modern browsers
-        isSuccessful(x.status))
-          callback.call(x, null, x);
-        else
-          callback.call(x, x, null);
+        isSuccessful(resp.status)) {
+          callback.call(resp, null, resp);
+        } else
+          callback.call(resp, resp, null);
       }
 
-      // Both `onreadystatechange` and `onload` can fire. `onreadystatechange`
-      // has [been supported for longer](http://stackoverflow.com/a/9181508/229001).
-      if ('onload' in x) {
-        x.onload = loaded;
-      } else {
-        x.onreadystatechange = function readystate() {
-          if (x.readyState === 4) {
+      var params = JSON.stringify({
+        encoded_polyline : rrshape,
+        range : true
+      })
+
+      var resp = $.ajax({
+        type : "POST",
+        url : this.elevServiceUrl + 'height?api_key=' + this.elevToken,
+        data : params,
+        success : "success",
+        dataType : 'text'
+      })
+
+      resp.done(function() {
+        if (resp.readyState === 4) {
+          if (resp.status >= 200 && resp.status < 400) {
             loaded();
+          } else {
+            errback(new Error('Response returned with non-OK status'));
           }
-        };
-      }
+        }
+      });
 
-      // Call the callback with the XMLHttpRequest object as an error and prevent
-      // it from ever being called again by reassigning it to `noop`
-      x.onerror = function error(evt) {
-        // XDomainRequest provides no evt parameter
-        callback.call(this, evt || true, null);
-        callback = function() {
-        };
-      };
-
-      // IE9 must have onprogress be set to a unique function.
-      x.onprogress = function() {
-      };
-
-      x.ontimeout = function(evt) {
-        callback.call(this, evt, null);
-        callback = function() {
-        };
-      };
-
-      x.onabort = function(evt) {
-        callback.call(this, evt, null);
-        callback = function() {
-        };
-      };
-
-      // GET is the only supported HTTP Verb by XDomainRequest and is the
-      // only one supported here.
-      x.open('GET', url, true);
-
-      // Send the request. Sending data is not supported.
-      x.send(null);
       sent = true;
-
-      return x;
+      return resp;
     }
+    ;
 
     if (typeof module !== 'undefined')
       module.exports = corslite;
@@ -150,9 +109,78 @@
             this._accessToken = accessToken;
             this._rrshape = rrshape;
             this._graphdata = [];
-            this._graphoptions = {};
+            this._graphoptions = {
+              axislabels : {
+                show : true
+              },
+              threshold : {
+                below : 0,
+                color : "#c00000"
+              },
+              legend : {
+                show : false
+              },
+              grid : {
+                // hoverable : true,
+                // / clickable : true,
+                // autoHighlight : true
+                borderWidth : 1,
+                minBorderMargin : 20,
+                labelMargin : 10,
+                backgroundColor : {
+                  colors : [ "#fff", "#e4f4f4" ]
+                },
+                margin : {
+                  top : 8,
+                  bottom : 25,
+                  left : 20
+                }
+              },
+              xaxis : {
+                min : 0,
+                // axisLabel : 'Range',
+                labelWidth : 30,
+                axisLabelUseCanvas : true,
+                axisLabelFontSizePixels : 14,
+                axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding : 10
+              },
+              yaxis : {
+                // axisLabel : 'Height',
+                labelWidth : 30,
+                axisLabelUseCanvas : true,
+                axisLabelFontSizePixels : 14,
+                axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding : 10
+              },
+              series : {
+                stack : true,
+                lines : {
+                  show : true,
+                  fill : true
+                },
+                points : {
+                  radius : 0,
+                  show : true,
+                  fill : true,
+                  fillColor : '#83ce16'
+                },
+              },
+              legend : {
+                labelBoxBorderColor : "none",
+                position : "right"
+              },
+              lines : {
+                fill : true,
+                lineWidth : 3,
+              }
+            };
+            // initilizing placeholder graph so that user knows there is graph
+            $.plot($('#graph'), this._graphdata, this._graphoptions);
+            var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+            var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+            yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
           },
-
           resetChart : function() {
             var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
             plot.destroy();
@@ -172,7 +200,7 @@
               });
             }, this.options.timeout);
 
-            corslite(url, L.bind(function(err, resp) {
+            corslite(rrshape, L.bind(function(err, resp) {
               var elevresult;
               clearTimeout(timer);
               if (!timedOut) {
@@ -187,73 +215,6 @@
                     },
                     "color" : '#2E2EFE'
                   } ];
-                  this._graphoptions = {
-                    axislabels : {
-                      show : true
-                    },
-                    threshold : {
-                      below : 0,
-                      color : "#c00000"
-                    },
-                    legend : {
-                      show : false
-                    },
-                    grid : {
-                     // hoverable : true,
-                     /// clickable : true,
-                     // autoHighlight : true
-                      borderWidth: 1,
-                      minBorderMargin: 20,
-                      labelMargin: 10,
-                      backgroundColor: {
-                          colors: ["#fff", "#e4f4f4"]
-                      },
-                      margin: {
-                          top: 8,
-                          bottom: 25,
-                          left: 20
-                      }
-                    },
-                    xaxis : {
-                      min : 0,
-                      //axisLabel : 'Range',
-                      labelWidth: 30,
-                      axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 14,
-                      axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 10
-                    },
-                    yaxis : {
-                     // axisLabel : 'Height',
-                      labelWidth: 30,
-                      axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 14,
-                      axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 10
-                    },
-                    series : {
-                      stack : true,
-                      lines : {
-                        show : true,
-                        fill : true
-                      },
-                      points : {
-                        radius : 0,
-                        show : true,
-                        fill : true,
-                        fillColor : '#83ce16'
-                      },
-                    },
-                    legend : {
-                      labelBoxBorderColor : "none",
-                      position : "right"
-                    },
-                    lines : {
-                      fill : true,
-                      lineWidth : 3,
-                    }
-                  };
-
                   $.plot($('#graph'), this._graphdata, this._graphoptions);
                   var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
                   var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
@@ -261,19 +222,19 @@
                 }
               }
             }, this), true);
+
             return this;
           },
 
-          ///mapzen example
           buildProfileUrl : function(rrshape, options) {
             var locs = [], locationKey, hint;
 
             var params = JSON.stringify({
               encoded_polyline : rrshape,
-              range: true
+              range : true
             });
 
-            //reset service url & access token if environment has changed
+            // reset service url & access token if environment has changed
             (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.serviceUrl = elevServiceUrl : this.options.serviceUrl = elevationServer.dev;
             (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
 
@@ -286,8 +247,8 @@
             var dataPoints = [];
             for (var xy = 0; xy < elevresult.range_height.length; xy++) {
               dataPoints.push({
-                x : elevresult.profile[xy][0] != null ? elevresult.profile[xy][0] : 0,
-                y : elevresult.profile[xy][1] != null ? elevresult.profile[xy][1] : 0
+                x : elevresult.range_height[xy][0] != null ? elevresult.range_height[xy][0] : 0,
+                y : elevresult.range_height[xy][1] != null ? elevresult.range_height[xy][1] : 0
               });
             }
             return dataPoints;
