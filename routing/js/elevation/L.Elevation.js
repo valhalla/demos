@@ -26,105 +26,69 @@
   return s
 })({
   1 : [ function(require, module, exports) {
-    function corslite(url, callback, cors) {
+
+    function sendRequest(rrshape, callback, url) {
       var sent = false;
 
       if (typeof window.XMLHttpRequest === 'undefined') {
         return callback(Error('Browser not supported'));
       }
 
-      if (typeof cors === 'undefined') {
+      if (typeof url === 'undefined') {
         var m = url.match(/^\s*https?:\/\/[^\/]*/);
-        cors = m && (m[0] !== location.protocol + '//' + location.domain + (location.port ? ':' + location.port : ''));
+        url = m && (m[0] !== location.protocol + '//' + location.domain + (location.port ? ':' + location.port : ''));
       }
-
-      var x = new window.XMLHttpRequest();
 
       function isSuccessful(status) {
         return status >= 200 && status < 300 || status === 304;
       }
 
-      if (cors && !('withCredentials' in x)) {
-        // IE8-9
-        x = new window.XDomainRequest();
-
-        // Ensure callback is never called synchronously, i.e., before
-        // x.send() returns (this has been observed in the wild).
-        // See https://github.com/mapbox/mapbox.js/issues/472
-        var original = callback;
-        callback = function() {
-          if (sent) {
-            original.apply(this, arguments);
-          } else {
-            var that = this, args = arguments;
-            setTimeout(function() {
-              original.apply(that, args);
-            }, 0);
-          }
-        }
-      }
-
       function loaded() {
         if (
-        // XDomainRequest
-        x.status === undefined ||
+        // ajax POST request
+        resp.status === undefined ||
         // modern browsers
-        isSuccessful(x.status))
-          callback.call(x, null, x);
-        else
-          callback.call(x, x, null);
+        isSuccessful(resp.status)) {
+          callback.call(resp, null, resp);
+        } else
+          callback.call(resp, resp, null);
       }
 
-      // Both `onreadystatechange` and `onload` can fire. `onreadystatechange`
-      // has [been supported for longer](http://stackoverflow.com/a/9181508/229001).
-      if ('onload' in x) {
-        x.onload = loaded;
-      } else {
-        x.onreadystatechange = function readystate() {
-          if (x.readyState === 4) {
+      // reset service url & access token if environment has changed
+      (typeof this.elevServiceUrl != 'undefined' || this.elevServiceUrl != null) ? this.options.serviceUrl = this.elevServiceUrl : this.options.serviceUrl = this.elevationServer.dev;
+      (typeof this.elevToken != "undefined" || this.elevToken != null) ? this._accessToken = this.elevToken : this._accessToken = this.elevAccessToken.dev;
+
+      var params = JSON.stringify({
+        encoded_polyline : rrshape,
+        range : true
+      });
+
+      var resp = $.ajax({
+        crossDomain : true,
+        type : "POST",
+        url : this.elevServiceUrl + 'height?api_key=' + this.elevToken,
+        data : params,
+        success : "success",
+        dataType : 'json'
+      });
+
+      resp.done(function() {
+        if (resp.readyState === 4) {
+          if (resp.status >= 200 && resp.status < 400) {
             loaded();
+            sent = true;
+          } else {
+            errback(new Error('Response returned with non-OK status'));
           }
-        };
-      }
-
-      // Call the callback with the XMLHttpRequest object as an error and prevent
-      // it from ever being called again by reassigning it to `noop`
-      x.onerror = function error(evt) {
-        // XDomainRequest provides no evt parameter
-        callback.call(this, evt || true, null);
-        callback = function() {
-        };
-      };
-
-      // IE9 must have onprogress be set to a unique function.
-      x.onprogress = function() {
-      };
-
-      x.ontimeout = function(evt) {
-        callback.call(this, evt, null);
-        callback = function() {
-        };
-      };
-
-      x.onabort = function(evt) {
-        callback.call(this, evt, null);
-        callback = function() {
-        };
-      };
-
-      // GET is the only supported HTTP Verb by XDomainRequest and is the
-      // only one supported here.
-      x.open('GET', url, true);
-
-      // Send the request. Sending data is not supported.
-      x.send(null);
-      sent = true;
-
-      return x;
+        }
+      });
+      console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
+      return resp;
     }
+    ;
 
     if (typeof module !== 'undefined')
-      module.exports = corslite;
+      module.exports = sendRequest;
   }, {} ],
   2 : [ function(require, module, exports) {
   }, {} ],
@@ -134,7 +98,7 @@
         'use strict';
 
         var L = (typeof window !== "undefined" ? window.L : typeof global !== "undefined" ? global.L : null);
-        var corslite = require('corslite');
+        var sendRequest = require('sendRequest');
         var polyline = require('polyline');
 
         L.Elevation = L.Elevation || {};
@@ -151,78 +115,75 @@
             this._rrshape = rrshape;
             this._graphdata = [];
             this._graphoptions = {
-                    axislabels : {
-                      show : true
-                    },
-                    threshold : {
-                      below : 0,
-                      color : "#c00000"
-                    },
-                    legend : {
-                      show : false
-                    },
-                    grid : {
-                     // hoverable : true,
-                     /// clickable : true,
-                     // autoHighlight : true
-                      borderWidth: 1,
-                      minBorderMargin: 20,
-                      labelMargin: 10,
-                      backgroundColor: {
-                          colors: ["#fff", "#e4f4f4"]
-                      },
-                      margin: {
-                          top: 8,
-                          bottom: 25,
-                          left: 20
-                      }
-                    },
-                    xaxis : {
-                      min : 0,
-                      //axisLabel : 'Range',
-                      labelWidth: 30,
-                      axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 14,
-                      axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 10
-                    },
-                    yaxis : {
-                     // axisLabel : 'Height',
-                      labelWidth: 30,
-                      axisLabelUseCanvas : true,
-                      axisLabelFontSizePixels : 14,
-                      axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                      axisLabelPadding : 10
-                    },
-                    series : {
-                      stack : true,
-                      lines : {
-                        show : true,
-                        fill : true
-                      },
-                      points : {
-                        radius : 0,
-                        show : true,
-                        fill : true,
-                        fillColor : '#83ce16'
-                      },
-                    },
-                    legend : {
-                      labelBoxBorderColor : "none",
-                      position : "right"
-                    },
-                    lines : {
-                      fill : true,
-                      lineWidth : 3,
-                    }
-                  };
-           //initilizing placeholder graph so that user knows there is graph
-             $.plot($('#graph'), this._graphdata, this._graphoptions);
-             var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
-             var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
-             yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
-           },
-           resetChart : function() {
+              axislabels : {
+                show : true
+              },
+              threshold : {
+                below : 0,
+                color : "#c00000"
+              },
+              legend : {
+                show : false
+              },
+              grid : {
+                borderWidth : 1,
+                minBorderMargin : 20,
+                labelMargin : 10,
+                backgroundColor : {
+                  colors : [ "#fff", "#e4f4f4" ]
+                },
+                margin : {
+                  top : 8,
+                  bottom : 25,
+                  left : 20
+                }
+              },
+              xaxis : {
+                min : 0,
+                // axisLabel : 'Range',
+                labelWidth : 30,
+                axisLabelUseCanvas : true,
+                axisLabelFontSizePixels : 14,
+                axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding : 10
+              },
+              yaxis : {
+                // axisLabel : 'Height',
+                labelWidth : 30,
+                axisLabelUseCanvas : true,
+                axisLabelFontSizePixels : 14,
+                axisLabelFontFamily : 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding : 10
+              },
+              series : {
+                stack : true,
+                lines : {
+                  show : true,
+                  fill : true
+                },
+                points : {
+                  radius : 0,
+                  show : true,
+                  fill : true,
+                  fillColor : '#83ce16'
+                },
+              },
+              legend : {
+                labelBoxBorderColor : "none",
+                position : "right"
+              },
+              lines : {
+                fill : true,
+                lineWidth : 3,
+              }
+            };
+            // initilizing placeholder graph so that user knows there is graph
+            $.plot($('#graph'), this._graphdata, this._graphoptions);
+            var xaxisLabel = $("<div class='axisLabel xaxisLabel'></div>").text("Range (m)").appendTo($('#graph'));
+            var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text("Height (m)").appendTo($('#graph'));
+            yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
+          },
+          resetChart : function() {
             var plot = $.plot($('#graph'), this._graphdata, this._graphoptions);
             plot.destroy();
             $('#graph').empty();
@@ -230,8 +191,6 @@
 
           profile : function(rrshape, callback, context, options) {
             var timedOut = false, options = options || {};
-
-            var url = this.buildProfileUrl(rrshape, options);
 
             var timer = setTimeout(function() {
               timedOut = true;
@@ -241,7 +200,7 @@
               });
             }, this.options.timeout);
 
-            corslite(url, L.bind(function(err, resp) {
+            sendRequest(rrshape, L.bind(function(err, resp) {
               var elevresult;
               clearTimeout(timer);
               if (!timedOut) {
@@ -265,23 +224,6 @@
             }, this), true);
 
             return this;
-          },
-
-          buildProfileUrl : function(rrshape, options) {
-            var locs = [], locationKey, hint;
-
-            var params = JSON.stringify({
-              encoded_polyline : rrshape,
-              range: true
-            });
-
-            //reset service url & access token if environment has changed
-            (typeof elevServiceUrl != 'undefined' || elevServiceUrl != null) ? this.options.serviceUrl = elevServiceUrl : this.options.serviceUrl = elevationServer.dev;
-            (typeof elevToken != "undefined" || elevToken != null) ? this._accessToken = elevToken : this._accessToken = elevAccessToken.dev;
-
-            console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
-
-            return this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
           },
 
           getDataPoints : function(elevresult) {
@@ -342,7 +284,7 @@
 
     }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
   }, {
-    "corslite" : 1,
+    "sendRequest" : 1,
     "polyline" : 2
   } ]
 }, {}, [ 3 ]);
