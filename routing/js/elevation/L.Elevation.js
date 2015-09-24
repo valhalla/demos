@@ -27,7 +27,7 @@
 })({
   1 : [ function(require, module, exports) {
 
-    function corslite(rrshape, callback, cors) {
+    function sendRequest(rrshape, callback, cors) {
       var sent = false;
 
       if (typeof window.XMLHttpRequest === 'undefined') {
@@ -84,10 +84,11 @@
       });
       console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
       return resp;
-    };
+    }
+    ;
 
     if (typeof module !== 'undefined')
-      module.exports = corslite;
+      module.exports = sendRequest;
   }, {} ],
   2 : [ function(require, module, exports) {
   }, {} ],
@@ -97,7 +98,7 @@
         'use strict';
 
         var L = (typeof window !== "undefined" ? window.L : typeof global !== "undefined" ? global.L : null);
-        var corslite = require('corslite');
+        var sendRequest = require('sendRequest');
         var polyline = require('polyline');
 
         L.Elevation = L.Elevation || {};
@@ -199,7 +200,7 @@
               });
             }, this.options.timeout);
 
-            corslite(rrshape, L.bind(function(err, resp) {
+            sendRequest(rrshape, L.bind(function(err, resp) {
               var elevresult;
               clearTimeout(timer);
               if (!timedOut) {
@@ -283,7 +284,7 @@
 
     }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
   }, {
-    "corslite" : 1,
+    "sendRequest" : 1,
     "polyline" : 2
   } ]
 }, {}, [ 3 ]);
