@@ -207,7 +207,7 @@
                 if (!err) {
                   elevresult = JSON.parse(resp.responseText);
                   this._graphdata = [ {
-                    "label" : "Elevation",
+                  //  "label" : "Elevation",
                     "data" : elevresult.range_height,
                     "points" : {
                       "symbol" : "circle",
