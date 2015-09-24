@@ -27,16 +27,16 @@
 })({
   1 : [ function(require, module, exports) {
 
-    function sendRequest(rrshape, callback, cors) {
+    function sendRequest(rrshape, callback, url) {
       var sent = false;
 
       if (typeof window.XMLHttpRequest === 'undefined') {
         return callback(Error('Browser not supported'));
       }
 
-      if (typeof cors === 'undefined') {
+      if (typeof url === 'undefined') {
         var m = url.match(/^\s*https?:\/\/[^\/]*/);
-        cors = m && (m[0] !== location.protocol + '//' + location.domain + (location.port ? ':' + location.port : ''));
+        url = m && (m[0] !== location.protocol + '//' + location.domain + (location.port ? ':' + location.port : ''));
       }
 
       function isSuccessful(status) {
