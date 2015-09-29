@@ -139,11 +139,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   // Set up the hash
   var hash = new L.Hash(map);
   var markers = [];
+  var locateMarkers = [];
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = [];
   };
 
   // Number of locations
@@ -179,6 +184,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     map.addLayer(marker);
     markers.push(marker);
   });
+
+  //locate edge snap markers
+  var locateEdgeMarkers = function (locate_result) {
+    //clear it
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = []
+
+    //mark all the results for that spot
+    locate_result.ways.forEach(function (element, index, array) {
+      var marker = L.circle( [element.correlated_lat,element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();      
+      locateMarkers.push(marker);
+    });
+  };
 
   $scope.renderHtml = function(html_code) {
     return $sce.trustAsHtml(html_code);
@@ -405,6 +427,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     $("#datepicker").on("click", function() {
       datetimeUpdate(this.value);
     });
+  });
+
+  //ask the service for information about this location
+  map.on("contextmenu", function(e) {
+    var ll = {
+      lat: e.latlng.lat,
+      lon: e.latlng.lng
+    };
+    getEnvToken();
+    var locate = L.locate(envToken);
+    locate.locate(ll, locateEdgeMarkers);
   });
 
   $("#showbtn").on("click", function() {
