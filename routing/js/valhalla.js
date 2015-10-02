@@ -185,13 +185,18 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     // shape
     if (parameters.locations !== undefined)
       var waypoints = JSON.parse(parameters.locations);
+    
+    var locs = [];
+    waypoints.forEach(function(waypoints) {
+      locs.push(L.latLng(waypoints.lat, waypoints.lng));
+    });
 
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
     
     var rr = L.Routing.control(
         {
-          waypoints : waypoints,
+          waypoints : locs,
           geocoder : null,
           transitmode : costing,
           routeWhileDragging : false,

@@ -308,7 +308,7 @@ if (typeof module !== undefined) module.exports = polyline;
 
         alts = [{
           ////gotta change
-          name: this._trimLocationKey(inputWaypoints[0]) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1]) ,
+          name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
           unit: response.trip.units,
           transitmode: this._transitmode,
           rrshape: this._rrshape,
@@ -407,8 +407,8 @@ if (typeof module !== undefined) module.exports = polyline;
       },
 
       _trimLocationKey: function(location){
-        var lat = location.latLng.lat;
-        var lng = location.latLng.lng;
+        var lat = location.lat;
+        var lng = location.lng;
 
         var nameLat = Math.floor(lat * 1000)/1000;
         var nameLng = Math.floor(lng * 1000)/1000;
