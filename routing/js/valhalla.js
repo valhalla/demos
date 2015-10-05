@@ -109,7 +109,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     iconSize : [ 38, 35 ], // size of the icon
     shadowSize : [ 50, 64 ], // size of the shadow
     iconAnchor : [ 22, 34 ], // point of the icon which will correspond to
-                              // marker's location
+    // marker's location
     shadowAnchor : [ 4, 62 ], // the same for the shadow
     popupAnchor : [ -3, -76 ]
   // point from which the popup should open relative to the iconAnchor
@@ -140,25 +140,25 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   // allow hash links
   var hash = new L.Hash(map);
   var markers = [];
-  
+
   var locateMarkers = [];
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
-    locateMarkers.forEach(function (element, index, array) {
+    locateMarkers.forEach(function(element, index, array) {
       map.removeLayer(element);
     });
     locateMarkers = [];
   };
-  
+
   var parseHash = function() {
     var hash = window.location.hash;
     if (hash.indexOf('#') === 0)
       hash = hash.substr(1);
     return hash.split('&');
-  };  
+  };
 
   var parseParams = function(pieces) {
     var parameters = {};
@@ -185,7 +185,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     window.location.hash = '#' + extra + parameter;
 
     document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
-  };    
+  };
 
   var hashRoute = function() {
     // something has to have changed for us to request again
@@ -198,7 +198,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var waypoints = [];
     if (parameters.locations !== undefined)
       waypoints = JSON.parse(parameters.locations);
-    
+
     var locs = [];
     waypoints.forEach(function(waypoints) {
       locs.push(L.latLng(waypoints.lat, waypoints.lng));
@@ -206,7 +206,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
-    
+
     var rr = L.Routing.control(
         {
           waypoints : locs,
@@ -284,19 +284,25 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     markers.push(marker);
   });
 
-  //locate edge snap markers
-  var locateEdgeMarkers = function (locate_result) {
-    //clear it
-    locateMarkers.forEach(function (element, index, array) {
+  // locate edge snap markers
+  var locateEdgeMarkers = function(locate_result) {
+    // clear it
+    locateMarkers.forEach(function(element, index, array) {
       map.removeLayer(element);
     });
     locateMarkers = []
 
-    //mark all the results for that spot
-    locate_result.ways.forEach(function (element, index, array) {
-      var marker = L.circle( [element.correlated_lat,element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+    // mark all the results for that spot
+    locate_result.ways.forEach(function(element, index, array) {
+      var marker = L.circle([ element.correlated_lat, element.correlated_lon ], 2, {
+        color : '#444',
+        opacity : 1,
+        fill : true,
+        fillColor : '#eee',
+        fillOpacity : 1
+      });
       map.addLayer(marker);
-      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();      
+      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();
       locateMarkers.push(marker);
     });
   };
@@ -318,11 +324,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   // if the hash changes
-  //L.DomEvent.addListener(window, "hashchange", hashRoute);
+  // L.DomEvent.addListener(window, "hashchange", hashRoute);
 
   // show something to start with but only if it was requested
   $(window).load(function(e) {
-   // rr = L.Routing.valhalla(accessToken);
+    // rr = L.Routing.valhalla(accessToken);
     force = true;
     hashRoute();
   });
@@ -544,11 +550,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   });
 
-  //ask the service for information about this location
+  // ask the service for information about this location
   map.on("contextmenu", function(e) {
     var ll = {
-      lat: e.latlng.lat,
-      lon: e.latlng.lng
+      lat : e.latlng.lat,
+      lon : e.latlng.lng
     };
     getEnvToken();
     var locate = L.locate(envToken);
