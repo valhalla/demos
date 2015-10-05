@@ -165,7 +165,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var pieces = parseHash();
     var extra = '';
     pieces.forEach(function(e, i, a) {
-      if (e.length && e.slice(0, 'locations='.length) != 'locations=')
+      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
         extra = extra + (extra.length ? '&' : '') + e;
     });
     var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(locs) + '&costing=' + JSON.stringify(costing);
@@ -173,7 +173,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     window.location.hash = '#' + extra + parameter;
 
     document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
-  };
+  };    
 
   var hashRoute = function() {
     // something has to have changed for us to request again
@@ -183,8 +183,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     force = false;
 
     // shape
+    var waypoints = [];
     if (parameters.locations !== undefined)
-      var waypoints = JSON.parse(parameters.locations);
+      waypoints = JSON.parse(parameters.locations);
     
     var locs = [];
     waypoints.forEach(function(waypoints) {
