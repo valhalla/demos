@@ -184,7 +184,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     force = show;
     window.location.hash = '#' + extra + parameter;
 
-    document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
 
   var hashRoute = function() {
@@ -241,7 +241,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           }
         }).addTo(map);
 
-    document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   }
 
   // Number of locations
