@@ -147,7 +147,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       map.removeLayer(markers[i]);
     }
     markers = [];
-    locateMarkers.forEach(function(element, index, array) {
+    locateMarkers.forEach(function (element, index, array) {
       map.removeLayer(element);
     });
     locateMarkers = [];
@@ -219,18 +219,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           createMarker : function(i, wp, n) {
             var iconV;
             if (i == 0) {
-              iconV = L.icon({
-                iconUrl : 'resource/dot.png',
-                iconSize : [ 24, 24 ]
-              });
+              iconV = getStartIcon();
             } else {
-              iconV = L.icon({
-                iconUrl : 'resource/dot.png',
-                iconSize : [ 24, 24 ]
-              })
+              iconV = getEndIcon();
             }
             var options = {
-              draggable : true,
+              draggable : false,
               icon : iconV
             }
             var dot = L.marker(wp.latLng, options);
@@ -285,15 +279,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   // locate edge snap markers
-  var locateEdgeMarkers = function(locate_result) {
+  var locateEdgeMarkers = function (locate_result) {
     // clear it
-    locateMarkers.forEach(function(element, index, array) {
+    locateMarkers.forEach(function (element, index, array) {
       map.removeLayer(element);
     });
     locateMarkers = []
 
     // mark all the results for that spot
-    locate_result.ways.forEach(function(element, index, array) {
+    locate_result.ways.forEach(function (element, index, array) {
       var marker = L.circle([ element.correlated_lat, element.correlated_lon ], 2, {
         color : '#444',
         opacity : 1,
@@ -355,7 +349,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         lat : geo.lat,
         lon : geo.lon
       })
-
       $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
       locations++;
       return;
@@ -384,7 +377,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locations++;
 
     valhalla_mode = mode_mapping[mode];
-
+    
     update(true, waypoints, valhalla_mode);
 
     var rr = L.Routing.control(
@@ -426,7 +419,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             fillOpacity : 1
           }
         }).addTo(map);
-
+    
     var driveBtn = document.getElementById("drive_btn");
     var bikeBtn = document.getElementById("bike_btn");
     var walkBtn = document.getElementById("walk_btn");
