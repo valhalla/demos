@@ -193,8 +193,9 @@ if (typeof module !== undefined) module.exports = polyline;
   var L = (typeof window !== "undefined" ? window.L : typeof global !== "undefined" ? global.L : null);
   var corslite = require('corslite');
   var polyline = require('polyline');
+  
   L.Routing = L.Routing || {};
-
+  
   L.Routing.Valhalla = L.Class.extend({
     options: {
       serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
@@ -212,8 +213,6 @@ if (typeof module !== undefined) module.exports = polyline;
     },
     
     route: function(waypoints, callback, context, options) {
-      console.log(waypoints);
-      console.log(options);
       var timedOut = false,
         wps = [],
         url,
@@ -222,8 +221,6 @@ if (typeof module !== undefined) module.exports = polyline;
         i;
 
       options = options || {};
-      //waypoints = options.waypoints || waypoints;
-      console.log(waypoints);
       url = this.buildRouteUrl(waypoints, options);
 
       timer = setTimeout(function() {
@@ -259,11 +256,11 @@ if (typeof module !== undefined) module.exports = polyline;
               $("#elevation_btn").trigger("click");
             }
           } else {
+           // alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
             callback.call(context || callback, {
               status: -1,
               message: 'HTTP request failed: ' + err.response
             });
-            alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
           }
         }
       }, this), true);
@@ -367,7 +364,8 @@ if (typeof module !== undefined) module.exports = polyline;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
-          locationKey = this._locationKey(waypoints[i].latLng).split(',');
+              locationKey = this._locationKey(waypoints[i].latLng).split(',');
+          
           if(i === 0 || i === waypoints.length-1){
             loc = {
               lat: parseFloat(locationKey[0]),
@@ -384,8 +382,8 @@ if (typeof module !== undefined) module.exports = polyline;
   	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
           locs.push(loc);
         }
-
-         var params = JSON.stringify({
+        
+        var params = JSON.stringify({
            locations: locs,
            street: streetName,
            costing: transitM,
@@ -402,7 +400,8 @@ if (typeof module !== undefined) module.exports = polyline;
         return this.options.serviceUrl + 'route?json=' +
                 params + '&api_key=' + this._accessToken;
       },
-
+      
+      
       _locationKey: function(location) {
         return location.lat + ',' + location.lng;
       },
@@ -411,8 +410,8 @@ if (typeof module !== undefined) module.exports = polyline;
         var lat = location.lat;
         var lng = location.lng;
 
-        var nameLat = Math.floor(location.lat * 1000)/1000;
-        var nameLng = Math.floor(location.lng * 1000)/1000;
+        var nameLat = Math.floor(lat * 1000)/1000;
+        var nameLng = Math.floor(lng * 1000)/1000;
 
         return nameLat + ' , ' + nameLng;
 
@@ -498,6 +497,7 @@ if (typeof module !== undefined) module.exports = polyline;
         indices[i] = Math.min(maxCoordIndex, Math.max(indices[i], 0));
       }
     }
+    
   });
 
   L.Routing.valhalla = function(accessToken, transitmode, options) {
