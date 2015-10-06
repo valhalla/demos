@@ -202,7 +202,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       marker.bindPopup(popup).openPopup();      
       locateMarkers.push(marker);
     }//mark all the results for that spot
-    else {
+    else if(locate_result.edges != null) {
       locate_result.edges.forEach(function (element, index, array) {
         var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
         map.addLayer(marker);
@@ -211,6 +211,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         marker.bindPopup(popup).openPopup(); 
         locateMarkers.push(marker);
       });
+    }//no data probably
+    else {
+      var marker = L.circle( [locate_result.input_lat,locate_result.input_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      var popup = L.popup({maxHeight : 200});
+      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
+      marker.bindPopup(popup).openPopup();      
+      locateMarkers.push(marker);
     }
   };
 
