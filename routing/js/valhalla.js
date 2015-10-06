@@ -7,7 +7,7 @@ var mode_mapping = {
   'transit' : 'multimodal'
 };
 var date = new Date();
-var isoDateTime = date.toISOString(); //"2015-06-12T15:28:46.493Z"
+var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
 var serviceUrl;
 var envToken;
 var elevToken;
@@ -42,7 +42,7 @@ function getEnvToken() {
   }
 }
 
-//sets ISO date time to 12:15 of current date on initial transit run
+// sets ISO date time to 12:15 of current date on initial transit run
 function parseIsoDateTime(dtStr) {
   var dt = dtStr.split("T");
   return dtStr.replace(dt[1], "12:15:00");
@@ -92,7 +92,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : false,
-    layers : [ roadmap ],
+    layers : [ elevationmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
 
@@ -108,7 +108,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     iconSize : [ 38, 35 ], // size of the icon
     shadowSize : [ 50, 64 ], // size of the shadow
-    iconAnchor : [ 22, 34 ], // point of the icon which will correspond to marker's location
+    iconAnchor : [ 22, 34 ], // point of the icon which will correspond to
+    // marker's location
     shadowAnchor : [ 4, 62 ], // the same for the shadow
     popupAnchor : [ -3, -76 ]
   // point from which the popup should open relative to the iconAnchor
@@ -136,9 +137,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   };
 
-  // Set up the hash
+  // allow hash links
   var hash = new L.Hash(map);
   var markers = [];
+
   var locateMarkers = [];
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
@@ -150,6 +152,97 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
     locateMarkers = [];
   };
+
+  var parseHash = function() {
+    var hash = window.location.hash;
+    if (hash.indexOf('#') === 0)
+      hash = hash.substr(1);
+    return hash.split('&');
+  };
+
+  var parseParams = function(pieces) {
+    var parameters = {};
+    pieces.forEach(function(e, i, a) {
+      var parts = e.split('=');
+      if (parts.length < 2)
+        parts.push('');
+      parameters[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+    });
+    return parameters;
+  };
+
+  var force = false;
+  var update = function(show, locs, costing) {
+    // update the permalink hash
+    var pieces = parseHash();
+    var extra = '';
+    pieces.forEach(function(e, i, a) {
+      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
+        extra = extra + (extra.length ? '&' : '') + e;
+    });
+    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(locs) + '&costing=' + JSON.stringify(costing);
+    force = show;
+    window.location.hash = '#' + extra + parameter;
+
+    document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+  };
+
+  var hashRoute = function() {
+    // something has to have changed for us to request again
+    var parameters = parseParams(parseHash());
+    if (!force && parameters.locations == JSON.stringify(locations))
+      return;
+    force = false;
+
+    // shape
+    var waypoints = [];
+    if (parameters.locations !== undefined)
+      waypoints = JSON.parse(parameters.locations);
+
+    var locs = [];
+    waypoints.forEach(function(waypoints) {
+      locs.push(L.latLng(waypoints.lat, waypoints.lng));
+    });
+
+    if (parameters.costing !== undefined)
+      var costing = JSON.parse(parameters.costing);
+
+    var rr = L.Routing.control(
+        {
+          waypoints : locs,
+          geocoder : null,
+          transitmode : costing,
+          routeWhileDragging : false,
+          router : L.Routing.valhalla(envToken, 'auto'),
+          summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
+
+          createMarker : function(i, wp, n) {
+            var iconV;
+            if (i == 0) {
+              iconV = getStartIcon();
+            } else {
+              iconV = getEndIcon();
+            }
+            var options = {
+              draggable : false,
+              icon : iconV
+            }
+            var dot = L.marker(wp.latLng, options);
+            return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+                + "&layers=Q target=_blank>Edit POI here<a/>");
+          },
+          formatter : new L.Routing.Valhalla.Formatter(),
+          pointMarkerStyle : {
+            radius : 6,
+            color : '#25A5FA',
+            fillColor : '#5E6472',
+            opacity : 1,
+            fillOpacity : 1
+          }
+        }).addTo(map);
+
+    document.getElementById('permalink').innerHTML = "<a href='https://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+  }
 
   // Number of locations
   var locations = 0;
@@ -185,19 +278,25 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     markers.push(marker);
   });
 
-  //locate edge snap markers
+  // locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
-    //clear it
+    // clear it
     locateMarkers.forEach(function (element, index, array) {
       map.removeLayer(element);
     });
     locateMarkers = []
 
-    //mark all the results for that spot
+    // mark all the results for that spot
     locate_result.ways.forEach(function (element, index, array) {
-      var marker = L.circle( [element.correlated_lat,element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      var marker = L.circle([ element.correlated_lat, element.correlated_lon ], 2, {
+        color : '#444',
+        opacity : 1,
+        fill : true,
+        fillColor : '#eee',
+        fillOpacity : 1
+      });
       map.addLayer(marker);
-      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();      
+      marker.bindPopup("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>").openPopup();
       locateMarkers.push(marker);
     });
   };
@@ -216,6 +315,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     $scope.$apply(function() {
       $scope.route_instructions = '';
     });
+  });
+
+  // if the hash changes
+  // L.DomEvent.addListener(window, "hashchange", hashRoute);
+
+  // show something to start with but only if it was requested
+  $(window).load(function(e) {
+    // rr = L.Routing.valhalla(accessToken);
+    force = true;
+    hashRoute();
   });
 
   map.on('click', function(e) {
@@ -268,6 +377,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locations++;
 
     valhalla_mode = mode_mapping[mode];
+    
+    update(true, waypoints, valhalla_mode);
 
     var rr = L.Routing.control(
         {
@@ -308,7 +419,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             fillOpacity : 1
           }
         }).addTo(map);
-
+    
     var driveBtn = document.getElementById("drive_btn");
     var bikeBtn = document.getElementById("bike_btn");
     var walkBtn = document.getElementById("walk_btn");
@@ -339,49 +450,52 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       });
     });
 
-  multiBtn.addEventListener('click', function (e) {
-	getEnvToken();
-    rr.route({transitmode: 'multimodal', date_time: dateStr});
-  });
-  
-  elevationBtn.addEventListener('click', function (e) {
-    selectEnv();
-    var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
-    elev.resetChart();
-    elev.profile(elev._rrshape);
-    document.getElementById('graph').style.display="block";
-  });
+    multiBtn.addEventListener('click', function(e) {
+      getEnvToken();
+      rr.route({
+        transitmode : 'multimodal',
+        date_time : dateStr
+      });
+    });
 
-  function setBikeOptions () {
-	var btype = document.getElementsByName("btype");
-	var bicycle_type = "Road";
-	  for (var i=0;i<btype.length;i++){
-	    if ( btype[i].checked ) {
-	    	bicycle_type = btype[i].value;
-	    }
-	  }
-	var use_roads = document.getElementById("use_roads").value;
-	var cycling_speed = document.getElementById("cycle_speed").value;
-	var use_hills = document.getElementById("use_hills").value;
-		
-	bikeoptions = {"bicycle":{
-	  bicycle_type: bicycle_type,
-	  use_roads: use_roads,
-	  cycling_speed: cycling_speed,
-	  use_hills: use_hills
-	}}
-	return bikeoptions;
-  };
+    elevationBtn.addEventListener('click', function(e) {
+      selectEnv();
+      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+      elev.resetChart();
+      elev.profile(elev._rrshape);
+      document.getElementById('graph').style.display = "block";
+    });
+
+    function setBikeOptions() {
+      var btype = document.getElementsByName("btype");
+      var bicycle_type = "Road";
+      for (var i = 0; i < btype.length; i++) {
+        if (btype[i].checked) {
+          bicycle_type = btype[i].value;
+        }
+      }
+      var use_roads = document.getElementById("use_roads").value;
+      var cycling_speed = document.getElementById("cycle_speed").value;
+      var use_hills = document.getElementById("use_hills").value;
+
+      bikeoptions = {
+        "bicycle" : {
+          bicycle_type : bicycle_type,
+          use_roads : use_roads,
+          cycling_speed : cycling_speed,
+          use_hills : use_hills
+        }
+      }
+      return bikeoptions;
+    }
+    ;
 
     /*
-    function openWin(id) {
-      var divText = document.getElementById(id).innerHTML;
-      myWindow=window.open('','','height: 100; width:200;');
-      var doc = myWindow.document;
-      doc.open();
-      doc.write(divText);
-      doc.close();
-    }*/
+     * function openWin(id) { var divText =
+     * document.getElementById(id).innerHTML;
+     * myWindow=window.open('','','height: 100; width:200;'); var doc =
+     * myWindow.document; doc.open(); doc.write(divText); doc.close(); }
+     */
 
     function datetimeUpdate(datetime) {
       var changeDt = datetime;
@@ -429,11 +543,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   });
 
-  //ask the service for information about this location
+  // ask the service for information about this location
   map.on("contextmenu", function(e) {
     var ll = {
-      lat: e.latlng.lat,
-      lon: e.latlng.lng
+      lat : e.latlng.lat,
+      lon : e.latlng.lng
     };
     getEnvToken();
     var locate = L.locate(envToken);
