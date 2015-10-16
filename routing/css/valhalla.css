@@ -2,7 +2,7 @@ body {
   font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0px;
   margin: 0px;
-  background-color: black;
+  background-color: #E6E6E6;
 }
 
 #map {
@@ -19,7 +19,7 @@ body {
 }
 
 #instructions h1, h2, h3, h4, h5, h6 {
-    color:white;
+    color:black;
 }
 
 div#route_inst {
@@ -68,6 +68,12 @@ div#route_inst table td.distance{
 #clearbtn {
   width: 120px;
   text-align: center;
+}
+
+#clear_btn {
+  border-color: #d4645c;
+  background-color: #d4645c;
+  color: #fff;
 }
 
 #flot-tooltip {

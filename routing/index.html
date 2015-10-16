@@ -49,12 +49,12 @@
       <div class="row">
         <div class="col-md-2">
           <div id="instructions">
-            <h3>Valhalla Routing<br>Test Tool</h3>
-            <h6>Point & click on the map to select a start & end point. Defaults to bicycle. Route test files may be uploaded as well.</h6>
+            <h3><b>Routing<br>Backend Test Utility</b></h3>
+            <h6>Point & click on the map to select a start & end point. Defaults to car.</h6>
             <h6>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h6>
             <h6>NOTE: Transit defaults to 12:15 on current date.</h6>
             <hr>
-            <span style="color:white" class="descriptions">Select an environment:</span><br>
+            <span style="color:black" class="descriptions">Select an environment:</span><br>
 			<select id = "env_dropdown" onchange="selectEnv()">
 				  <option id=localhost value="http://localhost:8002/">localhost</option>
 				  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
@@ -62,7 +62,7 @@
 				</select>
 		    <br>
 		    <div>
-		    <span style="color:white" class="descriptions">Routing Options: </span><br>
+		    <span style="color:black" class="descriptions">Routing Options: </span><br>
 				<form>
 				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
 				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
@@ -71,10 +71,10 @@
             <br>
             <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
             <div id="options" name="options" style="display:none">
-			  <form id="bike" name="bike" ><span style="color:white">
+			  <form id="bike" name="bike" ><span style="color:black">
 				<h2><b>Bike Options:</b></h2><br>
 				  road: <input type="radio" name="btype" value="Road" checked/>
-				  cross: <input style="color:white" type="radio" name="btype" value="Cross" />
+				  cross: <input style="color:black" type="radio" name="btype" value="Cross" />
                   hybrid: <input type="radio" name="btype" value="Hybrid" />
                   mountain: <input type="radio" name="btype" value="Mountain"/>
                   <br>
@@ -89,18 +89,27 @@
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 			<br>
-            <span style="color:white" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
+			<div id='permalink' style='display:inline-block; color:black'></div>
+			<br>
+            <span style="color:black" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
             <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
           </div>
           <br>
+          <div class = "col-md-15" >
+      	    <div id="graph" style= "display:none; height:200px; width: 100%; position: bottom; float:center;"></div>
+          </div>
           <button id="elevation_btn" class = "transparent_btn" type="button">Get Elevation</button>
           <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
-          <br>
-          <div id='permalink' style='display:inline-block; color:white'></div>
+          <br><br>
+          <div><button id="clear_btn" class = "transparent_btn" type="button">Clear Routes</button></div>
+          
+          <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
+          <h6>Point & click on map to place the origin.  Press & hold the
+          ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
+          key + click on your destination.  Clear your routes by clicking the red 'Clear Routes' button. </h6>
           
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
         </div>
-        <div id="graph" style= "display:none; height:200px; width: 50%; float:center;"></div>
         <div id="mapwrapper" class="col-md-10">
         <div id="map"></div>
         </div>

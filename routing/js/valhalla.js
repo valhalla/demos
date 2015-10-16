@@ -104,7 +104,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var mode = 'car';
 
   var icon = L.icon({
-    iconUrl : 'resource/dot.png',
+    iconUrl : 'resource/via_dot.png',
 
     iconSize : [ 38, 35 ], // size of the icon
     shadowSize : [ 50, 64 ], // size of the shadow
@@ -121,19 +121,26 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     'bicycle' : 'js/images/bike.png'
   };
 
-  var getStartIcon = function(icon) {
+  var getOriginIcon = function(icon) {
     return L.icon({
       iconUrl : 'resource/startmarker@2x.png',
       iconSize : [ 44, 56 ], // size of the icon
-      iconAnchor : [ 22, 50 ]
+      iconAnchor : [ 22, 42 ]
+    });
+  };
+  
+  var getViaIcon = function(icon) {
+    return L.icon({
+      iconUrl : 'resource/via_dot.png',
+      iconSize : [ 30, 30 ]
     });
   };
 
-  var getEndIcon = function(icon) {
+  var getDestinationIcon = function(icon) {
     return L.icon({
       iconUrl : 'resource/destmarker@2x.png',
       iconSize : [ 44, 56 ], // size of the icon
-      iconAnchor : [ 22, 50 ]
+      iconAnchor : [ 22, 42 ]
     });
   };
 
@@ -219,9 +226,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           createMarker : function(i, wp, n) {
             var iconV;
             if (i == 0) {
-              iconV = getStartIcon();
+              iconV = getOriginIcon();
             } else {
-              iconV = getEndIcon();
+              iconV = getDestinationIcon();
             }
             var options = {
               draggable : false,
@@ -263,13 +270,31 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getStartIcon(m || 'car')
+        icon : getOriginIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getEndIcon(m || 'car')
+        icon : getDestinationIcon(m || 'car')
+      });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    }
+    map.addLayer(marker);
+    markers.push(marker);
+  });
+  $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, m) {
+
+    if (locations == 0) {
+      var marker = new L.marker(geo, {
+        icon : getOriginIcon(m || 'car')
+      });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    } else {
+      var marker = new L.marker(geo, {
+        icon : getViaIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -346,28 +371,58 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
-
-    if (locations == 0) {
-      Locations.push({
-        lat : geo.lat,
-        lon : geo.lon
-      })
-      $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
-      locations++;
-      return;
-    } else if (locations > 1) {
-      Locations = [];
-      reset();
-
-      Locations.push({
-        lat : geo.lat,
-        lon : geo.lon
-      })
-      $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
-      locations++;
-      return;
+    if(event.ctrlKey) {
+      if (locations == 0) {
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
+        locations++;
+        return;
+      } else {
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
+        locations++;
+        return;
+      }
+    } else if (event.shiftKey) {
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        var marker = new L.marker(geo, {
+          icon : getDestinationIcon()
+        });
+        map.addLayer(marker);
+        markers.push(marker);
+        locations++;
+    } else {
+      if (locations == 0) {
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
+        locations++;
+        return;
+      } else if (locations > 1) {
+        Locations = [];
+        reset();
+  
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
+        locations++;
+        return;
+      }
     }
-
+    
     $scope.$on('setRouteInstruction', function(ev, instructions) {
       $scope.$apply(function() {
         $scope.route_instructions = instructions;
@@ -407,13 +462,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             var iconV;
             if (i == 0) {
               iconV = L.icon({
-                iconUrl : 'resource/dot.png',
-                iconSize : [ 24, 24 ]
+                iconUrl : 'resource/via_dot.png',
+                iconSize : [ 30, 30 ]
               });
             } else {
               iconV = L.icon({
-                iconUrl : 'resource/dot.png',
-                iconSize : [ 24, 24 ]
+                iconUrl : 'resource/via_dot.png',
+                iconSize : [ 30, 30 ]
               })
             }
             var options = {
@@ -439,6 +494,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var walkBtn = document.getElementById("walk_btn");
     var multiBtn = document.getElementById("multi_btn");
     var elevationBtn = document.getElementById("elevation_btn");
+    var clearBtn = document.getElementById("clear_btn");
     var routeresponse;
 
     driveBtn.addEventListener('click', function(e) {
@@ -471,13 +527,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         date_time : dateStr
       });
     });
-
+    
     elevationBtn.addEventListener('click', function(e) {
       selectEnv();
       var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
       elev.resetChart();
       elev.profile(elev._rrshape);
       document.getElementById('graph').style.display = "block";
+    });
+    
+    clearBtn.addEventListener('click', function(e) {
+      Locations = [];
+      waypoints = [];
+      reset();
+      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+      elev.resetChart();
+      document.getElementById('permalink').innerHTML = "";
+      window.location.hash = "";
     });
 
     function setBikeOptions() {
