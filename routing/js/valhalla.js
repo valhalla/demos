@@ -72,8 +72,11 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+  /*var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
+  }),*/ 
+  var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
@@ -92,7 +95,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : false,
-    layers : [ elevationmap ],
+    layers : [ roadmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
 
@@ -440,7 +443,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
 
-    waypoints.push(L.latLng(geo.lat, geo.lon));
+    //waypoints.push(L.latLng(geo.lat, geo.lon));
 
     $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
     locations++;
