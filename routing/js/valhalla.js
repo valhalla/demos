@@ -374,6 +374,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
+    //way to test multi-locations
     if(event.ctrlKey) {
       if (locations == 0) {
         Locations.push({
@@ -392,18 +393,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         locations++;
         return;
       }
-    } else if (event.shiftKey) {
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-        var marker = new L.marker(geo, {
-          icon : getDestinationIcon()
-        });
-        map.addLayer(marker);
-        markers.push(marker);
-        locations++;
-    } else {
+    } else if (!event.shiftKey){
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
@@ -442,8 +432,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     Locations.forEach(function(gLoc) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
-
-    //waypoints.push(L.latLng(geo.lat, geo.lon));
+    
+    waypoints.push(L.latLng(geo.lat, geo.lon));
 
     $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
     locations++;
