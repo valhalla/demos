@@ -368,14 +368,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     force = true;
     hashRoute();
   });
-
+  
   map.on('click', function(e) {
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
+
+    var eventObj = window.event ? event : e.originalEvent;
     //way to test multi-locations
-    if(event.ctrlKey) {
+    if(eventObj.ctrlKey) {
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
@@ -393,7 +395,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         locations++;
         return;
       }
-    } else if (!event.shiftKey){
+    } else if (!eventObj.shiftKey){
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
