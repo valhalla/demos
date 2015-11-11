@@ -101,14 +101,3 @@ html.is-iframed-demo .not-map-part {
 html.is-iframed-demo .hide-if-iframed {
   display: none;
 }
-/*
-#map .leaflet-label {
-	background: #585858;
-	color: #fff;
-	border-radius:  3px;
-	font: 10px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	padding: 2px 2px;
-	user-select: none;
-	white-space: nowrap;
-}*/
