@@ -19,6 +19,11 @@
   <div class="container-fluid" data-ng-controller="MatrixController">
   <div id="map"></div>
   <div class = "row not-map-part">
+    <h5><b>How To Use?</b><h5><span style="color:blue">
+          <h6>Point & click on map to place the origin.  Press & hold the
+          ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
+          key + click on your destination.  Now select an environment & click on a matrix type. Clear your POIs by clicking the red 'Clear Routes' button.</h6>
+    </span>
     <span style="color:black" class="descriptions">Select an environment:</span><br>
     <select id = "env_dropdown" onchange="selectEnv()">
 	  <option id=localhost value="http://localhost:8002/">localhost</option>
@@ -37,7 +42,7 @@
         <button id="one_to_many" class = "transparent_btn" type="button">One-to-Many</button>
         <button id="many_to_one" class = "transparent_btn" type="button">Many-to-One</button>
         <button id="many_to_many" class = "transparent_btn" type="button">Many-to-Many</button>
-        <br>
+        <br><br>
         <button id="clear_btn" class ="btn btn-mapzen" type="button" style='margin-right: 1em;'>clear</button>
         <div id='permalink' style='display:inline-block;'></div>
       </div>
