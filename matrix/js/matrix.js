@@ -36,8 +36,8 @@ function getEnvToken() {
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
-      'lat' : 40.7486,
-      'lng' : -73.9690
+      'lat' : 37.745353,
+      'lng' : -122.429176
     },
     'zoom' : 13
   };
@@ -68,7 +68,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
-    "ationMap" : elevationmap
+    "ElevationMap" : elevationmap
   };
   
   //leaflet slippy map
@@ -78,7 +78,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     layers : [ roadmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
-  
+
   L.control.layers(baseMaps, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
@@ -88,13 +88,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   }
   
   var Locations = [];
-  var mode = 'car';
-
-  var mode_icons = {
-    'car' : 'js/images/drive.png',
-    'foot' : 'js/images/walk.png',
-    'bicycle' : 'js/images/bike.png'
-  };
+  var mode = 'auto';
 
   var getOriginIcon = function() {
     return new L.Icon({ 
@@ -111,7 +105,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       iconUrl : '../routing/resource/via_dot.png',
       iconSize : [ 22, 24 ],
       iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
+      labelAnchor: [1, 1],
       shadowUrl: null
     });
   };
@@ -173,31 +167,75 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     force = show;
     window.location.hash = '#' + extra + parameter;
 
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    document.getElementById('permalink').innerHTML = "<a href='file:///home/kdiluca/sandbox/route-test-utility/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
   };
 
   var hashRoute = function() {
-    // something has to have changed for us to request again
-    var parameters = parseParams(parseHash());
-    if (!force && parameters.locations == JSON.stringify(locations))
-      return;
-    force = false;
+  // something has to have changed for us to request again
+  var parameters = parseParams(parseHash());
+  if (!force && parameters.locations == JSON.stringify(locations))
+    return;
+  force = false;
 
-    // shape
-    var waypoints = [];
-    if (parameters.locations !== undefined)
-      waypoints = JSON.parse(parameters.locations);
+  // shape
+  var waypoints = [];
+  if (parameters.locations !== undefined)
+    waypoints = JSON.parse(parameters.locations);
 
-    var locs = [];
-    waypoints.forEach(function(waypoints) {
-      locs.push(L.latLng(waypoints.lat, waypoints.lng));
+  var locs = [];
+  waypoints.forEach(function(waypoints) {
+    locs.push(L.latLng(waypoints.lat, waypoints.lon));
+  });
+
+  var marker = new L.marker(waypoints[0], {
+    icon : getOriginIcon()
+  }).bindLabel("0", {
+    noHide: true,
+    direction: 'auto'
+  });
+  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+      + "&layers=Q target=_blank>Edit POI here<a/>");
+  map.addLayer(marker);
+  markers.push(marker);
+
+
+  var marker = new L.marker(waypoints[waypoints.length-1], {
+    icon : getDestinationIcon()
+  }).bindLabel((waypoints.length-1).toString(), {
+    noHide: true,
+    direction: 'auto'
+  });
+  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+      + "&layers=Q target=_blank>Edit POI here<a/>");
+  map.addLayer(marker);
+  markers.push(marker);
+
+  for (var i = 1; i < waypoints.length-1; i++) {
+    viaCount++;
+    var marker = new L.marker(waypoints[i], {
+      icon : getViaIcon()
+    }).bindLabel((viaCount).toString(), {
+      noHide: true,
+      direction: 'auto'
+    });
+    marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+        + "&layers=Q target=_blank>Edit POI here<a/>");
+    map.addLayer(marker);
+    markers.push(marker);
+  }
+  
+  if (parameters.costing !== undefined)
+  var costing = JSON.parse(parameters.costing);
+
+  var mode = costing || "auto";
+  var matrixtype = JSON.parse(parameters.matrixtype);
+  var  matrix = L.Matrix.widget(selectEnv(), mode, matrixtype);
+    matrix.matrix({
+      waypoints : locs
     });
 
-    if (parameters.costing !== undefined)
-      var costing = JSON.parse(parameters.costing);
-
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
-  }
+  document.getElementById('permalink').innerHTML = "<a href='file:///home/kdiluca/sandbox/route-test-utility/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
+}
   
 //Number of locations
   var locations = 0;
@@ -226,6 +264,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         direction: 'auto'
       });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
@@ -233,6 +273,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         direction: 'auto'
       });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
     }
     map.addLayer(marker);
     markers.push(marker);
@@ -245,6 +287,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         direction: 'auto'
       });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
         icon : getViaIcon()
@@ -252,6 +296,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         direction: 'auto'
       });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
     }
     map.addLayer(marker);
     markers.push(marker);
@@ -297,7 +343,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.renderHtml = function(html_code) {
     return $sce.trustAsHtml(html_code);
   };
-  
+
   $scope.$on('setRouteInstruction', function(ev, instructions) {
     $scope.$apply(function() {
       $scope.route_instructions = instructions;
@@ -308,6 +354,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.$apply(function() {
       $scope.route_instructions = '';
     });
+  });
+
+  // if the hash changes
+  // L.DomEvent.addListener(window, "hashchange", hashRoute);
+
+  // show something to start with but only if it was requested
+  $(window).load(function(e) {
+    // rr = L.Routing.valhalla(accessToken);
+    force = true;
+    hashRoute();
   });
   
   map.on('click', function(e) {
@@ -443,4 +499,3 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     });
 
 })
-
