@@ -167,7 +167,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     force = show;
     window.location.hash = '#' + extra + parameter;
 
-    document.getElementById('permalink').innerHTML = "<a href='file:///home/kdiluca/sandbox/route-test-utility/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
   };
 
   var hashRoute = function() {
@@ -234,7 +234,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints : locs
     });
 
-  document.getElementById('permalink').innerHTML = "<a href='file:///home/kdiluca/sandbox/route-test-utility/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
+  document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
 }
   
 //Number of locations
