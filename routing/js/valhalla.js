@@ -228,8 +228,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var reset = function() {
     $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
+    if (rr) {
+      map.removeLayer(rr);
+    }
     $scope.$emit('resetRouteInstruction');
     remove_markers();
     locations = 0;
@@ -451,6 +452,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
               icon : iconV
             };
             var dot = L.marker(wp.latLng, options);
+            markers.push(dot);
             return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
                 + "&layers=Q target=_blank>Edit POI here<a/>");
           },
