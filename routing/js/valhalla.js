@@ -61,20 +61,20 @@ app.run(function($rootScope) {
     'zoom' : hash_loc.zoom,
     'lat' : hash_loc.center.lat,
     'lon' : hash_loc.center.lng
-  }
+  };
   $(document).on('new-location', function(e) {
     $rootScope.geobase = {
       'zoom' : e.zoom,
       'lat' : e.lat,
       'lon' : e.lon
     };
-  })
+  });
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   /*var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-  }),*/ 
+  }),*/
   var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
@@ -131,7 +131,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       iconAnchor : [ 22, 42 ]
     });
   };
-  
+
   var getViaIcon = function(icon) {
     return L.icon({
       iconUrl : 'resource/via_dot.png',
@@ -153,7 +153,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var locateMarkers = [];
   var remove_markers = function() {
-    for (i = 0; i < markers.length; i++) {
+    for (var i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
@@ -217,50 +217,20 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
 
-    var rr = L.Routing.control(
-        {
-          waypoints : locs,
-          geocoder : null,
-          transitmode : costing,
-          routeWhileDragging : false,
-          router : L.Routing.valhalla(envToken, 'auto'),
-          summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
-
-          createMarker : function(i, wp, n) {
-            var iconV;
-            if (i == 0) {
-              iconV = getOriginIcon();
-            } else {
-              iconV = getDestinationIcon();
-            }
-            var options = {
-              draggable : false,
-              icon : iconV
-            }
-            var dot = L.marker(wp.latLng, options);
-            return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-                + "&layers=Q target=_blank>Edit POI here<a/>");
-          },
-          formatter : new L.Routing.Valhalla.Formatter(),
-          pointMarkerStyle : {
-            radius : 6,
-            color : '#25A5FA',
-            fillColor : '#5E6472',
-            opacity : 1,
-            fillOpacity : 1
-          }
-        }).addTo(map);
+    rr = createRouting({waypoints: locs, transitmode: costing}, true);
+    locations = locs.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
-  }
+  };
 
   // Number of locations
   var locations = 0;
 
   var reset = function() {
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
+    if (rr) {
+      rr.removeFrom(map);
+      rr = null;
+    }
     $scope.$emit('resetRouteInstruction');
     remove_markers();
     locations = 0;
@@ -312,7 +282,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locateMarkers.forEach(function (element, index, array) {
       map.removeLayer(element);
     });
-    locateMarkers = []
+    locateMarkers = [];
 
     //mark from node
     if(locate_result.node != null) {
@@ -320,7 +290,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       map.addLayer(marker);
       var popup = L.popup({maxHeight : 200});
       popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();      
+      marker.bindPopup(popup).openPopup();
       locateMarkers.push(marker);
     }//mark all the results for that spot
     else if(locate_result.edges != null) {
@@ -328,8 +298,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
         map.addLayer(marker);
         var popup = L.popup({maxHeight : 200});
-        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>"); 
-        marker.bindPopup(popup).openPopup(); 
+        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>");
+        marker.bindPopup(popup).openPopup();
         locateMarkers.push(marker);
       });
     }//no data probably
@@ -338,7 +308,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       map.addLayer(marker);
       var popup = L.popup({maxHeight : 200});
       popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();      
+      marker.bindPopup(popup).openPopup();
       locateMarkers.push(marker);
     }
   };
@@ -368,7 +338,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     force = true;
     hashRoute();
   });
-  
+
   map.on('click', function(e) {
     var geo = {
       'lat' : e.latlng.lat,
@@ -382,7 +352,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
-        })
+        });
         $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
         locations++;
         return;
@@ -390,34 +360,34 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
-        })
+        });
         $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
         locations++;
         return;
       }
-    } else if (!eventObj.shiftKey){
+    } else if (!eventObj.shiftKey) {
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
-        })
+        });
         $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
         locations++;
         return;
       } else if (locations > 1) {
         Locations = [];
         reset();
-  
+
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
-        })
+        });
         $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
         locations++;
         return;
       }
     }
-    
+
     $scope.$on('setRouteInstruction', function(ev, instructions) {
       $scope.$apply(function() {
         $scope.route_instructions = instructions;
@@ -434,21 +404,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     Locations.forEach(function(gLoc) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
-    
+
     waypoints.push(L.latLng(geo.lat, geo.lon));
 
     $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
     locations++;
 
-    valhalla_mode = mode_mapping[mode];
-    
-    update(true, waypoints, valhalla_mode);
+    var valhalla_mode = mode_mapping[mode];
 
-    var rr = L.Routing.control(
-        {
-          waypoints : waypoints,
+    rr = createRouting({waypoints: waypoints, transitmode: valhalla_mode});
+    update(true, waypoints, valhalla_mode);
+  });
+
+    var rr;
+
+    var createRouting = function(options, createMarkers) {
+        var defaultOptions = {
           geocoder : null,
-          transitmode : valhalla_mode,
           routeWhileDragging : false,
           router : L.Routing.valhalla(envToken, 'auto'),
           summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
@@ -464,13 +436,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
               iconV = L.icon({
                 iconUrl : 'resource/via_dot.png',
                 iconSize : [ 30, 30 ]
-              })
+              });
             }
+
+            if (createMarkers) {
+                if (i == 0) {
+                    iconV = getOriginIcon();
+                } else if (i == n -1) {
+                    iconV = getDestinationIcon();
+                }
+            }
+
             var options = {
               draggable : true,
               icon : iconV
-            }
+            };
             var dot = L.marker(wp.latLng, options);
+            markers.push(dot);
             return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
                 + "&layers=Q target=_blank>Edit POI here<a/>");
           },
@@ -482,8 +464,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             opacity : 1,
             fillOpacity : 1
           }
-        }).addTo(map);
-    
+        };
+
+        options = options || {};
+        for (var k in options) {
+            defaultOptions[k] = options[k];
+        }
+
+        return L.Routing.control(defaultOptions).addTo(map);
+    };
+
     var driveBtn = document.getElementById("drive_btn");
     var bikeBtn = document.getElementById("bike_btn");
     var walkBtn = document.getElementById("walk_btn");
@@ -493,6 +483,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var routeresponse;
 
     driveBtn.addEventListener('click', function(e) {
+      if (!rr) return;
       getEnvToken();
       rr.route({
         transitmode : 'auto'
@@ -500,6 +491,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
 
     bikeBtn.addEventListener('click', function(e) {
+      if (!rr) return;
       getEnvToken();
       var bikeoptions = setBikeOptions();
       rr.route({
@@ -509,6 +501,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
 
     walkBtn.addEventListener('click', function(e) {
+      if (!rr) return;
       getEnvToken();
       rr.route({
         transitmode : 'pedestrian'
@@ -516,26 +509,27 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
 
     multiBtn.addEventListener('click', function(e) {
+      if (!rr) return;
       getEnvToken();
       rr.route({
         transitmode : 'multimodal',
         date_time : dateStr
       });
     });
-    
+
     elevationBtn.addEventListener('click', function(e) {
+      if (!rr) return;
       selectEnv();
       var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
       elev.resetChart();
       elev.profile(elev._rrshape);
       document.getElementById('graph').style.display = "block";
     });
-    
+
     clearBtn.addEventListener('click', function(e) {
       Locations = [];
-      waypoints = [];
+      var elev = (rr && typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
       reset();
-      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
       elev.resetChart();
       document.getElementById('permalink').innerHTML = "";
       window.location.hash = "";
@@ -553,17 +547,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       var cycling_speed = document.getElementById("cycle_speed").value;
       var use_hills = document.getElementById("use_hills").value;
 
-      bikeoptions = {
+      var bikeoptions = {
         "bicycle" : {
           bicycle_type : bicycle_type,
           use_roads : use_roads,
           cycling_speed : cycling_speed,
           use_hills : use_hills
         }
-      }
+      };
       return bikeoptions;
     }
-    ;
 
     /*
      * function openWin(id) { var divText =
@@ -600,7 +593,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         multiBtn.click();
       }
     }
-    ;
 
     $(document).on('mode-alert', function(e, m) {
       mode = m;
@@ -616,7 +608,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     $("#datepicker").on("click", function() {
       datetimeUpdate(this.value);
     });
-  });
+
 
   // ask the service for information about this location
   map.on("contextmenu", function(e) {
@@ -640,4 +632,4 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $("#hidechart").on("click", function() {
     document.getElementById('graph').style.display = "none";
   });
-})
+});
