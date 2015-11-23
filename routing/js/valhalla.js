@@ -227,9 +227,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var locations = 0;
 
   var reset = function() {
-    $('svg').html('');
     if (rr) {
-      map.removeLayer(rr);
+      rr.removeFrom(map);
+      rr = null;
     }
     $scope.$emit('resetRouteInstruction');
     remove_markers();
@@ -528,12 +528,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     clearBtn.addEventListener('click', function(e) {
       Locations = [];
-      reset();
       var elev = (rr && typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+      reset();
       elev.resetChart();
       document.getElementById('permalink').innerHTML = "";
       window.location.hash = "";
-      rr = null;
     });
 
     function setBikeOptions() {
