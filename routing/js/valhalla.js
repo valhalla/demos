@@ -42,10 +42,11 @@ function getEnvToken() {
   }
 }
 
-// sets ISO date time to 12:15 of current date on initial transit run
+// use to set ISO date time to 12:15 of current date for initial transit run
 function parseIsoDateTime(dtStr) {
-  var dt = dtStr.split("T");
-  return dtStr.replace(dt[1], "12:15:00");
+  //var dt = dtStr.split("T");
+  return dtStr.split("T");
+ // return dtStr.replace(dt[1], "12:15:00");
 }
 var dateStr = parseIsoDateTime(isoDateTime.toString());
 
@@ -511,9 +512,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     multiBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
+      var transitoptions = setTransitOptions(dateStr);
       rr.route({
         transitmode : 'multimodal',
-        date_time : dateStr
+        transit_options : transitoptions
       });
     });
 
@@ -556,6 +558,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         }
       };
       return bikeoptions;
+    }
+    
+    function setTransitOptions(dateStr) {
+      var ttype = document.getElementsByName("ttype");
+      for (var i = 0; i < ttype.length; i++) {
+        if (ttype[i].checked) {
+          dt_type = ttype[i].value;
+        }
+      }
+      //if user selects current, then we reset time to current date time
+      if (dt_type == 1)
+        dateStr = parseIsoDateTime(this.date.toISOString().toString());
+      var transitoptions = {
+        type : parseInt(dt_type),
+        value : dateStr
+      };
+      return transitoptions;
     }
 
     /*
@@ -622,11 +641,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   $("#showbtn").on("click", function() {
-    document.getElementById('options').style.display = "block";
+    document.getElementById('doptions').style.display = "block";
+    document.getElementById('boptions').style.display = "block";
+    document.getElementById('woptions').style.display = "block";
+    document.getElementById('toptions').style.display = "block";
   });
 
   $("#hidebtn").on("click", function() {
-    document.getElementById('options').style.display = "none";
+    document.getElementById('doptions').style.display = "none";
+    document.getElementById('boptions').style.display = "none";
+    document.getElementById('woptions').style.display = "none";
+    document.getElementById('toptions').style.display = "none";
   });
 
   $("#hidechart").on("click", function() {

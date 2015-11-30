@@ -361,6 +361,7 @@ if (typeof module !== undefined) module.exports = polyline;
         var streetName = options.street;
         this._transitmode = transitM;
         var costing_options = options.costing_options;
+        var transit_options = options.transit_options
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
@@ -379,16 +380,25 @@ if (typeof module !== undefined) module.exports = polyline;
               type: "through"
             }
           }
-  	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
+  	  //  if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
           locs.push(loc);
         }
-        
-        var params = JSON.stringify({
-           locations: locs,
-           street: streetName,
-           costing: transitM,
-           costing_options: costing_options
-         });
+        if (transitM === "multimodal") {
+          var params = JSON.stringify({
+            locations: locs,
+            street: streetName,
+            costing: transitM,
+            costing_options: costing_options,
+            date_time: transit_options
+          });
+        } else {
+          var params = JSON.stringify({
+             locations: locs,
+             street: streetName,
+             costing: transitM,
+             costing_options: costing_options
+           });
+        }
 
          //reset service url & access token if environment has changed
          (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
