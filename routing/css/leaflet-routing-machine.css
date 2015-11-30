@@ -118,11 +118,18 @@
       min-width:60px;
     }
     
-    .leaflet-routing-alt ul.verbal_alert, ul.verbal_pre, ul.verbal_post {
+    .leaflet-routing-alt ul.verbal_alert, ul.verbal_depart, ul.verbal_arrive, ul.verbal_pre, ul.verbal_post {
       color: #2E64FE;
       font-style: italic;
       font-size: 12px;
       margin: 5px;
+    }
+    
+    .leaflet-routing-alt ul.depart_instr, ul.arrive_instr {
+      color: #8A0808;
+      font-size: 12px;
+      margin: 5px;
+      font-weight: bold;
     }
     
     .leaflet-routing-alt::-webkit-scrollbar {
