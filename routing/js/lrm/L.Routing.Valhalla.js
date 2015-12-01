@@ -195,7 +195,7 @@ if (typeof module !== undefined) module.exports = polyline;
   var polyline = require('polyline');
   
   L.Routing = L.Routing || {};
-  
+
   L.Routing.Valhalla = L.Class.extend({
     options: {
       serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
@@ -361,7 +361,7 @@ if (typeof module !== undefined) module.exports = polyline;
         var streetName = options.street;
         this._transitmode = transitM;
         var costing_options = options.costing_options;
-        var transit_options = options.transit_options
+        var transit_options = options.transit_options;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
@@ -380,7 +380,6 @@ if (typeof module !== undefined) module.exports = polyline;
               type: "through"
             }
           }
-  	  //  if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
           locs.push(loc);
         }
         if (transitM === "multimodal") {
@@ -410,7 +409,6 @@ if (typeof module !== undefined) module.exports = polyline;
         return this.options.serviceUrl + 'route?json=' +
                 params + '&api_key=' + this._accessToken;
       },
-      
       
       _locationKey: function(location) {
         return location.lat + ',' + location.lng;
