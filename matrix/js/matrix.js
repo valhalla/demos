@@ -8,7 +8,7 @@ var mode_mapping = {
 
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
-var token = accessToken.prod;
+var envToken = accessToken.prod;
 var locCount = 0;
 
 function selectEnv() {
@@ -22,13 +22,13 @@ function selectEnv() {
 function getEnvToken() {
   switch (envServer) {
   case "localhost":
-    token = accessToken.local;
+    envToken = accessToken.local;
     break;
   case "development":
-    token = accessToken.dev;
+    envToken = accessToken.dev;
     break;
   case "production":
-    token = accessToken.prod;
+    envToken = accessToken.prod;
     break;
   }
 }
@@ -119,6 +119,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
  //Number of locations
   var locations = 0;
   var markers = [];
+  
+  var locateMarkers = [];
+  var remove_markers = function() {
+    for (i = 0; i < markers.length; i++) {
+      map.removeLayer(markers[i]);
+    }
+    markers = [];
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = [];
+  };
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
@@ -259,12 +271,49 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
     
-    var  matrix = L.Matrix.widget(token, mode, matrixtype);
+    var  matrix = L.Matrix.widget(envToken, mode, matrixtype);
     matrix.matrix({
       waypoints : waypoints
     });
   });
-    
+  
+//locate edge snap markers
+  var locateEdgeMarkers = function (locate_result) {
+    // clear it
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = []
+
+    //mark from node
+    if(locate_result.node != null) {
+      var marker = L.circle( [locate_result.node.lat,locate_result.node.lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      var popup = L.popup({maxHeight : 200});
+      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
+      marker.bindPopup(popup).openPopup();      
+      locateMarkers.push(marker);
+    }//mark all the results for that spot
+    else if(locate_result.edges != null) {
+      locate_result.edges.forEach(function (element, index, array) {
+        var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+        map.addLayer(marker);
+        var popup = L.popup({maxHeight : 200});
+        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>"); 
+        marker.bindPopup(popup).openPopup(); 
+        locateMarkers.push(marker);
+      });
+    }//no data probably
+    else {
+      var marker = L.circle( [locate_result.input_lat,locate_result.input_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      var popup = L.popup({maxHeight : 200});
+      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
+      marker.bindPopup(popup).openPopup();      
+      locateMarkers.push(marker);
+    }
+  };
+  
   var counterText = 0;
   
   function chooseLocations(matrixtype) {
@@ -370,7 +419,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lon : e.latlng.lng
       };
       getEnvToken();
-      var locate = L.locate(token);
+      var locate = L.locate(envToken);
       locate.locate(ll, locateEdgeMarkers);
     });
 

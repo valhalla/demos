@@ -240,7 +240,7 @@
 
                //reset service url & access token if environment has changed
                (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
-               (typeof token != "undefined" || token != null) ? this._accessToken=token : this._accessToken=accessToken.dev;
+               (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
 
                console.log(this.options.serviceUrl + this._matrixtype + '?json=' +
                       params + '&api_key=' + this._accessToken);
