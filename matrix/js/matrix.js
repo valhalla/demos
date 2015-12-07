@@ -201,8 +201,17 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var matrixBtn = document.getElementById("matrix_btn");
   var matrixtype = "";
   
+  function toggleButtonClass(btn) {
+    if($(oneToMany).hasClass('selected')) $(oneToMany).removeClass('selected');
+    if($(manyToOne).hasClass('selected')) $(manyToOne).removeClass('selected');
+    if($(manyToMany).hasClass('selected')) $(manyToOne).removeClass('selected');
+
+    if(!$(btn).hasClass('selected')) $(btn).addClass('selected');
+  }
+
   oneToMany.addEventListener('click', function(e) {
     reset_form();
+    toggleButtonClass(this);
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting point</b></h4></div>" ));
     $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add a start point" ) );
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending points</b></h4></div>" ));
@@ -216,6 +225,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   
   manyToOne.addEventListener('click', function(e) {
     reset_form();
+    toggleButtonClass(this);
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting points</b></h4></div>" ));
     $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add your starting points" ) );
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending point</b></h4></div>" ));
@@ -229,6 +239,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   manyToMany.addEventListener('click', function(e) {
     reset_form();
+    toggleButtonClass(this);
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Select points</b></h4></div>" ));
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4></h4></div>" ));
     $( 'input#endpt').replaceWith($("<input id=endpt type=hidden name=endpt />" ));
