@@ -105,16 +105,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       shadowUrl: null
     })
   };
-  
-  var getViaIcon = function() {
-    return new L.Icon({ 
-      iconUrl : '../matrix/resource/matrix_pin_end.png',
-      iconSize : [ 26, 32 ], // size of the icon
-      iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
-      shadowUrl: null
-    });
-  };
 
   var getDestinationIcon = function() {
     return new L.Icon({ 
@@ -131,48 +121,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
-  });
-  
-  $rootScope.$on('map.dropMarker', function(ev, geo, viaCount) {
-
-    if (locations == 0) {
-      var marker = new L.marker(geo, {
-        icon : getOriginIcon()
-      }).bindLabel("0", {
-        noHide: true,
-        direction: 'auto',
-        offset: [0,0]
-      });
-    } else {
-      var marker = new L.marker(geo, {
-        icon : getDestinationIcon()
-      }).bindLabel((viaCount+1).toString(), {
-        noHide: true,
-        direction: 'auto',
-        offset: [0,0]
-      });
-    }
-    map.addLayer(marker);
-    markers.push(marker);
-  });
-  $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, viaCount) {
-    if (locations == 0) {
-      var marker = new L.marker(geo, {
-        icon : getViaIcon()
-      }).bindLabel(viaCount, {
-        noHide: true,
-        direction: 'auto'
-      });
-    } else {
-      var marker = new L.marker(geo, {
-        icon : getViaIcon(),
-      }).bindLabel(viaCount.toString(), { 
-        noHide: true,
-        direction: 'auto'
-      });
-    }
-    map.addLayer(marker);
-    markers.push(marker);
   });
   
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, viaCount) {
@@ -314,7 +262,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ]);
         locations++;
         document.getElementById('startpt').value=[geo.lat, geo.lon];
         return;
@@ -324,7 +272,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lon : geo.lon
         })
         viaCount++;
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], viaCount);
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], viaCount);
         locations++;
 
         document.getElementById("endp").innerHTML = "";
