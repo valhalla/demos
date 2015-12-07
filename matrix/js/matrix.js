@@ -118,6 +118,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
  //Number of locations
   var locations = 0;
+  var markers = [];
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
@@ -230,14 +231,11 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
   
   matrixBtn.addEventListener('click', function(e) {
-
     var waypoints = [];
     Locations.forEach(function(gLoc) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
     
-    //waypoints.push(L.latLng(geo.lat, geo.lon));
-
     var  matrix = L.Matrix.widget(token, mode, matrixtype);
     matrix.matrix({
       waypoints : waypoints
