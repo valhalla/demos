@@ -126,6 +126,11 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
+    if (locCount == 0 ){
+      var marker = new L.marker(geo, {
+        icon : getOriginIcon()
+      });
+    } else {
       var marker = new L.marker(geo, {
         icon : getOriginIcon()
       }).bindLabel((locCount).toString(), {
@@ -133,12 +138,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         offset: [-9,-12]
       });
+    }
     map.addLayer(marker);
     markers.push(marker);
   });
   
   $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
 
+    if (locCount == 0 ){
+      var marker = new L.marker(geo, {
+        icon : getDestinationIcon()
+      });
+    } else {
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
       }).bindLabel((locCount).toString(), {
@@ -146,6 +157,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         noHide: true,
         offset: [-9,-12]
       });
+    }
     map.addLayer(marker);
     markers.push(marker);
   });
@@ -260,7 +272,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
         document.getElementById('startpt').value=[geo.lat, geo.lon];
         return;
@@ -279,6 +291,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         newdiv.innerHTML="<input id='endpt'"+counterText +" type=text name='endpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
         document.getElementById('endform').appendChild(newdiv);
 
+        counterText++;
         return;
       }
     } else if (matrixtype == "many_to_one") {
@@ -288,7 +301,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lon : geo.lon
         })
         locCount++;
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], 0);
         locations++;
         document.getElementById('endpt').value=[geo.lat, geo.lon];
 
