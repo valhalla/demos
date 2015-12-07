@@ -19,27 +19,40 @@
   <div class="container-fluid" data-ng-controller="MatrixController">
   <div id="map"></div>
   <div class = "row not-map-part">
-    <span style="color:black" class="descriptions">Select an environment:</span><br>
-    <select id = "env_dropdown" onchange="selectEnv()">
-	  <option id=localhost value="http://localhost:8002/">localhost</option>
-	  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
-	  <option id=production value="http://matrix.mapzen.com/">production</option>
-	</select>
+    <img src="resource/turnbyturnlogo.png" alt="logo"">
     <div id="graph_controls" class = "clear">
       <div id="controls" class = "col-sm-4 col-md-4">
         <br>
+        <h4><b>Select a travel mode: </b></h4>
         <div id="options" name="options">
-          drive: <input style="color:black" type="radio" name="mode" value="auto"  checked />
-          bike: <input style="color:black" type="radio" name="mode" value="bicycle" />
-          walk: <input style="color:black" type="radio" name="mode" value="pedestrian" />
+          drive: <input style="color:gray" type="radio" name="mode" value="auto"  checked />
+          bike: <input style="color:gray" type="radio" name="mode" value="bicycle" />
+          walk: <input style="color:gray" type="radio" name="mode" value="pedestrian" />
         </div>
         <br>
-        <button id="one_to_many" class = "transparent_btn" type="button">One-to-Many</button>
-        <button id="many_to_one" class = "transparent_btn" type="button">Many-to-One</button>
-        <button id="many_to_many" class = "transparent_btn" type="button">Many-to-Many</button>
-        <br>
-        <button id="clear_btn" class ="btn btn-mapzen" type="button" style='margin-right: 1em;'>clear</button>
-        <div id='permalink' style='display:inline-block;'></div>
+        <h4><b>Select a matrix type</b></h4>
+        <button id="one_to_many" class = "stitched" type="button">One-to-Many</button>
+        <button id="many_to_one" class = "stitched" type="button">Many-to-One</button>
+        <button id="many_to_many" class = "stitched" type="button">Many-to-Many</button>
+        <h5><i>Options vary for each matrix type</i></h5>
+        <br><br>
+        <div class="start" id="start" name="start">
+          <div class="startheader" id="startheader"><h4><b>Starting point</b></h4></div>
+          <form id="startform" name="startform"><span style="color:black">
+		    <input id="startpt" type="text" name="startpt" style="color:#A4A4A4"/>
+		  </form>
+		  <p id="startp" style="font-size:18px; font-style:italic; color:black; margin-bottom:10px;"></p>
+		</div>
+		<br>
+		<div class="end" id="end" name="end">
+		  <div class="endheader" id="endheader"><h4><b>Ending points</b></h4></div>
+		  <form id="endform" name="endform"><span style="color:black">
+		    <input id="endpt" type="text" name="endpt" style="color:#A4A4A4"/>
+		  </form>
+		  <p id="endp" style="font-size:18px; font-style:italic; color:black; margin-bottom:10px;"></p>
+	    </div>	
+        <button id="clear_btn" class ="btn-matrix" type="button" style='margin-left: 20em;'>Reset All</button>
+        <button id="matrix_btn" class ="btn-matrix" type="button" style='margin-left: 1em;' autofocus>Get Matrix</button>
       </div>
       <div id="columns"></div>
     </div>
@@ -52,7 +65,7 @@
   
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
-  <script src="js/leaflet.label.js"></script>
+  <script src="js/leaflet.label.js"></script>>
   <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
   <script type="text/javascript" src="js/matrix.js"></script>
   <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>

@@ -220,14 +220,12 @@
                 if(i === 0 || i === waypoints.length-1){
                   loc = {
                     lat: waypoints[i].lat,
-                    lon: waypoints[i].lng,
-                    type: "break"
+                    lon: waypoints[i].lng
                   }
                 }else{
                   loc = {
                       lat: waypoints[i].lat,
-                      lon: waypoints[i].lng,
-                    type: "through"
+                      lon: waypoints[i].lng
                   }
                 }
                 locs.push(loc);

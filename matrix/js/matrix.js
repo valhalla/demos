@@ -88,7 +88,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   }
   
   var Locations = [];
-  var mode = 'car';
+  var mode = 'auto';
 
   var mode_icons = {
     'car' : 'js/images/drive.png',
@@ -98,18 +98,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   var getOriginIcon = function() {
     return new L.Icon({ 
-      iconUrl : '../routing/resource/startmarker@2x.png',
+      iconUrl : '../matrix/resource/matrix_pin_start.png',
       iconSize : [ 26, 32 ], // size of the icon
       iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
+    //  labelAnchor: [5, 5],
       shadowUrl: null
     })
   };
   
   var getViaIcon = function() {
     return new L.Icon({ 
-      iconUrl : '../routing/resource/via_dot.png',
-      iconSize : [ 22, 24 ],
+      iconUrl : '../matrix/resource/matrix_pin_end.png',
+      iconSize : [ 26, 32 ], // size of the icon
       iconAnchor : [ 15, 20],
       labelAnchor: [5, 5],
       shadowUrl: null
@@ -118,7 +118,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   var getDestinationIcon = function() {
     return new L.Icon({ 
-      iconUrl : '../routing/resource/destmarker@2x.png',
+      iconUrl : '../matrix/resource/matrix_pin_end.png',
       iconSize : [ 26, 32 ], // size of the icon
       iconAnchor : [ 15, 20],
       labelAnchor: [5, 5],
@@ -202,17 +202,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 //Number of locations
   var locations = 0;
 
-  var reset = function() {
-    Locations = [];
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
-    $scope.$emit('resetRouteInstruction');
-    remove_markers();
-    locations = 0;
-    viaCount = 0;
-  };
-
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
   });
@@ -224,14 +213,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         icon : getOriginIcon()
       }).bindLabel("0", {
         noHide: true,
-        direction: 'auto'
+        direction: 'auto',
+        offset: [0,0]
       });
     } else {
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
       }).bindLabel((viaCount+1).toString(), {
         noHide: true,
-        direction: 'auto'
+        direction: 'auto',
+        offset: [0,0]
       });
     }
     map.addLayer(marker);
@@ -240,19 +231,45 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, viaCount) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon()
-      }).bindLabel("0", {
+        icon : getViaIcon()
+      }).bindLabel(viaCount, {
         noHide: true,
         direction: 'auto'
       });
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon()
-      }).bindLabel(viaCount.toString(), {
+        icon : getViaIcon(),
+      }).bindLabel(viaCount.toString(), { 
         noHide: true,
         direction: 'auto'
       });
     }
+    map.addLayer(marker);
+    markers.push(marker);
+  });
+  
+  $rootScope.$on('map.dropOriginMarker', function(ev, geo, viaCount) {
+
+      var marker = new L.marker(geo, {
+        icon : getOriginIcon()
+      }).bindLabel((viaCount+1).toString(), {
+        noHide: true,
+        direction: 'auto',
+        offset: [0,0]
+      });
+    map.addLayer(marker);
+    markers.push(marker);
+  });
+  
+  $rootScope.$on('map.dropDestMarker', function(ev, geo, viaCount) {
+
+      var marker = new L.marker(geo, {
+        icon : getDestinationIcon()
+      }).bindLabel((viaCount+1).toString(), {
+        noHide: true,
+        direction: 'auto',
+        offset: [0,0]
+      });
     map.addLayer(marker);
     markers.push(marker);
   });
@@ -310,24 +327,122 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     });
   });
   
-  map.on('click', function(e) {
+  function setMode() {
+    var modeBtn = document.getElementsByName("mode");
+    var transitmode = "auto";
+    for (var i = 0; i < modeBtn.length; i++) {
+      if (modeBtn[i].checked) {
+        transitmode = modeBtn[i].value;
+      }
+    } 
+    return transitmode;
+  }  
+  
+  var reset_form = function() {
+    document.getElementById("startp").innerHTML = "";
+    document.getElementById("endp").innerHTML = "";
+  };
+  
+  var oneToMany = document.getElementById("one_to_many");
+  var manyToOne = document.getElementById("many_to_one");
+  var manyToMany = document.getElementById("many_to_many");
+  var clearBtn = document.getElementById("clear_btn");
+  var matrixBtn = document.getElementById("matrix_btn");
+  var matrixtype = "";
+  
+  oneToMany.addEventListener('click', function(e) {
+    reset_form();
+    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting point</b></h4></div>" ));
+    $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add a start point" ) );
+    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending points</b></h4></div>" ));
+    $( 'input#endpt').replaceWith($("<input id=endpt type=text name=endpt  style=color:#A4A4A4/>" ));
+    $( "p#endp" ).prepend( document.createTextNode( "Click on the map to add your ending points" ) );
+    getEnvToken();
+    var mode = setMode();
+    matrixtype = "one_to_many";
+    chooseLocations(matrixtype);
+  });
+  
+  manyToOne.addEventListener('click', function(e) {
+    reset_form();
+    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting points</b></h4></div>" ));
+    $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add your starting points" ) );
+    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending point</b></h4></div>" ));
+    $( 'input#endpt').replaceWith($("<input id=endpt type=text name=endpt  style=color:#A4A4A4/>" ));
+    $( "p#endp" ).prepend( document.createTextNode( "Ctrl + Click on the map to add an ending point" ) );
+    getEnvToken();
+    var mode = setMode();
+    matrixtype = "many_to_one";
+    chooseLocations(matrixtype);
+  });
+
+  manyToMany.addEventListener('click', function(e) {
+    reset_form();
+    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Select points</b></h4></div>" ));
+    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4></h4></div>" ));
+    $( 'input#endpt').replaceWith($("<input id=endpt type=hidden name=endpt />" ));
+    getEnvToken();
+    var mode = setMode();
+    matrixtype = "many_to_many";
+    chooseLocations(matrixtype);
+  });
+  
+  clearBtn.addEventListener('click', function(e) {
+    javascript:location.reload(true)
+  });
+  
+/*  clearBtn.addEventListener('click', function(e) {
+    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting point</b></h4></div>" ));
+   // $( 'input#startpt').replaceWith($("<input id=startpt type=text name=startpt  style=color:#A4A4A4/>" ));
+    $( 'form#startform').remove();
+   // var formreset = document.createElement('startform');
+   // formreset.innerHTML="<form id=startform name=startform><span style=color:black>";
+   // document.getElementById("start").appendChild(formreset);
+    document.getElementById("startp").innerHTML = "";
+    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending points</b></h4></div>" ));
+   // $( 'input#endpt').replaceWith($("<input id=endpt type=text name=endpt  style=color:#A4A4A4/>" ));
+    $( 'form#endform').remove();
+    document.getElementById("endp").innerHTML = "";
+  });*/
+  
+  matrixBtn.addEventListener('click', function(e) {
+
+    var waypoints = [];
+    Locations.forEach(function(gLoc) {
+      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+    });
+    
+    //waypoints.push(L.latLng(geo.lat, geo.lon));
+
+    var  matrix = L.Matrix.widget(token, mode, matrixtype);
+    matrix.matrix({
+      waypoints : waypoints
+    });
+  });
+  
+  
+  var counterText = 0;
+  
+  function chooseLocations(matrixtype) {
+    map.on('click', function(e) {
+
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
 
     var eventObj = window.event ? event : e.originalEvent;
-    //way to test multi-locations
-    if(eventObj.ctrlKey) {
+
+    if (matrixtype == "one_to_many") {
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ]);
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
         locations++;
+        document.getElementById('startpt').value=[geo.lat, geo.lon];
         return;
-      //vias 
       } else {
         Locations.push({
           lat : geo.lat,
@@ -336,101 +451,73 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         viaCount++;
         $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], viaCount);
         locations++;
+
+        document.getElementById("endp").innerHTML = "";
+        document.getElementById('endpt').value=[geo.lat, geo.lon];
+        var newdiv = document.createElement('endpt'+ counterText);
+        newdiv.innerHTML="<input id='endpt'"+counterText +" type=text name='endpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+        document.getElementById('endform').appendChild(newdiv);
+
         return;
       }
-    } else if (!eventObj.shiftKey){
-      if (locations == 0) {
+    } else if (matrixtype == "many_to_one") {
+      if (eventObj.ctrlKey) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ]);
         locations++;
+        document.getElementById('endpt').value=[geo.lat, geo.lon];
+
         return;
-      } else if (locations > 1) {
-        Locations = [];
-        reset();
-  
+      } else {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+        viaCount++;
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], viaCount);
         locations++;
+
+        document.getElementById("startp").innerHTML = "";
+        document.getElementById('startpt').value=[geo.lat, geo.lon];
+        var newdiv = document.createElement('startpt'+ counterText);
+        newdiv.innerHTML="<input id='startpt'"+counterText +" type=text name='startpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+        document.getElementById('startform').appendChild(newdiv);
+        
+        counterText++;
         return;
       }
+      //many_to_many
+    } else {
+      Locations.push({
+        lat : geo.lat,
+        lon : geo.lon
+      })
+      viaCount++;
+      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], viaCount);
+      locations++;
+
+      document.getElementById("startp").innerHTML = "";
+      document.getElementById('startpt').value=[geo.lat, geo.lon];
+      var newdiv = document.createElement('startpt'+ counterText);
+      newdiv.innerHTML="<input id='startpt'"+counterText +" type=text name='endpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+      document.getElementById('startform').appendChild(newdiv);
+      
+      counterText++;
+ 
+      return;
     }
-    var waypoints = [];
-    Locations.forEach(function(gLoc) {
-      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
-    });
-    
-    waypoints.push(L.latLng(geo.lat, geo.lon));
 
     $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], viaCount);
     locations++;
 
     valhalla_mode = mode_mapping[mode];
-    
-   function setMode() {
-     var modeBtn = document.getElementsByName("mode");
-     var transitmode = "auto";
-     for (var i = 0; i < modeBtn.length; i++) {
-       if (modeBtn[i].checked) {
-         transitmode = modeBtn[i].value;
-       }
-     } 
-     return transitmode;
-   }  
      
-    var oneToMany = document.getElementById("one_to_many");
-    var manyToOne = document.getElementById("many_to_one");
-    var manyToMany = document.getElementById("many_to_many");
-    var clearBtn = document.getElementById("clear_btn");
     var matrixResponse;
-
-    oneToMany.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'one_to_many';
-      var matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
     });
-
-    manyToOne.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'many_to_one';
-      var matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
-    });
-
-    manyToMany.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'many_to_many';
-      var  matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
-    });
-    
-    clearBtn.addEventListener('click', function(e) {
-      reset();
-      $('#columns').columns('destroy');
-      var json = [{"From":"", "To":"", "Time (secs)":"","Distance (mi)":""}]; 
-      $('#columns').columns({
-        data:json
-      });
-      document.getElementById('permalink').innerHTML = "";
-      window.location.hash = "";
-    });
-
-  });
+  };
     // ask the service for information about this location
     map.on("contextmenu", function(e) {
       var ll = {
