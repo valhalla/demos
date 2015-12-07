@@ -6,9 +6,9 @@ var mode_mapping = {
   'bicycle' : 'bicycle'
 };
 
-var serviceUrl = "http://valhalla.dev.mapzen.com/";
-var envServer = "development";
-var token = accessToken.dev;
+var serviceUrl = "https://matrix.mapzen.com/";
+var envServer = "production";
+var token = accessToken.prod;
 var viaCount = 0;
 
 function selectEnv() {

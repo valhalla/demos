@@ -23,7 +23,13 @@
     <div id="graph_controls" class = "clear">
       <div id="controls" class = "col-sm-4 col-md-4">
         <br>
-        <h4><b>Select a travel mode: </b></h4>
+        <h4><span style="color:black" class="descriptions"><b>Select an environment</b></span></h4>
+		<select id = "env_dropdown" onchange="selectEnv()">
+			  <option id=localhost value="http://localhost:8002/">localhost</option>
+			  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
+			  <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
+			</select>
+        <h4><b>Select a travel mode</b></h4>
         <div id="options" name="options">
           drive: <input style="color:gray" type="radio" name="mode" value="auto"  checked />
           bike: <input style="color:gray" type="radio" name="mode" value="bicycle" />
