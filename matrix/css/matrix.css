@@ -31,6 +31,10 @@ body {
   float: left;
 }
 
+.ui-columns-search input.ui-table-search{
+  display: none;
+}
+
 input[type=text] {
   height: 45px;
   margin-top: 20px;
@@ -54,7 +58,6 @@ input#endpt{
   background-image:url(../resource/matrix_pin_end.png);
 }
 
-
 .stitched {
   padding: 8px;
   margin-right: 5px;
@@ -76,8 +79,6 @@ input#endpt{
   border: 2px solid #65B7A1;
 }
 
-
-
 .btn-matrix {
   border-color: #FFFFFF;
   background-color: #FFFFFF;
@@ -86,6 +87,7 @@ input#endpt{
   font-weight: 600;
   padding: 10px 16px;
   margin-top: 100px;
+  margin-bottom: 20px;
 }
 
  .btn-matrix:focus {
@@ -124,7 +126,6 @@ input#endpt{
     transform-origin: 0 0;
     -webkit-transform-origin: 0 0;
 }
-
 
 .legend table, .legend > div {
   height: 35px !important;

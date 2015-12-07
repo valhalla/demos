@@ -346,11 +346,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         locations++;
 
         document.getElementById("endp").innerHTML = "";
-        document.getElementById('endpt').value=[geo.lat, geo.lon];
+        if (counterText==0)
+          document.getElementById('endpt').remove();
         var newdiv = document.createElement('endpt'+ counterText);
-        newdiv.innerHTML="<input id='endpt'"+counterText +" type=text name='endpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
-        document.getElementById('endform').appendChild(newdiv);
+        newdiv.innerHTML="<input id=endpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
 
+        document.getElementById('endform').appendChild(newdiv);
         counterText++;
         return;
       }
@@ -376,11 +377,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         locations++;
 
         document.getElementById("startp").innerHTML = "";
-        document.getElementById('startpt').value=[geo.lat, geo.lon];
+        if (counterText==0)
+          document.getElementById('startpt').remove();
         var newdiv = document.createElement('startpt'+ counterText);
-        newdiv.innerHTML="<input id='startpt'"+counterText +" type=text name='startpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
-        document.getElementById('startform').appendChild(newdiv);
+        newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=startpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
         
+        document.getElementById('startform').appendChild(newdiv);
         counterText++;
         return;
       }
@@ -395,13 +397,13 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       locations++;
 
       document.getElementById("startp").innerHTML = "";
-      document.getElementById('startpt').value=[geo.lat, geo.lon];
+      if (counterText==0)
+        document.getElementById('startpt').remove();
       var newdiv = document.createElement('startpt'+ counterText);
-      newdiv.innerHTML="<input id='startpt'"+counterText +" type=text name='endpt' style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
-      document.getElementById('startform').appendChild(newdiv);
+      newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
       
+      document.getElementById('startform').appendChild(newdiv);
       counterText++;
- 
       return;
     }
 
