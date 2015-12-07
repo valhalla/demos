@@ -13,95 +13,70 @@ body {
 
 .container-fluid {
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.control-container {
+  width: 500px;
+  height: 100%;
+  padding: 20px;
+  float: left;
+  overflow-y: auto;
 }
 
 #map {
-  height: calc( 100% - 50px ); 
-  width: 75%;
-  position: absolute;
-  right: 20px;
-/*  background: #fff;
-  margin:0;*/
+  width: calc( 100% - 500px);
+  height: 100%;
+  float: left;
 }
 
 input[type=text] {
   height: 45px;
-  width: 400px;
   margin-top: 20px;
+  width: 100%;
+  box-shadow: none;
+  border-radius: 0;
+
+  background-repeat: no-repeat;
+  background-position:6px;
+  border:1px solid #DADADA;
+  margin-top: 10px;
+  padding-left: 40px;
+  font-size: 14px;
 }
 
 input#startpt{
   background-image:url(../resource/matrix_pin_start.png);
-  background-repeat:no-repeat;
-  background-position:6px;
-  border:1px solid #DADADA;
-  margin-top:10px;
-  padding-left:35px;
-  font-size:14px;
-  box-shadow:0 0 10px;
-  -webkit-box-shadow:0 0 10px;
-  /* For I.E */
-  -moz-box-shadow:0 0 10px;
-  /* For Mozilla Web Browser*/
-  border-radius:5px;
-  -webkit-border-radius:5px;
-  /* For I.E */
-  -moz-border-radius:5px
-  /* For Mozilla Web Browser*/
 }
 
 input#endpt{
   background-image:url(../resource/matrix_pin_end.png);
-  background-repeat:no-repeat;
-  background-position:6px;
-  border:1px solid #DADADA;
-  margin-top:10px;
-  padding-left:35px;
-  font-size:14px;
-  box-shadow:0 0 10px;
-  -webkit-box-shadow:0 0 10px;
-  /* For I.E */
-  -moz-box-shadow:0 0 10px;
-  /* For Mozilla Web Browser*/
-  border-radius:5px;
-  -webkit-border-radius:5px;
-  /* For I.E */
-  -moz-border-radius:5px
-  /* For Mozilla Web Browser*/
 }
 
+
 .stitched {
-   padding: 8px;
-   margin: 10px;
-   background: #FFFFFF;
-   color: #A4A4A4;
-   font-size: 18px;
-   font-weight: bold;
-   //line-height: 1.3em;
-   border-right: 1px dashed;
-   border-left: 1px dashed;
-   border-top: 1px dashed;
-   border-bottom: 1px dashed;
-   border-right-color:#DADADA;
-   border-left-color:#DADADA;
-   border-top-color:#DADADA;
-   border-bottom-color:#DADADA;
-  // border-radius: 8px;
-   box-shadow: 2px 1px 6px 4px 2px 1px 6px 4px rgba(10, 10, 0, 0.5);
-  // text-shadow: -1px -1px #aa3030;
+  padding: 8px;
+  margin-right: 5px;
+  background: #FFFFFF;
+  color: #A4A4A4;
+  font-size: 18px;
+  font-weight: bold;
+  border: 2px dashed #DADADA;
+  box-shadow: 0;
+}
+
+.stitched.selected {
+  color: #65B7A1;
+  border: 2px solid #65B7A1;
 }
 
 .stitched:focus {
-   color: #65B7A1;
-   border-right: 2px solid;
-   border-left: 2px solid;
-   border-top: 2px solid;
-   border-bottom: 2px solid;
-   border-right-color:#65B7A1;
-   border-left-color:#65B7A1;
-   border-top-color:#65B7A1;
-   border-bottom-color:#65B7A1;
+  color: #65B7A1;
+  border: 2px solid #65B7A1;
 }
+
+
 
 .btn-matrix {
   border-color: #FFFFFF;
@@ -190,7 +165,6 @@ html.is-iframed-demo .container-fluid {
 }
 
 html.is-iframed-demo .not-map-part {
-  max-width: 900px;
   margin: 0 auto;
 }
 
