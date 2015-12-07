@@ -9,7 +9,7 @@ var mode_mapping = {
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
 var token = accessToken.prod;
-var viaCount = 0;
+var locCount = 0;
 
 function selectEnv() {
   $("option:selected").each(function() {
@@ -99,8 +99,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var getOriginIcon = function() {
     return new L.Icon({ 
       iconUrl : '../matrix/resource/matrix_pin_start.png',
-      iconSize : [ 26, 32 ], // size of the icon
-      iconAnchor : [ 15, 20],
+      iconSize : [ 30, 36 ], // size of the icon
+    //  iconAnchor : [ 15, 20],
     //  labelAnchor: [5, 5],
       shadowUrl: null
     })
@@ -109,9 +109,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var getDestinationIcon = function() {
     return new L.Icon({ 
       iconUrl : '../matrix/resource/matrix_pin_end.png',
-      iconSize : [ 26, 32 ], // size of the icon
-      iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
+      iconSize : [ 30, 36 ], // size of the icon
+    //  iconAnchor : [ 15, 20],
+    //  labelAnchor: [5, 5],
       shadowUrl: null
     });
   };
@@ -124,27 +124,27 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     map.setView(geo, zoom || 8);
   });
   
-  $rootScope.$on('map.dropOriginMarker', function(ev, geo, viaCount) {
+  $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
       var marker = new L.marker(geo, {
         icon : getOriginIcon()
-      }).bindLabel((viaCount+1).toString(), {
+      }).bindLabel((locCount).toString(), {
+        position: [geo.lat,geo.lon],
         noHide: true,
-        direction: 'auto',
-        offset: [0,0]
+        offset: [-9,-12]
       });
     map.addLayer(marker);
     markers.push(marker);
   });
   
-  $rootScope.$on('map.dropDestMarker', function(ev, geo, viaCount) {
+  $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
 
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
-      }).bindLabel((viaCount+1).toString(), {
+      }).bindLabel((locCount).toString(), {
+        position: [geo.lat,geo.lon],
         noHide: true,
-        direction: 'auto',
-        offset: [0,0]
+        offset: [-9,-12]
       });
     map.addLayer(marker);
     markers.push(marker);
@@ -260,7 +260,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ]);
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
         document.getElementById('startpt').value=[geo.lat, geo.lon];
         return;
@@ -269,8 +269,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        viaCount++;
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], viaCount);
+        locCount++;
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
 
         document.getElementById("endp").innerHTML = "";
@@ -287,7 +287,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ]);
+        locCount++;
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
         document.getElementById('endpt').value=[geo.lat, geo.lon];
 
@@ -297,8 +298,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
-        viaCount++;
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], viaCount);
+        locCount++;
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
 
         document.getElementById("startp").innerHTML = "";
@@ -316,8 +317,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lat : geo.lat,
         lon : geo.lon
       })
-      viaCount++;
-      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], viaCount);
+      locCount++;
+      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
       locations++;
 
       document.getElementById("startp").innerHTML = "";
@@ -331,7 +332,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       return;
     }
 
-    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], viaCount);
     locations++;
 
     valhalla_mode = mode_mapping[mode];
