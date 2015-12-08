@@ -365,7 +365,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         locCount++;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], 0);
         locations++;
-        document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        document.getElementById('endpt').innerHTML ='<div class = "end marker"></div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         return;
       } else {
         Locations.push({
@@ -384,7 +384,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         
         var newli = document.createElement('li');
         newli.setAttribute('id',counterText);
-        newli.innerHTML='<div class = "start marker"></div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        newli.innerHTML='<div class = "start marker">'+ locCount+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         document.getElementById('startPoints').appendChild(newli);
         counterText++;
         return;
