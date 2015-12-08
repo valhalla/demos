@@ -8,7 +8,7 @@ var mode_mapping = {
 
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
-var token = accessToken.prod;
+var envToken = accessToken.prod;
 var locCount = 0;
 
 function selectEnv() {
@@ -22,13 +22,13 @@ function selectEnv() {
 function getEnvToken() {
   switch (envServer) {
   case "localhost":
-    token = accessToken.local;
+    envToken = accessToken.local;
     break;
   case "development":
-    token = accessToken.dev;
+    envToken = accessToken.dev;
     break;
   case "production":
-    token = accessToken.prod;
+    envToken = accessToken.prod;
     break;
   }
 }
@@ -119,6 +119,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
  //Number of locations
   var locations = 0;
   var markers = [];
+  
+  var locateMarkers = [];
+  var remove_markers = function() {
+    for (i = 0; i < markers.length; i++) {
+      map.removeLayer(markers[i]);
+    }
+    markers = [];
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = [];
+  };
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
@@ -253,12 +265,49 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
     
-    var  matrix = L.Matrix.widget(token, mode, matrixtype);
+    var  matrix = L.Matrix.widget(envToken, mode, matrixtype);
     matrix.matrix({
       waypoints : waypoints
     });
   });
-    
+  
+//locate edge snap markers
+  var locateEdgeMarkers = function (locate_result) {
+    // clear it
+    locateMarkers.forEach(function (element, index, array) {
+      map.removeLayer(element);
+    });
+    locateMarkers = []
+
+    //mark from node
+    if(locate_result.node != null) {
+      var marker = L.circle( [locate_result.node.lat,locate_result.node.lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      var popup = L.popup({maxHeight : 200});
+      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
+      marker.bindPopup(popup).openPopup();      
+      locateMarkers.push(marker);
+    }//mark all the results for that spot
+    else if(locate_result.edges != null) {
+      locate_result.edges.forEach(function (element, index, array) {
+        var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+        map.addLayer(marker);
+        var popup = L.popup({maxHeight : 200});
+        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>"); 
+        marker.bindPopup(popup).openPopup(); 
+        locateMarkers.push(marker);
+      });
+    }//no data probably
+    else {
+      var marker = L.circle( [locate_result.input_lat,locate_result.input_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      map.addLayer(marker);
+      var popup = L.popup({maxHeight : 200});
+      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
+      marker.bindPopup(popup).openPopup();      
+      locateMarkers.push(marker);
+    }
+  };
+  
   var counterText = 0;
   
   function chooseLocations(matrixtype) {
@@ -302,12 +351,23 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           return;
         }
 
+<<<<<<< HEAD
         var newli = document.createElement('li');
         newli.setAttribute('id',counterText);
         newli.innerHTML = '<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         document.getElementById('endPoints').appendChild(newli);
 
         
+=======
+        document.getElementById("endp").innerHTML = "";
+        if (counterText==0)
+          document.getElementById('endpt').remove();
+        var newdiv = document.createElement('endpt'+ counterText);
+        newdiv.innerHTML="<input id=endpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+
+        document.getElementById('endform').appendChild(newdiv);
+        counterText++;
+>>>>>>> matrix2
         return;
       }
     } else if (matrixtype == "many_to_one") {
@@ -331,6 +391,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
 
+<<<<<<< HEAD
         //counter text is updated in wierd way, using locCount
         if(locCount == 1) {
           document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
@@ -341,6 +402,15 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         newli.setAttribute('id',counterText);
         newli.innerHTML='<div class = "start marker"></div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         document.getElementById('startPoints').appendChild(newli);
+=======
+        document.getElementById("startp").innerHTML = "";
+        if (counterText==0)
+          document.getElementById('startpt').remove();
+        var newdiv = document.createElement('startpt'+ counterText);
+        newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=startpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+        
+        document.getElementById('startform').appendChild(newdiv);
+>>>>>>> matrix2
         counterText++;
         return;
       }
@@ -354,6 +424,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
       locations++;
 
+<<<<<<< HEAD
       var lat = geo.lat.toString();
       var lon = geo.lon.toString();
       document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
@@ -361,9 +432,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       newli.setAttribute('id',counterText);
       newli.innerHTML='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
       document.getElementById('startPoints').appendChild(newli);
+=======
+      document.getElementById("startp").innerHTML = "";
+      if (counterText==0)
+        document.getElementById('startpt').remove();
+      var newdiv = document.createElement('startpt'+ counterText);
+      newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+>>>>>>> matrix2
       
+      document.getElementById('startform').appendChild(newdiv);
       counterText++;
- 
       return;
     }
 
@@ -381,7 +459,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lon : e.latlng.lng
       };
       getEnvToken();
-      var locate = L.locate(token);
+      var locate = L.locate(envToken);
       locate.locate(ll, locateEdgeMarkers);
     });
 
