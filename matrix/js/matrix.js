@@ -234,7 +234,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting points</b></h4></div>" ));
     $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to your a starting points</i></span>"));
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending point</b></h4></div>" ));
-    $('#endPoints .geocode').replaceWith($("<span class = 'geocode'><i><b>Ctrl + Click</b> on the map to add an ending point</i></span>"));
+    $('#endPoints .geocode').replaceWith($("<span class = 'geocode'><i><b>Shift + Click</b> on the map to add an ending point</i></span>"));
     getEnvToken();
     var mode = setMode();
     matrixtype = "many_to_one";
@@ -356,7 +356,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         return;
       }
     } else if (matrixtype == "many_to_one") {
-      if (eventObj.ctrlKey) {
+      if (eventObj.shiftKey) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
