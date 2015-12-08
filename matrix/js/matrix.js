@@ -99,9 +99,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var getOriginIcon = function() {
     return new L.Icon({ 
       iconUrl : '../matrix/resource/matrix_pin_start.png',
-      iconSize : [ 30, 36 ], // size of the icon
-    //  iconAnchor : [ 15, 20],
-    //  labelAnchor: [5, 5],
+      iconSize : [ 30, 36 ],
       shadowUrl: null
     })
   };
@@ -109,9 +107,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var getDestinationIcon = function() {
     return new L.Icon({ 
       iconUrl : '../matrix/resource/matrix_pin_end.png',
-      iconSize : [ 30, 36 ], // size of the icon
-    //  iconAnchor : [ 15, 20],
-    //  labelAnchor: [5, 5],
+      iconSize : [ 30, 36 ],
       shadowUrl: null
     });
   };
@@ -202,8 +198,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   }  
   
   var reset_form = function() {
-    document.getElementById("startp").innerHTML = "";
-    document.getElementById("endp").innerHTML = "";
+    $('#startPoints .geocode').html("<i>Click on the map to add your starting points </i>");
+    $('#endPoints .geocode').html("<i>Click on the map to add your ending points </i>");
   };
   
   var oneToMany = document.getElementById("one_to_many");
@@ -214,21 +210,19 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var matrixtype = "";
   
   function toggleButtonClass(btn) {
-    if($(oneToMany).hasClass('selected')) $(oneToMany).removeClass('selected');
-    if($(manyToOne).hasClass('selected')) $(manyToOne).removeClass('selected');
-    if($(manyToMany).hasClass('selected')) $(manyToOne).removeClass('selected');
-
-    if(!$(btn).hasClass('selected')) $(btn).addClass('selected');
+    oneToMany.classList.remove('selected');
+    manyToOne.classList.remove('selected');
+    manyToMany.classList.remove('selected');
+    
+    (btn).classList.add('selected');
   }
 
   oneToMany.addEventListener('click', function(e) {
     reset_form();
     toggleButtonClass(this);
-    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting point</b></h4></div>" ));
-    $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add a start point" ) );
-    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending points</b></h4></div>" ));
-    $( 'input#endpt').replaceWith($("<input id=endpt type=text name=endpt  style=color:#A4A4A4/>" ));
-    $( "p#endp" ).prepend( document.createTextNode( "Click on the map to add your ending points" ) );
+    $( '.startheader' ).replaceWith($('<div class="startheader" id="startheader"><h4><b>Starting point</b></h4></div>' ));
+    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to add a starting point</i></span>"));
+    $( '.endheader' ).replaceWith($('<div class="endheader" id="endheader"><h4><b>Ending points</b></h4></div>'));
     getEnvToken();
     var mode = setMode();
     matrixtype = "one_to_many";
@@ -239,10 +233,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     reset_form();
     toggleButtonClass(this);
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting points</b></h4></div>" ));
-    $( "p#startp" ).prepend( document.createTextNode( "Click on the map to add your starting points" ) );
+    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to your a starting points</i></span>"));
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending point</b></h4></div>" ));
-    $( 'input#endpt').replaceWith($("<input id=endpt type=text name=endpt  style=color:#A4A4A4/>" ));
-    $( "p#endp" ).prepend( document.createTextNode( "Ctrl + Click on the map to add an ending point" ) );
+    $('#endPoints .geocode').replaceWith($("<span class = 'geocode'><i><b>Ctrl + Click</b> on the map to add an ending point</i></span>"));
     getEnvToken();
     var mode = setMode();
     matrixtype = "many_to_one";
@@ -253,8 +246,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     reset_form();
     toggleButtonClass(this);
     $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Select points</b></h4></div>" ));
+    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to add your points</i></span>"));
     $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4></h4></div>" ));
-    $( 'input#endpt').replaceWith($("<input id=endpt type=hidden name=endpt />" ));
+    $( '#endPoints').replaceWith($("<input id=endpt type=hidden name=endpt />" ));
     getEnvToken();
     var mode = setMode();
     matrixtype = "many_to_many";
@@ -334,25 +328,32 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         })
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
-        document.getElementById('startpt').value=[geo.lat, geo.lon];
+
+ 
+        $('#startpt .geocode').html(geo.lat + ' , ' + geo.lon);
         return;
       } else {
+
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
+
         locCount++;
+
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
-
-        document.getElementById("endp").innerHTML = "";
-        if (counterText==0)
-          document.getElementById('endpt').remove();
-        var newdiv = document.createElement('endpt'+ counterText);
-        newdiv.innerHTML="<input id=endpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
-
-        document.getElementById('endform').appendChild(newdiv);
         counterText++;
+        if( locCount == 1 ) {
+          document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+          return;
+        }
+
+        var newli = document.createElement('li');
+        newli.setAttribute('id',counterText);
+        newli.innerHTML = '<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        document.getElementById('endPoints').appendChild(newli);
+
         return;
       }
     } else if (matrixtype == "many_to_one") {
@@ -364,8 +365,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         locCount++;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], 0);
         locations++;
-        document.getElementById('endpt').value=[geo.lat, geo.lon];
-
+        document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         return;
       } else {
         Locations.push({
@@ -376,13 +376,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
 
-        document.getElementById("startp").innerHTML = "";
-        if (counterText==0)
-          document.getElementById('startpt').remove();
-        var newdiv = document.createElement('startpt'+ counterText);
-        newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=startpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+        //counter text is updated in wierd way, using locCount
+        if(locCount == 1) {
+          document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+          return;
+        }
         
-        document.getElementById('startform').appendChild(newdiv);
+        var newli = document.createElement('li');
+        newli.setAttribute('id',counterText);
+        newli.innerHTML='<div class = "start marker"></div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        document.getElementById('startPoints').appendChild(newli);
         counterText++;
         return;
       }
@@ -396,11 +399,13 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
       locations++;
 
-      document.getElementById("startp").innerHTML = "";
-      if (counterText==0)
-        document.getElementById('startpt').remove();
-      var newdiv = document.createElement('startpt'+ counterText);
-      newdiv.innerHTML="<input id=startpt"+counterText +" type=text name=endpt"+counterText+ " style=color:#A4A4A4 value="+[geo.lat, geo.lon]+" />";
+      var lat = geo.lat.toString();
+      var lon = geo.lon.toString();
+      document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+      var newli = document.createElement('li');
+      newli.setAttribute('id',counterText);
+      newli.innerHTML='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+      document.getElementById('startPoints').appendChild(newli);
       
       document.getElementById('startform').appendChild(newdiv);
       counterText++;

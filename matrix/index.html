@@ -39,21 +39,25 @@
         <button id="many_to_many" class = "stitched" type="button">Many-to-Many</button>
 
         <h5><i>Options vary for each matrix type</i></h5>
-
+ 
         <div class="start" id="start" name="start">
           <div class="startheader" id="startheader"><h4><b>Starting point</b></h4></div>
-          <form id="startform" name="startform">
-            <input id="startpt" type="text" name="startpt" style="color:#A4A4A4"/>
-          </form>
-          <p id="startp" style="font-size:18px; font-style:italic; color:black; margin-bottom:10px;"></p>
+          <ol id="startPoints">
+            <li id="startpt">
+              <div class = "start marker"></div>
+              <span class = "geocode"> <i>Click on the map to add a starting point </i></span>
+            </li> 
+          </ol>
         </div>
 
         <div class="end" id="end" name="end">
-        <div class="endheader" id="endheader"><h4> Ending points </h4></div>
-          <form id="endform" name="endform"><span style="color:black">
-            <input id="endpt" type="text" name="endpt" style="color:#A4A4A4"/>
-          </form>
-          <p id="endp" style="font-size:18px; font-style:italic; color:black; margin-bottom:10px;"></p>
+        <div class="endheader" id="endheader"><h4><b>Ending points</b></h4></div>
+          <ol id="endPoints">
+            <li id="endpt">
+              <div class = "end marker"></div>
+              <span class = "geocode"> <i>Click on the map to add your ending points </i></span>
+            </li>
+          </ol>
         </div>
 
         <button id="clear_btn" class ="btn-matrix" type="button">Reset All</button>
