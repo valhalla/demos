@@ -187,14 +187,13 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
   
   function setMode() {
-    var modeBtn = document.getElementsByName("mode");
-    var transitmode = "auto";
+    var modeBtn = document.getElementsByName("modebtn");
     for (var i = 0; i < modeBtn.length; i++) {
       if (modeBtn[i].checked) {
-        transitmode = modeBtn[i].value;
+        mode = modeBtn[i].value;
       }
     } 
-    return transitmode;
+    return mode;
   }  
   
   var reset_form = function() {
