@@ -258,9 +258,9 @@
                var time = response.one_to_many[0][i].time;
                var distance = response.one_to_many[0][i].distance;
                var row = {"from":from_index, "to":to_index, "time":time, "distance":distance };
-               array.push(row);
+               if(from_index != to_index) array.push(row);
              })
-               $('#columns').columns({                 
+               $('#columns').columns({
                  data: array,
                  schema:[
                    { "header":"From","key":"from"},
@@ -280,9 +280,9 @@
                var time = response.many_to_one[i][0].time;
                var distance = response.many_to_one[i][0].distance;
                var row = {"from":from_index, "to":to_index, "time":time, "distance":distance };
-               array.push(row);
+               if(from_index != to_index) array.push(row);
              })
-               $('#columns').columns({                 
+               $('#columns').columns({
                  data: array,
                  schema:[
                    { "header":"From","key":"from"},
@@ -304,11 +304,11 @@
                  var time = response.many_to_many[counter][i].time;
                  var distance = response.many_to_many[counter][i].distance;
                  var row = {"from":from_index, "to":to_index, "time":time, "distance":distance };
-                 array.push(row);
+                 if(from_index != to_index) array.push(row);
                })
                counter++;
              })
-               $('#columns').columns({                 
+               $('#columns').columns({
                  data: array,
                  schema:[
                    { "header":"From","key":"from"},
