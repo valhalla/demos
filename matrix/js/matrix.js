@@ -134,38 +134,26 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
-    if (locCount == 0 ){
-      var marker = new L.marker(geo, {
-        icon : getOriginIcon()
-      });
-    } else {
       var marker = new L.marker(geo, {
         icon : getOriginIcon()
       }).bindLabel((locCount).toString(), {
         position: [geo.lat,geo.lon],
         noHide: true,
-        offset: [-9,-12]
+        offset: [-10,-11]
       });
-    }
     map.addLayer(marker);
     markers.push(marker);
   });
   
   $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
 
-    if (locCount == 0 ){
-      var marker = new L.marker(geo, {
-        icon : getDestinationIcon()
-      });
-    } else {
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
       }).bindLabel((locCount).toString(), {
         position: [geo.lat,geo.lon],
         noHide: true,
-        offset: [-9,-12]
+        offset: [-10,-11]
       });
-    }
     map.addLayer(marker);
     markers.push(marker);
   });
@@ -328,8 +316,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
 
- 
-        $('#startpt .geocode').html(geo.lat + ' , ' + geo.lon);
+        document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         return;
       } else {
 
@@ -362,9 +349,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lon : geo.lon
         })
         locCount++;
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], 0);
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount-1);
         locations++;
-        document.getElementById('endpt').innerHTML ='<div class = "end marker"></div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ (locCount-1)+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         return;
       } else {
         Locations.push({
@@ -372,18 +359,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lon : geo.lon
         })
         locCount++;
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount-1);
         locations++;
 
         //counter text is updated in wierd way, using locCount
         if(locCount == 1) {
-          document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+          document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
           return;
         }
         
         var newli = document.createElement('li');
         newli.setAttribute('id',counterText);
-        newli.innerHTML='<div class = "start marker">'+ locCount+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
+        newli.innerHTML='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         document.getElementById('startPoints').appendChild(newli);
         counterText++;
         return;
@@ -395,20 +382,20 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lon : geo.lon
       })
       locCount++;
-      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount);
+      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount-1);
       locations++;
 
       var lat = geo.lat.toString();
       var lon = geo.lon.toString();
       
       if( locCount == 1 ) {
-        document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+        document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
         return;
       }
       
       var newli = document.createElement('li');
       newli.setAttribute('id',counterText);
-      newli.innerHTML='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+      newli.innerHTML='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
       document.getElementById('startPoints').appendChild(newli);
       document.getElementById('startform').appendChild(newdiv);
       counterText++;
