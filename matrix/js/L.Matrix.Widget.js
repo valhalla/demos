@@ -267,7 +267,8 @@
                    { "header":"To","key":"to"},
                    { "header":"Time (secs)","key":"time"},
                    { "header":"Distance (mi)","key":"distance"}
-                 ]
+                 ],
+                 search: false
                });
            },
            
@@ -288,7 +289,8 @@
                    { "header":"To","key":"to"},
                    { "header":"Time (secs)","key":"time"},
                    { "header":"Distance (mi)","key":"distance"}
-                 ]
+                 ],
+                 search: false
                });
            },
                       
@@ -313,7 +315,8 @@
                    { "header":"To","key":"to"},
                    { "header":"Time (secs)","key":"time"},
                    { "header":"Distance (mi)","key":"distance"}
-                 ]
+                 ],
+                 search: false
                });
            },
 
