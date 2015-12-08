@@ -401,12 +401,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
       var lat = geo.lat.toString();
       var lon = geo.lon.toString();
-      document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+      
+      if( locCount == 1 ) {
+        document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+        return;
+      }
+      
       var newli = document.createElement('li');
       newli.setAttribute('id',counterText);
       newli.innerHTML='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
       document.getElementById('startPoints').appendChild(newli);
-      
       document.getElementById('startform').appendChild(newdiv);
       counterText++;
       return;
