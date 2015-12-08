@@ -11,10 +11,6 @@ body {
   min-height: 600px;
 }
 
-.ui-columns-search .ui-table-search{
-  display: none;
-}
-
 .container-fluid {
   height: 100%;
   margin: 0;
@@ -33,21 +29,6 @@ body {
   width: calc( 100% - 500px);
   height: 100%;
   float: left;
-}
-
-input[type=text] {
-  height: 45px;
-  margin-top: 20px;
-  width: 100%;
-  box-shadow: none;
-  border-radius: 0;
-
-  background-repeat: no-repeat;
-  background-position:6px;
-  border:1px solid #DADADA;
-  margin-top: 10px;
-  padding-left: 40px;
-  font-size: 14px;
 }
 
 .stitched {
@@ -133,6 +114,10 @@ li .geocode {
 
 .btn-matrix:hover, .btn-matrix:focus {
   background-color: #ccc;
+}
+
+.ui-table {
+  margin-top: 20px;
 }
 
 .axisLabel {
