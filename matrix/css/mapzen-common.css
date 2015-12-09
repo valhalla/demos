@@ -1,9 +1,5 @@
 /* button styles */
 
-button:focus {
-  outline: 0;
-}
-
 .btn {
   border-radius: 0;
   border-width: 1px;

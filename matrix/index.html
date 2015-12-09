@@ -1,3 +1,5 @@
+
+
 <html class="matrix-widget" data-ng-app="matrix">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -11,43 +13,68 @@
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script src="js/jquery.columns.min.js"></script>
-    
+
 </head>
 <body>
-  <div class="container-fluid" data-ng-controller="MatrixController">
-  <div id="map"></div>
-  <div class = "row not-map-part">
-    <h5><b>How To Use?</b><h5><span style="color:blue">
-          <h6>Point & click on map to place the origin.  Press & hold the
-          ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
-          key + click on your destination.  Now select an environment & click on a matrix type. Clear your POIs by clicking the red 'Clear Routes' button.</h6>
-    </span>
-    <span style="color:black" class="descriptions">Select an environment:</span><br>
-    <select id = "env_dropdown" onchange="selectEnv()">
-    <option id=localhost value="http://localhost:8002/">localhost</option>
-    <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
-    <option id=production value="http://matrix.mapzen.com/">production</option>
-  </select>
-    <div id="graph_controls" class = "clear">
-      <div id="controls" class = "col-sm-4 col-md-4">
-        <br>
-        <div id="options" name="options">
-          drive: <input style="color:black" type="radio" name="mode" value="auto"  checked />
-          bike: <input style="color:black" type="radio" name="mode" value="bicycle" />
-          walk: <input style="color:black" type="radio" name="mode" value="pedestrian" />
-        </div>
-        <br>
-        <button id="one_to_many" class = "transparent_btn" type="button">One-to-Many</button>
-        <button id="many_to_one" class = "transparent_btn" type="button">Many-to-One</button>
-        <button id="many_to_many" class = "transparent_btn" type="button">Many-to-Many</button>
-        <br><br>
-        <button id="clear_btn" class ="btn btn-mapzen" type="button" style='margin-right: 1em;'>clear</button>
-        <div id='permalink' style='display:inline-block;'></div>
+  <div class="container-fluid row" ng-controller="MatrixController">
+      <div id="controls" class = "control-container">
+        <img src="resource/turnbyturnlogo.png" alt="logo">
+        <h4><span class="descriptions"> Select an environment</span></h4>
+        <select id = "env_dropdown" onchange="selectEnv()">
+          <option id=localhost value="http://localhost:8002/">localhost</option>
+          <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
+          <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
+        </select>
+
+      <div class = "matrixWrapper">
+        <h4 class="instruction"> 1. Select a matrix type </h4>
+        <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'oneToMany' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
+        <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'manyToOne' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
+        <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'manyToMany' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
+        <div class = "matrixBlocker"></div>
       </div>
-      <div id="columns"></div>
+
+
+    <div class = "pointsWrapper">
+      <h4 class="instruction"> 2. Select start points </h4>
+        <div class="start" id="start" name="start">
+          <div class="startheader" id="startheader">Starting point</div>
+          <ol>
+            <li id="startpt" ng-repeat="point in startPoints">
+              <div class = "start marker">{{point.index}}</div>
+              <span class = "geocode"> {{point.lat}}   ,  {{point.lon}}  </span>
+            </li>
+            <li ng-hide="startPoints.length != 0">
+              <div class = "start marker"></div>
+              <span class = "geocode"> <i>{{geocode}}</i></span>
+            </li>
+          </ol>
+        </div>
+
+        <div ng-hide="matrixType == 'manyToMany'" class="end" id="end" name="end">
+          <h4 class="instruction"> 3. Select end points </h4>
+          <div class="endheader" id="endheader"><h4><b>{{endheader}}</b></h4></div>
+          <ol id="endPoints">
+            <li id="endpt">
+              <div class = "end marker"></div>
+              <span class = "geocode"> <i>{{geocode}}</i></span>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class = "btnWrapper">
+        <button class="btnClear" id="clear_btn" type="button">Clear All</button>
+        <div class="vehicleBox" id="vehicleoptions">
+          <div class = "vehicle auto"> drive </div>
+        </div>
+
+        <button id="matrix_btn" class ="btnMatrix" type="button" autofocus>Get Matrix</button>
+        <div id="columns"></div>
+      </div>
     </div>
-  </div>
-  </div>
+
+    <div id="map"></div>
   </div>
 </div>
 
@@ -69,3 +96,4 @@
   </script>
 </body>
 </html>
+

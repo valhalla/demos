@@ -64,13 +64,13 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   });
-  
+
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap
   };
-  
+
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
@@ -86,11 +86,18 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   if (window.self !== window.top) {
     map.scrollWheelZoom.disable();
   }
-  
+
   var Locations = [];
   var mode = 'auto';
 
+  var mode_icons = {
+    'car' : 'js/images/drive.png',
+    'foot' : 'js/images/walk.png',
+    'bicycle' : 'js/images/bike.png'
+  };
+
   var getOriginIcon = function() {
+
     return new L.Icon({ 
       iconUrl : '../routing/resource/startmarker@2x.png',
       iconSize : [ 26, 32 ], // size of the icon
@@ -254,7 +261,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
   });
-  
+
   $rootScope.$on('map.dropMarker', function(ev, geo, viaCount) {
 
     if (locations == 0) {
@@ -304,6 +311,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
 
   // locate edge snap markers
+
   var locateEdgeMarkers = function (locate_result) {
     // clear it
     locateMarkers.forEach(function (element, index, array) {
@@ -317,7 +325,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       map.addLayer(marker);
       var popup = L.popup({maxHeight : 200});
       popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();      
+      marker.bindPopup(popup).openPopup();
       locateMarkers.push(marker);
     }//mark all the results for that spot
     else if(locate_result.edges != null) {
@@ -325,8 +333,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
         map.addLayer(marker);
         var popup = L.popup({maxHeight : 200});
-        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>"); 
-        marker.bindPopup(popup).openPopup(); 
+        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>");
+        marker.bindPopup(popup).openPopup();
         locateMarkers.push(marker);
       });
     }//no data probably
@@ -335,7 +343,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       map.addLayer(marker);
       var popup = L.popup({maxHeight : 200});
       popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();      
+      marker.bindPopup(popup).openPopup();
       locateMarkers.push(marker);
     }
   };
@@ -367,6 +375,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
   
   map.on('click', function(e) {
+
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
@@ -380,8 +389,10 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         })
+
         $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ]);
         locations++;
+
         return;
       //vias 
       } else {
@@ -413,6 +424,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         })
         $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
         locations++;
+
         return;
       }
     }
@@ -443,6 +455,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     var manyToOne = document.getElementById("many_to_one");
     var manyToMany = document.getElementById("many_to_many");
     var clearBtn = document.getElementById("clear_btn");
+
     var matrixResponse;
 
     oneToMany.addEventListener('click', function(e) {
