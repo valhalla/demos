@@ -6,12 +6,10 @@ var mode_mapping = {
   'bicycle' : 'bicycle'
 };
 
-var serviceUrl = "https://matrix.mapzen.com/";
-var envServer = "production";
-var envToken = accessToken.prod;
-var locCount = 0;
-
-var uiFlow = ['travel_mode','matrix','point'];
+var serviceUrl = "http://valhalla.dev.mapzen.com/";
+var envServer = "development";
+var token = accessToken.dev;
+var viaCount = 0;
 
 function selectEnv() {
   $("option:selected").each(function() {
@@ -24,13 +22,13 @@ function selectEnv() {
 function getEnvToken() {
   switch (envServer) {
   case "localhost":
-    envToken = accessToken.local;
+    token = accessToken.local;
     break;
   case "development":
-    envToken = accessToken.dev;
+    token = accessToken.dev;
     break;
   case "production":
-    envToken = accessToken.prod;
+    token = accessToken.prod;
     break;
   }
 }
@@ -38,8 +36,8 @@ function getEnvToken() {
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
-      'lat' : 40.7486,
-      'lng' : -73.9690
+      'lat' : 37.745353,
+      'lng' : -122.429176
     },
     'zoom' : 13
   };
@@ -70,7 +68,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
-    "ationMap" : elevationmap
+    "ElevationMap" : elevationmap
   };
   
   //leaflet slippy map
@@ -80,7 +78,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     layers : [ roadmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
-  
+
   L.control.layers(baseMaps, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
@@ -94,24 +92,38 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   var getOriginIcon = function() {
     return new L.Icon({ 
-      iconUrl : '../matrix/resource/matrix_pin_start.png',
-      iconSize : [ 30, 36 ],
+      iconUrl : '../routing/resource/startmarker@2x.png',
+      iconSize : [ 26, 32 ], // size of the icon
+      iconAnchor : [ 15, 20],
+      labelAnchor: [5, 5],
       shadowUrl: null
     })
   };
-
-  var getDestinationIcon = function() {
+  
+  var getViaIcon = function() {
     return new L.Icon({ 
-      iconUrl : '../matrix/resource/matrix_pin_end.png',
-      iconSize : [ 30, 36 ],
+      iconUrl : '../routing/resource/via_dot.png',
+      iconSize : [ 22, 24 ],
+      iconAnchor : [ 15, 20],
+      labelAnchor: [1, 1],
       shadowUrl: null
     });
   };
 
- //Number of locations
-  var locations = 0;
+  var getDestinationIcon = function() {
+    return new L.Icon({ 
+      iconUrl : '../routing/resource/destmarker@2x.png',
+      iconSize : [ 26, 32 ], // size of the icon
+      iconAnchor : [ 15, 20],
+      labelAnchor: [5, 5],
+      shadowUrl: null
+    });
+  };
+
+  // allow hash links
+  var hash = new L.Hash(map);
   var markers = [];
-  
+
   var locateMarkers = [];
   var remove_markers = function() {
     for (i = 0; i < markers.length; i++) {
@@ -124,137 +136,174 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     locateMarkers = [];
   };
 
+  var parseHash = function() {
+    var hash = window.location.hash;
+    if (hash.indexOf('#') === 0)
+      hash = hash.substr(1);
+    return hash.split('&');
+  };
+
+  var parseParams = function(pieces) {
+    var parameters = {};
+    pieces.forEach(function(e, i, a) {
+      var parts = e.split('=');
+      if (parts.length < 2)
+        parts.push('');
+      parameters[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+    });
+    return parameters;
+  };
+
+  var force = false;
+  var update = function(show, locs, costing) {
+    // update the permalink hash
+    var pieces = parseHash();
+    var extra = '';
+    pieces.forEach(function(e, i, a) {
+      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
+        extra = extra + (extra.length ? '&' : '') + e;
+    });
+    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(locs) + '&costing=' + JSON.stringify(costing);
+    force = show;
+    window.location.hash = '#' + extra + parameter;
+
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
+  };
+
+  var hashRoute = function() {
+  // something has to have changed for us to request again
+  var parameters = parseParams(parseHash());
+  if (!force && parameters.locations == JSON.stringify(locations))
+    return;
+  force = false;
+
+  // shape
+  var waypoints = [];
+  if (parameters.locations !== undefined)
+    waypoints = JSON.parse(parameters.locations);
+
+  var locs = [];
+  waypoints.forEach(function(waypoints) {
+    locs.push(L.latLng(waypoints.lat, waypoints.lon));
+  });
+
+  var marker = new L.marker(waypoints[0], {
+    icon : getOriginIcon()
+  }).bindLabel("0", {
+    noHide: true,
+    direction: 'auto'
+  });
+  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+      + "&layers=Q target=_blank>Edit POI here<a/>");
+  map.addLayer(marker);
+  markers.push(marker);
+
+
+  var marker = new L.marker(waypoints[waypoints.length-1], {
+    icon : getDestinationIcon()
+  }).bindLabel((waypoints.length-1).toString(), {
+    noHide: true,
+    direction: 'auto'
+  });
+  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+      + "&layers=Q target=_blank>Edit POI here<a/>");
+  map.addLayer(marker);
+  markers.push(marker);
+
+  for (var i = 1; i < waypoints.length-1; i++) {
+    viaCount++;
+    var marker = new L.marker(waypoints[i], {
+      icon : getViaIcon()
+    }).bindLabel((viaCount).toString(), {
+      noHide: true,
+      direction: 'auto'
+    });
+    marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+        + "&layers=Q target=_blank>Edit POI here<a/>");
+    map.addLayer(marker);
+    markers.push(marker);
+  }
+  
+  if (parameters.costing !== undefined)
+  var costing = JSON.parse(parameters.costing);
+
+  var mode = costing || "auto";
+  var matrixtype = JSON.parse(parameters.matrixtype);
+  var  matrix = L.Matrix.widget(selectEnv(), mode, matrixtype);
+    matrix.matrix({
+      waypoints : locs
+    });
+
+  document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
+}
+  
+//Number of locations
+  var locations = 0;
+
+  var reset = function() {
+    Locations = [];
+    $('svg').html('');
+    $('.leaflet-routing-container').remove();
+    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
+    $scope.$emit('resetRouteInstruction');
+    remove_markers();
+    locations = 0;
+    viaCount = 0;
+  };
+
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
   });
   
-  $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
+  $rootScope.$on('map.dropMarker', function(ev, geo, viaCount) {
 
+    if (locations == 0) {
       var marker = new L.marker(geo, {
         icon : getOriginIcon()
-      }).bindLabel((locCount).toString(), {
-        position: [geo.lat,geo.lon],
+      }).bindLabel("0", {
         noHide: true,
-        offset: [-10,-11]
+        direction: 'auto'
       });
-    map.addLayer(marker);
-    markers.push(marker);
-  });
-  
-  $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
-
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    } else {
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
-      }).bindLabel((locCount).toString(), {
-        position: [geo.lat,geo.lon],
+      }).bindLabel((viaCount+1).toString(), {
         noHide: true,
-        offset: [-10,-11]
+        direction: 'auto'
       });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    }
     map.addLayer(marker);
     markers.push(marker);
   });
-    
-  $scope.renderHtml = function(html_code) {
-    return $sce.trustAsHtml(html_code);
-  };
-  
-  $scope.$on('setRouteInstruction', function(ev, instructions) {
-    $scope.$apply(function() {
-      $scope.route_instructions = instructions;
-    });
+  $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, viaCount) {
+    if (locations == 0) {
+      var marker = new L.marker(geo, {
+        icon : getOriginIcon()
+      }).bindLabel("0", {
+        noHide: true,
+        direction: 'auto'
+      });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    } else {
+      var marker = new L.marker(geo, {
+        icon : getViaIcon()
+      }).bindLabel(viaCount.toString(), {
+        noHide: true,
+        direction: 'auto'
+      });
+      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
+          + "&layers=Q target=_blank>Edit POI here<a/>");
+    }
+    map.addLayer(marker);
+    markers.push(marker);
   });
 
-  $scope.$on('resetRouteInstruction', function(ev) {
-    $scope.$apply(function() {
-      $scope.route_instructions = '';
-    });
-  });
-  
-  function setMode() {
-    var modeBtn = document.getElementsByName("modebtn");
-    for (var i = 0; i < modeBtn.length; i++) {
-      if (modeBtn[i].checked) {
-        mode = modeBtn[i].value;
-      }
-    } 
-    return mode;
-  }  
-  
-  var reset_form = function() {
-    $('#startPoints .geocode').html("<i>Click on the map to add your starting points </i>");
-    $('#endPoints .geocode').html("<i>Click on the map to add your ending points </i>");
-  };
-  
-  var oneToMany = document.getElementById("one_to_many");
-  var manyToOne = document.getElementById("many_to_one");
-  var manyToMany = document.getElementById("many_to_many");
-  var clearBtn = document.getElementById("clear_btn");
-  var matrixBtn = document.getElementById("matrix_btn");
-  var matrixtype = "";
-  
-  function toggleButtonClass(btn) {
-    oneToMany.classList.remove('selected');
-    manyToOne.classList.remove('selected');
-    manyToMany.classList.remove('selected');
-    
-    (btn).classList.add('selected');
-  }
-
-  oneToMany.addEventListener('click', function(e) {
-    reset_form();
-    toggleButtonClass(this);
-    $( '.startheader' ).replaceWith($('<div class="startheader" id="startheader"><h4><b>Starting point</b></h4></div>' ));
-    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to add a starting point</i></span>"));
-    $( '.endheader' ).replaceWith($('<div class="endheader" id="endheader"><h4><b>Ending points</b></h4></div>'));
-    getEnvToken();
-    var mode = setMode();
-    matrixtype = "one_to_many";
-    chooseLocations(matrixtype);
-  });
-  
-  manyToOne.addEventListener('click', function(e) {
-    reset_form();
-    toggleButtonClass(this);
-    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Starting points</b></h4></div>" ));
-    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to your a starting points</i></span>"));
-    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4><b>Ending point</b></h4></div>" ));
-    $('#endPoints .geocode').replaceWith($("<span class = 'geocode'><i><b>Shift + Click</b> on the map to add an ending point</i></span>"));
-    getEnvToken();
-    var mode = setMode();
-    matrixtype = "many_to_one";
-    chooseLocations(matrixtype);
-  });
-
-  manyToMany.addEventListener('click', function(e) {
-    reset_form();
-    toggleButtonClass(this);
-    $( '.startheader' ).replaceWith($("<div class=startheader id=startheader><h4><b>Select points</b></h4></div>" ));
-    $('#startPoints .geocode').replaceWith($(" <span class = 'geocode'><i>Click on the map to add your points</i></span>"));
-    $( '.endheader' ).replaceWith($("<div class=endheader id=endheader><h4></h4></div>" ));
-    $( '#endPoints').replaceWith($("<input id=endpt type=hidden name=endpt />" ));
-    getEnvToken();
-    var mode = setMode();
-    matrixtype = "many_to_many";
-    chooseLocations(matrixtype);
-  });
-  
-  clearBtn.addEventListener('click', function(e) {
-    javascript:location.reload(true)
-  });
-  
-  matrixBtn.addEventListener('click', function(e) {
-    var waypoints = [];
-    Locations.forEach(function(gLoc) {
-      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
-    });
-    
-    var  matrix = L.Matrix.widget(envToken, mode, matrixtype);
-    matrix.matrix({
-      waypoints : waypoints
-    });
-  });
-  
-//locate edge snap markers
+  // locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
     // clear it
     locateMarkers.forEach(function (element, index, array) {
@@ -290,120 +339,154 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       locateMarkers.push(marker);
     }
   };
+
+  $scope.renderHtml = function(html_code) {
+    return $sce.trustAsHtml(html_code);
+  };
+
+  $scope.$on('setRouteInstruction', function(ev, instructions) {
+    $scope.$apply(function() {
+      $scope.route_instructions = instructions;
+    });
+  });
+
+  $scope.$on('resetRouteInstruction', function(ev) {
+    $scope.$apply(function() {
+      $scope.route_instructions = '';
+    });
+  });
+
+  // if the hash changes
+  // L.DomEvent.addListener(window, "hashchange", hashRoute);
+
+  // show something to start with but only if it was requested
+  $(window).load(function(e) {
+    // rr = L.Routing.valhalla(accessToken);
+    force = true;
+    hashRoute();
+  });
   
-  var counterText = 0;
-  
-  function chooseLocations(matrixtype) {
-    map.on('click', function(e) {
+  map.on('click', function(e) {
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
     };
 
     var eventObj = window.event ? event : e.originalEvent;
-
-    if (matrixtype == "one_to_many") {
+    //way to test multi-locations
+    if(eventObj.ctrlKey) {
       if (locations == 0) {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ]);
         locations++;
-
-        document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ locCount + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
         return;
-      } else {
-
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-
-        locCount++;
-
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
-        locations++;
-        counterText++;8
-        if( locCount == 1 ) {
-          document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
-          return;
-        }
-
-        var newli = document.createElement('li');
-        newli.setAttribute('id',counterText);
-        newli.innerHTML = '<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
-        document.getElementById('endPoints').appendChild(newli);
-
-        return;
-      }
-    } else if (matrixtype == "many_to_one") {
-      if (eventObj.shiftKey) {
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-        locCount++;
-        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount-1);
-        locations++;
-        document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ (locCount-1)+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
-        return;
+      //vias 
       } else {
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
         })
-        locCount++;
-        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount-1);
+        viaCount++;
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], viaCount);
         locations++;
-
-        //counter text is updated in wierd way, using locCount
-        if(locCount == 1) {
-          document.getElementById('startpt').innerHTML ='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
-          return;
-        }
-        
-        var newli = document.createElement('li');
-        newli.setAttribute('id',counterText);
-        newli.innerHTML='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
-        document.getElementById('startPoints').appendChild(newli);
-        counterText++;
         return;
       }
-      //many_to_many
-    } else {
-      Locations.push({
-        lat : geo.lat,
-        lon : geo.lon
-      })
-      locCount++;
-      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], locCount-1);
-      locations++;
-
-      var lat = geo.lat.toString();
-      var lon = geo.lon.toString();
-      
-      if( locCount == 1 ) {
-        document.getElementById('startpt').innerHTML= '<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
+    } else if (!eventObj.shiftKey){
+      if (locations == 0) {
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+        locations++;
+        return;
+      } else if (locations > 1) {
+        Locations = [];
+        reset();
+  
+        Locations.push({
+          lat : geo.lat,
+          lon : geo.lon
+        })
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+        locations++;
         return;
       }
-      
-      var newli = document.createElement('li');
-      newli.setAttribute('id',counterText);
-      newli.innerHTML='<div class = "start marker">'+ (locCount-1) + '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';lat + ' , ' + lon;
-      document.getElementById('startPoints').appendChild(newli);
-      document.getElementById('startform').appendChild(newdiv);
-      counterText++;
-      return;
     }
+    var waypoints = [];
+    Locations.forEach(function(gLoc) {
+      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+    });
+    
+    waypoints.push(L.latLng(geo.lat, geo.lon));
 
+    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], viaCount);
     locations++;
 
     valhalla_mode = mode_mapping[mode];
+    
+   function setMode() {
+     var modeBtn = document.getElementsByName("mode");
+     var transitmode = "auto";
+     for (var i = 0; i < modeBtn.length; i++) {
+       if (modeBtn[i].checked) {
+         transitmode = modeBtn[i].value;
+       }
+     } 
+     return transitmode;
+   }  
      
+    var oneToMany = document.getElementById("one_to_many");
+    var manyToOne = document.getElementById("many_to_one");
+    var manyToMany = document.getElementById("many_to_many");
+    var clearBtn = document.getElementById("clear_btn");
     var matrixResponse;
+
+    oneToMany.addEventListener('click', function(e) {
+      getEnvToken();
+      var mode = setMode();
+      var matrixtype = 'one_to_many';
+      var matrix = L.Matrix.widget(token, mode, matrixtype);
+      matrix.matrix({
+        waypoints : waypoints
+      });
     });
-  };
+
+    manyToOne.addEventListener('click', function(e) {
+      getEnvToken();
+      var mode = setMode();
+      var matrixtype = 'many_to_one';
+      var matrix = L.Matrix.widget(token, mode, matrixtype);
+      matrix.matrix({
+        waypoints : waypoints
+      });
+    });
+
+    manyToMany.addEventListener('click', function(e) {
+      getEnvToken();
+      var mode = setMode();
+      var matrixtype = 'many_to_many';
+      var  matrix = L.Matrix.widget(token, mode, matrixtype);
+      matrix.matrix({
+        waypoints : waypoints
+      });
+    });
+    
+    clearBtn.addEventListener('click', function(e) {
+      reset();
+      $('#columns').columns('destroy');
+      var json = [{"From":"", "To":"", "Time (secs)":"","Distance (mi)":""}]; 
+      $('#columns').columns({
+        data:json
+      });
+      document.getElementById('permalink').innerHTML = "";
+      window.location.hash = "";
+    });
+
+  });
     // ask the service for information about this location
     map.on("contextmenu", function(e) {
       var ll = {
@@ -411,9 +494,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lon : e.latlng.lng
       };
       getEnvToken();
-      var locate = L.locate(envToken);
+      var locate = L.locate(token);
       locate.locate(ll, locateEdgeMarkers);
     });
 
 })
-

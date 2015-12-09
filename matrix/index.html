@@ -1,92 +1,65 @@
 <html class="matrix-widget" data-ng-app="matrix">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
   <link rel="stylesheet" href="css/matrix.css" />
   <link rel="stylesheet" href="css/mapzen-common.css" />
   <link rel="stylesheet" href="css/classic.css" />
   <link rel="stylesheet" href="css/leaflet.label.css" />
-  
   <script src="conf/env.conf"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script src="js/jquery.columns.min.js"></script>
     
 </head>
 <body>
-  <div class="container-fluid row" data-ng-controller="MatrixController">
-    <div id="controls" class = "control-container">
-      <img src="resource/turnbyturnlogo.png" alt="logo">
-      <h4><span class="descriptions"> Select an environment </span></h4>
-      <select id = "env_dropdown" onchange="selectEnv()">
-        <option id=localhost value="http://localhost:8002/">localhost</option>
-        <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
-        <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
-      </select>
-      <div class="vehicleWrapper">
-        <h4 class="instruction"> 1. Select a travel mode </h4>
-        <div id="options" name="options" label="vehicleOption">
-          <div class = "vehicle auto"> <input type="radio" name="mode" value="auto"  checked /> drive </div>
-          <div class = "vehicle bike"> <input type="radio" name="mode" value="bicycle" /> bike </div>
-          <div class = "vehicle walk"> <input type="radio" name="mode" value="pedestrian" /> walk</div>
+  <div class="container-fluid" data-ng-controller="MatrixController">
+  <div id="map"></div>
+  <div class = "row not-map-part">
+    <h5><b>How To Use?</b><h5><span style="color:blue">
+          <h6>Point & click on map to place the origin.  Press & hold the
+          ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
+          key + click on your destination.  Now select an environment & click on a matrix type. Clear your POIs by clicking the red 'Clear Routes' button.</h6>
+    </span>
+    <span style="color:black" class="descriptions">Select an environment:</span><br>
+    <select id = "env_dropdown" onchange="selectEnv()">
+    <option id=localhost value="http://localhost:8002/">localhost</option>
+    <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
+    <option id=production value="http://matrix.mapzen.com/">production</option>
+  </select>
+    <div id="graph_controls" class = "clear">
+      <div id="controls" class = "col-sm-4 col-md-4">
+        <br>
+        <div id="options" name="options">
+          drive: <input style="color:black" type="radio" name="mode" value="auto"  checked />
+          bike: <input style="color:black" type="radio" name="mode" value="bicycle" />
+          walk: <input style="color:black" type="radio" name="mode" value="pedestrian" />
         </div>
-        <div class = "vehicleBlocker"></div>
+        <br>
+        <button id="one_to_many" class = "transparent_btn" type="button">One-to-Many</button>
+        <button id="many_to_one" class = "transparent_btn" type="button">Many-to-One</button>
+        <button id="many_to_many" class = "transparent_btn" type="button">Many-to-Many</button>
+        <br><br>
+        <button id="clear_btn" class ="btn btn-mapzen" type="button" style='margin-right: 1em;'>clear</button>
+        <div id='permalink' style='display:inline-block;'></div>
       </div>
-
-      <div class = "matrixWrapper">
-        <h4 class="instruction"> 2. Select a matrix type </h4>
-        <button id="one_to_many" class = "stitched" type="button">One-to-Many</button>
-        <button id="many_to_one" class = "stitched" type="button">Many-to-One</button>
-        <button id="many_to_many" class = "stitched" type="button">Many-to-Many</button>
-        <h5><i>Options vary for each matrix type</i></h5>
-        <div class = "matrixBlocker"></div>
-      </div>
-
-      <div class = "pointsWrapper">
-      <h4 class="instruction"> 3. Select start/end points </h4>
-        <div class="start" id="start" name="start">
-          <div class="startheader" id="startheader">Starting point</div>
-          <ol id="startPoints">
-            <li id="startpt">
-              <div class = "start marker"></div>
-              <span class = "geocode"> <i>Click on the map to add a starting point </i></span>
-            </li> 
-          </ol>
-        </div>
-
-        <div class="end" id="end" name="end">
-        <div class="endheader" id="endheader">Ending points</div>
-          <ol id="endPoints">
-            <li id="endpt">
-              <div class = "end marker"></div>
-              <span class = "geocode"> <i>Click on the map to add your ending points </i></span>
-            </li>
-          </ol>
-        </div>
-        <div class="pointsBlocker"></div>
-      </div>
-
-      <button id="clear_btn" class ="btn-matrix" type="button">Reset All</button>
-      <button id="matrix_btn" class ="btn-matrix" type="button" autofocus>Get Matrix</button>
       <div id="columns"></div>
     </div>
-    <div>
-      <div id="graph"></div>
-      <div id="map"></div>
-    </div>
+  </div>
+  </div>
   </div>
 </div>
 
-  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-  <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
   <script src="js/leaflet.label.js"></script>
+  <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
   <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
+  
   <script type="text/javascript" src="js/matrix.js"></script>
   <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
   <script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
-
   <script type="text/javascript">
     // Apply special root-element class for iframed demo situations
     if (window.self !== window.top) {
