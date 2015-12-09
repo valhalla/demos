@@ -7,19 +7,19 @@
   <link rel="stylesheet" href="css/mapzen-common.css" />
   <link rel="stylesheet" href="css/classic.css" />
   <link rel="stylesheet" href="css/leaflet.label.css" />
-  
+
   <script src="conf/env.conf"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script src="js/jquery.columns.min.js"></script>
-    
+
 </head>
 <body>
-  <div class="container-fluid row" data-ng-controller="MatrixController">
+  <div class="container-fluid row" ng-controller="MatrixController">
       <div id="controls" class = "control-container">
         <img src="resource/turnbyturnlogo.png" alt="logo">
-        <h4><span class="descriptions"> Select an environment </span></h4>
+        <h4><span class="descriptions"> Select an environment</span></h4>
         <select id = "env_dropdown" onchange="selectEnv()">
           <option id=localhost value="http://localhost:8002/">localhost</option>
           <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
@@ -34,28 +34,32 @@
         </div>
 
         <h4><b>Select a matrix type</b></h4>
-        <button id="one_to_many" class = "stitched" type="button">One-to-Many</button>
-        <button id="many_to_one" class = "stitched" type="button">Many-to-One</button>
-        <button id="many_to_many" class = "stitched" type="button">Many-to-Many</button>
+        <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'oneToMany' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
+        <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'manyToOne' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
+        <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'manyToMany' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
 
         <h5><i>Options vary for each matrix type</i></h5>
- 
+
         <div class="start" id="start" name="start">
-          <div class="startheader" id="startheader"><h4><b>Starting point</b></h4></div>
-          <ol id="startPoints">
-            <li id="startpt">
+          <div class="startheader" id="startheader"><h4><b>{{startheader}}</b></h4></div>
+          <ol>
+            <li ng-repeat="point in startPoints">
+              <div class = "start marker">{{point.index}}</div>
+              <span class = "geocode">' + {{point.lat}} + ' , '+ {{point.lon}} + '</span>
+            </li>
+            <li ng-hide="startPoints.length != 0">
               <div class = "start marker"></div>
-              <span class = "geocode"> <i>Click on the map to add a starting point </i></span>
-            </li> 
+              <span class = "geocode"> <i>{{geocode}}</i></span>
+            </li>
           </ol>
         </div>
 
-        <div class="end" id="end" name="end">
-        <div class="endheader" id="endheader"><h4><b>Ending points</b></h4></div>
+        <div ng-hide="matrixType == 'manyToMany'" class="end" id="end" name="end">
+          <div class="endheader" id="endheader"><h4><b>{{endheader}}</b></h4></div>
           <ol id="endPoints">
             <li id="endpt">
               <div class = "end marker"></div>
-              <span class = "geocode"> <i>Click on the map to add your ending points </i></span>
+              <span class = "geocode"> <i>{{geocode}}</i></span>
             </li>
           </ol>
         </div>
@@ -70,7 +74,7 @@
       </div>
     </div>
 </div>
-  
+
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
   <script src="js/leaflet.label.js"></script>
