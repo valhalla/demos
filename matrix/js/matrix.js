@@ -11,6 +11,8 @@ var envServer = "production";
 var envToken = accessToken.prod;
 var locCount = 0;
 
+var uiFlow = ['travel_mode','matrix','point'];
+
 function selectEnv() {
   $("option:selected").each(function() {
     envServer = $(this).text();
@@ -89,12 +91,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   
   var Locations = [];
   var mode = 'auto';
-
-  var mode_icons = {
-    'car' : 'js/images/drive.png',
-    'foot' : 'js/images/walk.png',
-    'bicycle' : 'js/images/bike.png'
-  };
 
   var getOriginIcon = function() {
     return new L.Icon({ 
@@ -312,7 +308,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   
   function chooseLocations(matrixtype) {
     map.on('click', function(e) {
-
     var geo = {
       'lat' : e.latlng.lat,
       'lon' : e.latlng.lng
@@ -343,7 +338,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], locCount);
         locations++;
-        counterText++;
+        counterText++;8
         if( locCount == 1 ) {
           document.getElementById('endpt').innerHTML ='<div class = "end marker">'+ counterText+ '</div> <span class = "geocode">' + geo.lat + ' , '+ geo.lon + '</span>';
           return;
@@ -357,7 +352,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         return;
       }
     } else if (matrixtype == "many_to_one") {
+      
       if (eventObj.ctrlKey) {
+
         Locations.push({
           lat : geo.lat,
           lon : geo.lon
