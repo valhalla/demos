@@ -6,10 +6,9 @@ var mode_mapping = {
   'bicycle' : 'bicycle'
 };
 
-var serviceUrl = "http://valhalla.dev.mapzen.com/";
-var envServer = "development";
-var token = accessToken.dev;
-var viaCount = 0;
+var serviceUrl = "https://matrix.mapzen.com/";
+var envServer = "production";
+var envToken = accessToken.prod;
 
 function selectEnv() {
   $("option:selected").each(function() {
@@ -22,13 +21,13 @@ function selectEnv() {
 function getEnvToken() {
   switch (envServer) {
   case "localhost":
-    token = accessToken.local;
+    envToken = accessToken.local;
     break;
   case "development":
-    token = accessToken.dev;
+    envToken = accessToken.dev;
     break;
   case "production":
-    token = accessToken.prod;
+    envToken = accessToken.prod;
     break;
   }
 }
@@ -36,8 +35,8 @@ function getEnvToken() {
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
-      'lat' : 37.745353,
-      'lng' : -122.429176
+      'lat' : 40.7486,
+      'lng' : -73.9690
     },
     'zoom' : 13
   };
@@ -68,7 +67,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
-    "ElevationMap" : elevationmap
+    "ationMap" : elevationmap
   };
 
   //leaflet slippy map
@@ -87,48 +86,26 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     map.scrollWheelZoom.disable();
   }
 
-  var Locations = [];
   var mode = 'auto';
 
-  var mode_icons = {
-    'car' : 'js/images/drive.png',
-    'foot' : 'js/images/walk.png',
-    'bicycle' : 'js/images/bike.png'
-  };
-
   var getOriginIcon = function() {
-
-    return new L.Icon({ 
-      iconUrl : '../routing/resource/startmarker@2x.png',
-      iconSize : [ 26, 32 ], // size of the icon
-      iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
+    return new L.Icon({
+      iconUrl : '../matrix/resource/matrix_pin_start.png',
+      iconSize : [ 30, 36 ],
       shadowUrl: null
     })
   };
-  
-  var getViaIcon = function() {
-    return new L.Icon({ 
-      iconUrl : '../routing/resource/via_dot.png',
-      iconSize : [ 22, 24 ],
-      iconAnchor : [ 15, 20],
-      labelAnchor: [1, 1],
-      shadowUrl: null
-    });
-  };
 
   var getDestinationIcon = function() {
-    return new L.Icon({ 
-      iconUrl : '../routing/resource/destmarker@2x.png',
-      iconSize : [ 26, 32 ], // size of the icon
-      iconAnchor : [ 15, 20],
-      labelAnchor: [5, 5],
+    return new L.Icon({
+      iconUrl : '../matrix/resource/matrix_pin_end.png',
+      iconSize : [ 30, 36 ],
       shadowUrl: null
     });
   };
 
-  // allow hash links
-  var hash = new L.Hash(map);
+ //Number of locations
+  var locations = 0;
   var markers = [];
 
   var locateMarkers = [];
@@ -143,175 +120,118 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     locateMarkers = [];
   };
 
-  var parseHash = function() {
-    var hash = window.location.hash;
-    if (hash.indexOf('#') === 0)
-      hash = hash.substr(1);
-    return hash.split('&');
-  };
-
-  var parseParams = function(pieces) {
-    var parameters = {};
-    pieces.forEach(function(e, i, a) {
-      var parts = e.split('=');
-      if (parts.length < 2)
-        parts.push('');
-      parameters[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
-    });
-    return parameters;
-  };
-
-  var force = false;
-  var update = function(show, locs, costing) {
-    // update the permalink hash
-    var pieces = parseHash();
-    var extra = '';
-    pieces.forEach(function(e, i, a) {
-      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
-        extra = extra + (extra.length ? '&' : '') + e;
-    });
-    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(locs) + '&costing=' + JSON.stringify(costing);
-    force = show;
-    window.location.hash = '#' + extra + parameter;
-
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
-  };
-
-  var hashRoute = function() {
-  // something has to have changed for us to request again
-  var parameters = parseParams(parseHash());
-  if (!force && parameters.locations == JSON.stringify(locations))
-    return;
-  force = false;
-
-  // shape
-  var waypoints = [];
-  if (parameters.locations !== undefined)
-    waypoints = JSON.parse(parameters.locations);
-
-  var locs = [];
-  waypoints.forEach(function(waypoints) {
-    locs.push(L.latLng(waypoints.lat, waypoints.lon));
-  });
-
-  var marker = new L.marker(waypoints[0], {
-    icon : getOriginIcon()
-  }).bindLabel("0", {
-    noHide: true,
-    direction: 'auto'
-  });
-  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-      + "&layers=Q target=_blank>Edit POI here<a/>");
-  map.addLayer(marker);
-  markers.push(marker);
-
-
-  var marker = new L.marker(waypoints[waypoints.length-1], {
-    icon : getDestinationIcon()
-  }).bindLabel((waypoints.length-1).toString(), {
-    noHide: true,
-    direction: 'auto'
-  });
-  marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-      + "&layers=Q target=_blank>Edit POI here<a/>");
-  map.addLayer(marker);
-  markers.push(marker);
-
-  for (var i = 1; i < waypoints.length-1; i++) {
-    viaCount++;
-    var marker = new L.marker(waypoints[i], {
-      icon : getViaIcon()
-    }).bindLabel((viaCount).toString(), {
-      noHide: true,
-      direction: 'auto'
-    });
-    marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-        + "&layers=Q target=_blank>Edit POI here<a/>");
-    map.addLayer(marker);
-    markers.push(marker);
-  }
-  
-  if (parameters.costing !== undefined)
-  var costing = JSON.parse(parameters.costing);
-
-  var mode = costing || "auto";
-  var matrixtype = JSON.parse(parameters.matrixtype);
-  var  matrix = L.Matrix.widget(selectEnv(), mode, matrixtype);
-    matrix.matrix({
-      waypoints : locs
-    });
-
-  document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/matrix/index.html" + window.location.hash + "' target='_top'>Matrix Permalink</a>";
-}
-  
-//Number of locations
-  var locations = 0;
-
-  var reset = function() {
-    Locations = [];
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
-    $scope.$emit('resetRouteInstruction');
-    remove_markers();
-    locations = 0;
-    viaCount = 0;
-  };
-
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
   });
 
-  $rootScope.$on('map.dropMarker', function(ev, geo, viaCount) {
+  $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
-    if (locations == 0) {
       var marker = new L.marker(geo, {
         icon : getOriginIcon()
-      }).bindLabel("0", {
+      }).bindLabel((locCount).toString(), {
+        position: [geo.lat,geo.lon],
         noHide: true,
-        direction: 'auto'
+        offset: [-10,-11]
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
-    } else {
+    map.addLayer(marker);
+    markers.push(marker);
+  });
+
+  $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
+
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
-      }).bindLabel((viaCount+1).toString(), {
+      }).bindLabel((locCount).toString(), {
+        position: [geo.lat,geo.lon],
         noHide: true,
-        direction: 'auto'
+        offset: [-10,-11]
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
-    }
-    map.addLayer(marker);
-    markers.push(marker);
-  });
-  $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, viaCount) {
-    if (locations == 0) {
-      var marker = new L.marker(geo, {
-        icon : getOriginIcon()
-      }).bindLabel("0", {
-        noHide: true,
-        direction: 'auto'
-      });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
-    } else {
-      var marker = new L.marker(geo, {
-        icon : getViaIcon()
-      }).bindLabel(viaCount.toString(), {
-        noHide: true,
-        direction: 'auto'
-      });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
-    }
     map.addLayer(marker);
     markers.push(marker);
   });
 
-  // locate edge snap markers
+  $scope.renderHtml = function(html_code) {
+    return $sce.trustAsHtml(html_code);
+  };
 
+  function setMode() {
+    var modeBtn = document.getElementsByName("modebtn");
+    for (var i = 0; i < modeBtn.length; i++) {
+      if (modeBtn[i].checked) {
+        mode = modeBtn[i].value;
+      }
+    }
+    return mode;
+  }
+
+  var reset_form = function() {
+    $scope.startPoints = [];
+    $scope.endPoints = [];
+  };
+
+  //set up map events
+  chooseLocations();
+
+  var oneToMany = document.getElementById("one_to_many");
+  var manyToOne = document.getElementById("many_to_one");
+  var manyToMany = document.getElementById("many_to_many");
+  var clearBtn = document.getElementById("clear_btn");
+  var matrixBtn = document.getElementById("matrix_btn");
+  
+  $scope.matrixType = '';
+  $scope.startPoints = [];
+  $scope.endPoints = [];
+
+  $scope.oneToManyClick = function(e) {
+    $scope.matrixType = "one_to_many";
+    reset_form();
+    $scope.startheader = "Starting point";
+    $scope.endheader = "Ending points";
+    $scope.startgeocode = "Click on the map to add a starting point";
+    $scope.endgeocode = "Click on the map to add your ending points";
+    getEnvToken();
+    mode = setMode();
+  }
+
+  $scope.manyToOneClick = function(e) {
+    $scope.matrixType = "many_to_one";
+    reset_form();
+    $scope.startheader = "Starting points";
+    $scope.endheader = "Ending point";
+    $scope.startgeocode = "Click on the map to your a starting points";
+    $scope.endgeocode = "Click on the map to add an ending point";
+    getEnvToken();
+    mode = setMode();
+  };
+
+  $scope.manyToManyClick = function(e) {
+    $scope.matrixType = "many_to_many";
+    reset_form();
+    $scope.startheader = "Select points";
+    $scope.startgeocode = "Click on the map to add your points";
+    getEnvToken();
+    mode = setMode();
+  };
+
+  clearBtn.addEventListener('click', function(e) {
+    javascript:location.reload(true)
+  });
+
+  matrixBtn.addEventListener('click', function(e) {
+    var waypoints = [];
+    var locationsArray = $scope.startPoints.concat($scope.endPoints);
+    console.log(locationsArray);
+    locationsArray.forEach(function(gLoc) {
+      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+    });
+
+    var  matrix = L.Matrix.widget(envToken, mode, $scope.matrixType);
+    matrix.matrix({
+      waypoints : waypoints
+    });
+  });
+
+//locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
     // clear it
     locateMarkers.forEach(function (element, index, array) {
@@ -348,33 +268,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     }
   };
 
-  $scope.renderHtml = function(html_code) {
-    return $sce.trustAsHtml(html_code);
-  };
+  var counterText = 0;
 
-  $scope.$on('setRouteInstruction', function(ev, instructions) {
-    $scope.$apply(function() {
-      $scope.route_instructions = instructions;
-    });
-  });
 
-  $scope.$on('resetRouteInstruction', function(ev) {
-    $scope.$apply(function() {
-      $scope.route_instructions = '';
-    });
-  });
 
-  // if the hash changes
-  // L.DomEvent.addListener(window, "hashchange", hashRoute);
-
-  // show something to start with but only if it was requested
-  $(window).load(function(e) {
-    // rr = L.Routing.valhalla(accessToken);
-    force = true;
-    hashRoute();
-  });
-  
-  map.on('click', function(e) {
+  function chooseLocations() {
+    map.on('click', function(e) {
 
     var geo = {
       'lat' : e.latlng.lat,
@@ -382,124 +281,63 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     };
 
     var eventObj = window.event ? event : e.originalEvent;
-    //way to test multi-locations
-    if(eventObj.ctrlKey) {
+    var latlon = "";
+    if ($scope.matrixType == "one_to_many") {
       if (locations == 0) {
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ]);
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
-
+        latlon = geo.lat + ' , '+ geo.lon;
+        $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.$apply();
         return;
-      //vias 
       } else {
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-        viaCount++;
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], viaCount);
+
+        counterText++;
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
+        
+        latlon = geo.lat + ' , '+ geo.lon;
+        $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon,latlon: latlon});
+        $scope.$apply();
         return;
       }
-    } else if (!eventObj.shiftKey){
-      if (locations == 0) {
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+    } else if ($scope.matrixType == "many_to_one") {
+      if (eventObj.shiftKey) {
+        $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
+        
+        latlon = geo.lat + ' , '+ geo.lon;
+        $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.$apply();
+        counterText++;
         return;
-      } else if (locations > 1) {
-        Locations = [];
-        reset();
-  
-        Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
-        })
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ]);
+      } else {
+
+        $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
 
+        latlon = geo.lat + ' , '+ geo.lon;
+        $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.$apply();
+        counterText++;
         return;
       }
+      //many_to_many
+    } else if ($scope.matrixType == "many_to_many") {
+
+      $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], counterText);
+      locations++;
+
+      var latlon = geo.lat + ' , '+ geo.lon;
+      $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon,latlon: latlon});
+      $scope.$apply();
+      counterText++;
+      locations++;
+      return;
     }
-    var waypoints = [];
-    Locations.forEach(function(gLoc) {
-      waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+
     });
-    
-    waypoints.push(L.latLng(geo.lat, geo.lon));
-
-    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], viaCount);
-    locations++;
-
-    valhalla_mode = mode_mapping[mode];
-    
-   function setMode() {
-     var modeBtn = document.getElementsByName("mode");
-     var transitmode = "auto";
-     for (var i = 0; i < modeBtn.length; i++) {
-       if (modeBtn[i].checked) {
-         transitmode = modeBtn[i].value;
-       }
-     } 
-     return transitmode;
-   }  
-     
-    var oneToMany = document.getElementById("one_to_many");
-    var manyToOne = document.getElementById("many_to_one");
-    var manyToMany = document.getElementById("many_to_many");
-    var clearBtn = document.getElementById("clear_btn");
-
-    var matrixResponse;
-
-    oneToMany.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'one_to_many';
-      var matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
-    });
-
-    manyToOne.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'many_to_one';
-      var matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
-    });
-
-    manyToMany.addEventListener('click', function(e) {
-      getEnvToken();
-      var mode = setMode();
-      var matrixtype = 'many_to_many';
-      var  matrix = L.Matrix.widget(token, mode, matrixtype);
-      matrix.matrix({
-        waypoints : waypoints
-      });
-    });
-    
-    clearBtn.addEventListener('click', function(e) {
-      reset();
-      $('#columns').columns('destroy');
-      var json = [{"From":"", "To":"", "Time (secs)":"","Distance (mi)":""}]; 
-      $('#columns').columns({
-        data:json
-      });
-      document.getElementById('permalink').innerHTML = "";
-      window.location.hash = "";
-    });
-
-  });
+  };
     // ask the service for information about this location
     map.on("contextmenu", function(e) {
       var ll = {
@@ -507,7 +345,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         lon : e.latlng.lng
       };
       getEnvToken();
-      var locate = L.locate(token);
+      var locate = L.locate(envToken);
       locate.locate(ll, locateEdgeMarkers);
     });
 
