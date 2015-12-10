@@ -9,6 +9,7 @@ var mode_mapping = {
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
 var envToken = accessToken.prod;
+var sentManyToManyEnd = false;
 
 function selectEnv() {
   $("option:selected").each(function() {
@@ -309,10 +310,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   function chooseLocations() {
     map.on('click', function(e) {
-
+    if ($scope.matrixType == '')
+      alert("Please select a matrix type.");
+    
     var geo = {
-      'lat' : e.latlng.lat,
-      'lon' : e.latlng.lng
+      'lat' : e.latlng.lat.toFixed(6),
+      'lon' : e.latlng.lng.toFixed(6)
     };
 
     var eventObj = window.event ? event : e.originalEvent;
@@ -339,6 +342,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       }
     } else if ($scope.matrixType == "many_to_one") {
       if (eventObj.shiftKey) {
+        if (sentManyToManyEnd == false) {
+        sentManyToManyEnd = true;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
         
@@ -346,8 +351,10 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
         $scope.editingFocus = 'start';
         $scope.$apply();
-        counterText++;
         return;
+        } else {
+          alert("Only 1 end point should be selected.");
+        }
       } else {
 
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], counterText);
