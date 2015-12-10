@@ -1,4 +1,4 @@
-/html {
+html {
   width: 100%;
   height: 100%;
 }
@@ -20,6 +20,7 @@ body {
 .control-container {
   width: 500px;
   height: 100%;
+  background-color: #eee;
   padding: 20px;
   float: left;
   overflow-y: auto;
@@ -27,26 +28,31 @@ body {
 
 .instruction {
   text-align: center;
-  margin: 25px 0;
+  font-weight: 600;
+  margin: 20px 0;
 }
 
 /* these are for blocking ui */
-div[class$="Wrapper"] {
+div[class*="Wrapper"] {
   position: relative;
-  padding: 5px;
+  padding: 10px;
+  margin: 10px 0;
 }
 
 div[class*="Blocker"] {
   position: absolute;
   left: 0;
   top: 0;
+  z-index: 1050;
 }
 
 .block {
   width: 100%;
   height: 100%;
-  background-color:rgba(255,255,255,0.5);
-  pointer-events: none;
+  background-color:rgba(238,238,238,0.5);
+}
+.show {
+  background-color: #fff;
 }
 
 #map {
@@ -72,15 +78,16 @@ div[class*="Blocker"] {
   text-transform: uppercase;
 }
 
-
-
+.matrixWrapper {
+  text-align: center;
+}
 .stitched {
   padding: 8px;
-  margin-right: 5px;
+  margin-right: 7px;
+  margin-bottom: 20px;
   background: #FFFFFF;
   color: #A4A4A4;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
   border: 2px dashed #DADADA;
   box-shadow: 0;
 }
@@ -103,17 +110,27 @@ input#endpt{
   background-image:url(../resource/matrix_pin_end.png);
 }
 
+.edit {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background-image:url('../images/edit.svg');
+  background-size: cover;
+}
+
 ol {
-  padding: 0;
+  padding: 0 30px;
 }
 
 li {
   list-style-type: none;
   width: 100%;
   height: 45px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
+  border-bottom: 1px solid #99cfc1;
   position: relative;
+  margin: 5px 0;
 }
 li .marker {
   width: 28px;
@@ -126,7 +143,6 @@ li .marker {
   padding-top: 5px;
   font-weight: 600;
   text-align: center;
-  
 }
 
 li .start {
@@ -146,9 +162,20 @@ li .geocode {
   bottom: 10px;
 }
 
+.mapInstruction {
+  color: #ccc;
+  width: 100%;
+  text-align: center;
+  font-style: italic;
+}
 
-.btnWrapper * {
-  float: left;
+
+.btnWrapper {
+
+}
+
+.routingBtns {
+  float: right;
 }
 
 .btnWrapper::after {
@@ -157,12 +184,19 @@ li .geocode {
   clear: both;
 }
 
+.plain {
+  background: transparent;
+  border: none;
+  color: #65B7A1;
+}
+
 .btnMatrix {
   background-color: transparent;
+  float: left;
+  margin-left: 10px;
   font-weight: 600;
-  padding: 10px 16px;
+  padding: 10px 26px;
   border: 1px solid #000;
-  width: 200px;
 }
 
 .btn-matrix:hover, .btn-matrix:focus {
@@ -170,7 +204,9 @@ li .geocode {
 }
 
 .vehicleBox {
+  width: 50px;
   padding: 10px 16px;
+  float:  left;
   border: 1px solid #000;
 }
 

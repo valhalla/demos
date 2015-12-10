@@ -16,8 +16,10 @@
 </head>
 <body>
   <div class="container-fluid row" ng-controller="MatrixController">
-      <div id="controls" class = "control-container">
-        <img src="resource/turnbyturnlogo.png" alt="logo">
+    <div id="controls" class = "control-container">
+      <img src="resource/turnbyturnlogo.png" alt="logo">
+      <!---------control view ------>
+      <div ng-hide="appView == 'matrixTable'" class = "not-table ng-hide">
         <h4><span class="descriptions"> Select an environment</span></h4>
         <select id = "env_dropdown" onchange="selectEnv()">
           <option id=localhost value="http://localhost:8002/">localhost</option>
@@ -25,18 +27,18 @@
           <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
         </select>
 
-      <div class = "matrixWrapper">
-        <h4 class="instruction"> 1. Select a matrix type </h4>
-        <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
-        <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
-        <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
-        <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
+      <div class = "{{startPoints.length != 0 ? '' : 'show'}} matrixWrapper">
+          <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
+          <h4 class="instruction"> 1. Select a matrix type </h4>
+          <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
+          <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
+          <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
       </div>
 
-    <div class = "pointsWrapper">
-      <h4 class="instruction"> 2. Select start points </h4>
-        <div class="start" id="start" name="start">
-          <div class="startheader" id="startheader"><h4><b>{{startheader}}</b></h4></div>
+    <div class = "{{matrixType == '' ? '' : 'show'}} startPointsWrapper">
+      <div class="start" id="start" name="start">
+        <h4 class="instruction"> 2. Select start point(s) </h4>
+        <!--<div ng-show="editingFocus == 'start'" ng-click="toggleEditFocus()" class ="edit"></div>-->
           <ol>
             <li id="startpt" ng-repeat="point in startPoints">
               <div class = "start marker">{{point.index}}</div>
@@ -44,14 +46,19 @@
             </li>
             <li ng-hide="startPoints.length != 0">
               <div class = "start marker"></div>
-              <span class = "geocode"> <i>{{geocode}}</i></span>
+              <span class = "geocode"> <i>{{startgeocode}}</i></span>
             </li>
           </ol>
+          <div class="mapInstruction"> Click on the map to add a point </div>
         </div>
+        <div class = "{{matrixType == '' ? 'block' : ''}} pointsBlocker"></div>
+        <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
+      </div>
 
-        <h4 class="instruction"> 3. Select end points </h4>
-        <div ng-hide="matrixType == 'many_to_many'" class="end" id="end" name="end">
-          <div class="endheader" id="endheader"><h4><b>{{endheader}}</b></h4></div>
+      <div ng-hide="matrixType == 'many_to_many'" class = "{{matrixType == '' ? '' : 'show'}} endPointsWrapper">
+        <div class="end" id="end" name="end">
+          <h4 class="instruction"> 3. Select end point(s) </h4>
+          <!--<div ng-show="editingFocus == 'end'" ng-click="toggleEditFocus()" class ="edit"></div>-->
           <ol>
             <li ng-repeat="point in endPoints">
               <div class = "end marker">{{point.index}}</div>
@@ -62,22 +69,30 @@
               <span class = "geocode"> <i>{{endgeocode}}</i></span>
             </li>
           </ol>
+          <div class="mapInstruction"> Click on the map to add points </div>
         </div>
         <div class = "{{matrixType == '' ? 'block' : ''}} pointsBlocker"></div>
       </div>
+
       <div class = "btnWrapper">
-        <button class="btnClear" id="clear_btn" type="button">Clear All</button>
-        <div class="vehicleBox" id="vehicleoptions">
-          <div class = "vehicle auto"> drive </div>
+        <button class="plain" id="clear_btn" type="button">Clear All</button>
+        <div class = "routingBtns">
+          <div class="vehicleBox" id="vehicleoptions">
+            <div class = "vehicle auto"> drive </div>
+          </div>
+          <button id="matrix_btn" class ="btnMatrix" type="button">Get Matrix</button>
         </div>
-        <button id="matrix_btn" class ="btnMatrix" type="button" autofocus>Get Matrix</button>
       </div>
-      <div id="columns"></div>
+      </div>
+      <!---------table view ------>
+      <div ng-hide="appView == 'control'" class = "table ng-hide">
+        <div id="columns"></div>
+        <button class = "plain" ng-click="goToControlView()"> back</button>
+      </div>
     </div>
     <div id="map"></div>
   </div>
 </div>
-
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
   <script src="js/leaflet.label.js"></script>

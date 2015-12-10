@@ -181,14 +181,37 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];
+  $scope.editingFocus = 'start'
+  $scope.appView = 'control'
+
+
+  $scope.goToControlView = function(e) {
+    $scope.appView = 'control';
+    $scope.matrixType = '';
+    $scope.startPoints = [];
+    $scope.endPoints = [];
+    $scope.editingFocus = 'start'
+    $scope.appView = 'control'
+    remove_markers();
+    locations = 0;
+    counterText = 0;
+    markers = [];
+    $('#columns').columns('destroy');
+    remove_markers();
+  }
+
+  $scope.toggleEditFocus = function(e) {
+    if ($scope.editingFocus == 'start') $scope.editingFocus = 'end';
+    else if($scope.editingFocus == 'end') $scope.editingFocus = 'start';
+  }
 
   $scope.oneToManyClick = function(e) {
     $scope.matrixType = "one_to_many";
     reset_form();
     $scope.startheader = "Starting point";
     $scope.endheader = "Ending points";
-    $scope.startgeocode = "Click on the map to add a starting point";
-    $scope.endgeocode = "Click on the map to add your ending points";
+    $scope.startgeocode = "Latitude, Longitude";
+    $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
     mode = setMode();
   }
@@ -198,8 +221,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     reset_form();
     $scope.startheader = "Starting points";
     $scope.endheader = "Ending point";
-    $scope.startgeocode = "Click on the map to your a starting points";
-    $scope.endgeocode = "Click on the map to add an ending point";
+    $scope.startgeocode = "Latitude, Longitude";
+    $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
     mode = setMode();
   };
@@ -208,19 +231,29 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.matrixType = "many_to_many";
     reset_form();
     $scope.startheader = "Select points";
-    $scope.startgeocode = "Click on the map to add your points";
+    $scope.startgeocode = "Latitude, Longitude";
     getEnvToken();
     mode = setMode();
   };
 
   clearBtn.addEventListener('click', function(e) {
-    javascript:location.reload(true)
+    $scope.matrixType = '';
+    $scope.startPoints = [];
+    $scope.endPoints = [];
+    $scope.editingFocus = 'start'
+    $scope.appView = 'control'
+    remove_markers();
+    locations = 0;
+    counterText = 0;
+    markers = [];
+    remove_markers();
+    $scope.$apply();
   });
 
   matrixBtn.addEventListener('click', function(e) {
     var waypoints = [];
     var locationsArray = $scope.startPoints.concat($scope.endPoints);
-    console.log(locationsArray);
+
     locationsArray.forEach(function(gLoc) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
@@ -229,6 +262,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     matrix.matrix({
       waypoints : waypoints
     });
+    $scope.appView = 'matrixTable'
+    $scope.$apply();
   });
 
 //locate edge snap markers
@@ -287,6 +322,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
         latlon = geo.lat + ' , '+ geo.lon;
+        $scope.editingFocus = 'end';
         $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
         $scope.$apply();
         return;
@@ -295,8 +331,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         counterText++;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
-        
         latlon = geo.lat + ' , '+ geo.lon;
+        $scope.editingFocus = 'start';
         $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon,latlon: latlon});
         $scope.$apply();
         return;
@@ -308,6 +344,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         
         latlon = geo.lat + ' , '+ geo.lon;
         $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.editingFocus = 'start';
         $scope.$apply();
         counterText++;
         return;
@@ -318,6 +355,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
         latlon = geo.lat + ' , '+ geo.lon;
         $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.editingFocus = 'end';
         $scope.$apply();
         counterText++;
         return;
@@ -335,7 +373,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       locations++;
       return;
     }
-
     });
   };
     // ask the service for information about this location
