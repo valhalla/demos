@@ -195,11 +195,11 @@
                     this._make_ManyToOne_Table(matrixresult, callback, context);
                   else this._make_ManyToMany_Table(matrixresult, callback, context);
                 } else {
-                 // alert("Travel Mode: "+ this._mode + ", status code: " + err.status + ", " + err.response);
                   callback.call(context || callback, {
                     status: -1,
                     message: 'HTTP request failed: ' + err.response
                   });
+                alert("Travel Mode: "+ this._mode + ", status code: " + err.status + ", " + err.response);
                 }
               }
             }, this), true);
