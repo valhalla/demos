@@ -178,11 +178,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var manyToMany = document.getElementById("many_to_many");
   var clearBtn = document.getElementById("clear_btn");
   var matrixBtn = document.getElementById("matrix_btn");
-  
+
+
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];
-  $scope.editingFocus = 'start'
+  $scope.editingFocus = 'start_points'
   $scope.appView = 'control'
 
 
@@ -191,8 +192,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.matrixType = '';
     $scope.startPoints = [];
     $scope.endPoints = [];
-    $scope.editingFocus = 'start'
     $scope.appView = 'control'
+    $scope.editingFocus = 'start_points'
+    sentManyToManyEnd = false
     remove_markers();
     locations = 0;
     counterText = 0;
@@ -200,10 +202,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $('#columns').columns('destroy');
     remove_markers();
   }
-
-  $scope.toggleEditFocus = function(e) {
-    if ($scope.editingFocus == 'start') $scope.editingFocus = 'end';
-    else if($scope.editingFocus == 'end') $scope.editingFocus = 'start';
+  $scope.goToEndPoints = function(e) {
+    $scope.editingFocus = 'end_points'
   }
 
   $scope.oneToManyClick = function(e) {
@@ -241,8 +241,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.matrixType = '';
     $scope.startPoints = [];
     $scope.endPoints = [];
-    $scope.editingFocus = 'start'
     $scope.appView = 'control'
+    $scope.editingFocus = 'start_points'
+    sentManyToManyEnd = false
     remove_markers();
     locations = 0;
     counterText = 0;
@@ -322,26 +323,24 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     var latlon = "";
     if ($scope.matrixType == "one_to_many") {
       if (locations == 0) {
+        $scope.editingFocus = 'end_points';
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
         latlon = geo.lat + ' , '+ geo.lon;
-        $scope.editingFocus = 'end';
         $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
         $scope.$apply();
         return;
       } else {
-
         counterText++;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         locations++;
         latlon = geo.lat + ' , '+ geo.lon;
-        $scope.editingFocus = 'start';
         $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon,latlon: latlon});
         $scope.$apply();
         return;
       }
     } else if ($scope.matrixType == "many_to_one") {
-      if (eventObj.shiftKey) {
+      if ($scope.editingFocus == 'end_points' ) {
         if (sentManyToManyEnd == false) {
         sentManyToManyEnd = true;
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
@@ -349,7 +348,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         
         latlon = geo.lat + ' , '+ geo.lon;
         $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
-        $scope.editingFocus = 'start';
         $scope.$apply();
         return;
         } else {
@@ -362,7 +360,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
         latlon = geo.lat + ' , '+ geo.lon;
         $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
-        $scope.editingFocus = 'end';
         $scope.$apply();
         counterText++;
         return;

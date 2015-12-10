@@ -12,7 +12,6 @@
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script src="js/jquery.columns.min.js"></script>
-
 </head>
 <body>
   <div class="container-fluid row" ng-controller="MatrixController">
@@ -38,7 +37,6 @@
     <div class = "{{matrixType == '' ? '' : 'show'}} startPointsWrapper">
       <div class="start" id="start" name="start">
         <h4 class="instruction"> 2. Select start point(s) </h4>
-        <!--<div ng-show="editingFocus == 'start'" ng-click="toggleEditFocus()" class ="edit"></div>-->
           <ol>
             <li id="startpt" ng-repeat="point in startPoints">
               <div class = "start marker">{{point.index}}</div>
@@ -50,15 +48,15 @@
             </li>
           </ol>
           <div class="mapInstruction"> Click on the map to add a point </div>
+          <button ng-show="matrixType == 'many_to_one'&&editingFocus == 'start_points'" ng-click="goToEndPoints()" class ="done"> Done Selecting start points</button>
         </div>
-        <div class = "{{matrixType == '' ? 'block' : ''}} pointsBlocker"></div>
+        <div ng-show = "matrixType == ''||editingFocus=='end_points'" class = "block pointsBlocker"></div>
         <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
       </div>
 
       <div ng-hide="matrixType == 'many_to_many'" class = "{{matrixType == '' ? '' : 'show'}} endPointsWrapper">
         <div class="end" id="end" name="end">
           <h4 class="instruction"> 3. Select end point(s) </h4>
-          <!--<div ng-show="editingFocus == 'end'" ng-click="toggleEditFocus()" class ="edit"></div>-->
           <ol>
             <li ng-repeat="point in endPoints">
               <div class = "end marker">{{point.index}}</div>
@@ -71,7 +69,7 @@
           </ol>
           <div class="mapInstruction"> Click on the map to add points </div>
         </div>
-        <div class = "{{matrixType == '' ? 'block' : ''}} pointsBlocker"></div>
+        <div ng-show = "matrixType == ''||editingFocus=='start_points'" class = "block pointsBlocker"></div>
       </div>
 
       <div class = "btnWrapper">
@@ -84,6 +82,8 @@
         </div>
       </div>
       </div>
+
+
       <!---------table view ------>
       <div ng-hide="appView == 'control'" class = "table ng-hide">
         <div id="columns"></div>

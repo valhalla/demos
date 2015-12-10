@@ -37,6 +37,7 @@ div[class*="Wrapper"] {
   position: relative;
   padding: 10px;
   margin: 10px 0;
+  text-align: center;
 }
 
 div[class*="Blocker"] {
@@ -78,9 +79,6 @@ div[class*="Blocker"] {
   text-transform: uppercase;
 }
 
-.matrixWrapper {
-  text-align: center;
-}
 .stitched {
   padding: 8px;
   margin-right: 7px;
@@ -110,14 +108,14 @@ input#endpt{
   background-image:url(../resource/matrix_pin_end.png);
 }
 
-.edit {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  top: 40px;
-  right: 10px;
-  background-image:url('../images/edit.svg');
-  background-size: cover;
+.done {
+  background-color: #fff;
+  padding: 3px 8px;
+  margin: 15px auto;
+  width: auto;
+  text-align: center;
+  border: 1px solid #666;
+  cursor: pointer;
 }
 
 ol {
@@ -167,11 +165,6 @@ li .geocode {
   width: 100%;
   text-align: center;
   font-style: italic;
-}
-
-
-.btnWrapper {
-
 }
 
 .routingBtns {
@@ -241,66 +234,12 @@ body {
   margin:0;*/
 }
 
-.range-bar {
-  margin: 20px 0;
-}
-
 .instruction {
   margin: 20px 0;
 }
 
 .ui-table {
   margin-top: 20px;
-}
-
-.axisLabel {
-    position: absolute;
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.xaxisLabel {
-    bottom: 10px;
-    left: 0;
-    right: 0;
-}
-
-.yaxisLabel {
-    top: 50%;
-    left: 2px;
-    font-weight: bold;
-    transform: rotate(-90deg);
-    -webkit-transform:  rotate(-90deg);
-    transform-origin: 0 0;
-    -webkit-transform-origin: 0 0;
-}
-
-.legend table, .legend > div {
-  height: 35px !important;
-  opacity: 1 !important;
-  right: -55px;
-  top: 10px;
-  width: 116px !important;
-}
-
-.legend table {
-  border: 1px solid #555;
-  padding: 5px;
-}
-
-#flot-tooltip {
-  font-size: 12px;
-  font-family: Verdana, Arial, sans-serif;
-  position: absolute;
-  display: none;
-  padding: 2px;
-  background-color: #FFF;
-  opacity: 1;
-  border: 1px solid #aaa;
-  -moz-box-shadow: 0px 1px 1px #ddd;
-  -webkit-box-shadow: 0px 1px 1px #ddd;
-  box-shadow: 0px 1px 2px #ddd;
 }
 
 html.is-iframed-demo .container-fluid {
