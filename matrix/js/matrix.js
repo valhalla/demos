@@ -279,8 +279,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       alert("Please select a matrix type.");
     
     var geo = {
-      'lat' : e.latlng.lat,
-      'lon' : e.latlng.lng
+      'lat' : e.latlng.lat.toFixed(6),
+      'lon' : e.latlng.lng.toFixed(6)
     };
 
     var eventObj = window.event ? event : e.originalEvent;
