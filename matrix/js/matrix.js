@@ -87,7 +87,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     map.scrollWheelZoom.disable();
   }
 
-  var mode = 'auto';
 
   var getOriginIcon = function() {
     return new L.Icon({
@@ -155,14 +154,19 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     return $sce.trustAsHtml(html_code);
   };
 
-  function setMode() {
-    var modeBtn = document.getElementsByName("modebtn");
-    for (var i = 0; i < modeBtn.length; i++) {
-      if (modeBtn[i].checked) {
-        mode = modeBtn[i].value;
-      }
-    }
-    return mode;
+  // function setMode() {
+  //   var modeBtn = document.getElementsByName("modebtn");
+  //   for (var i = 0; i < modeBtn.length; i++) {
+  //     if (modeBtn[i].checked) {
+  //       mode = modeBtn[i].value;
+  //     }
+  //   }
+  //   return mode;
+  // }
+
+  $scope.setMode = function(mode){
+    console.log(mode);
+    $scope.mode = mode;
   }
 
   var reset_form = function() {
@@ -180,6 +184,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var matrixBtn = document.getElementById("matrix_btn");
 
 
+  $scope.mode = 'auto';
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];
@@ -214,7 +219,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.startgeocode = "Latitude, Longitude";
     $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
-    mode = setMode();
   }
 
   $scope.manyToOneClick = function(e) {
@@ -225,7 +229,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.startgeocode = "Latitude, Longitude";
     $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
-    mode = setMode();
   };
 
   $scope.manyToManyClick = function(e) {
@@ -234,7 +237,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.start_mapInstruction = " Click on the map to add points";
     $scope.startgeocode = "Latitude, Longitude";
     getEnvToken();
-    mode = setMode();
   };
 
   clearBtn.addEventListener('click', function(e) {
@@ -260,7 +262,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
 
-    var  matrix = L.Matrix.widget(envToken, mode, $scope.matrixType);
+    var  matrix = L.Matrix.widget(envToken, $scope.mode, $scope.matrixType);
     matrix.matrix({
       waypoints : waypoints
     });

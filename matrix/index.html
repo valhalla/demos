@@ -76,7 +76,9 @@
         <button class="plain" id="clear_btn" type="button">Clear All</button>
         <div class = "routingBtns">
           <div class="vehicleBox" id="vehicleoptions">
-            <div class = "vehicle auto"> drive </div>
+            <div ng-click="setMode('auto')" name="auto" class = "{{mode == 'auto' ? 'active ' : ''}}vehicle auto"> </div>
+            <div ng-click="setMode('bicycle')" name="bike" class = "{{mode == 'bicycle' ? 'active ' : ''}}vehicle bike"> </div>
+            <div ng-click="setMode('pedestrian')" name="pedestrain" class = "{{mode == 'pedestrian' ? 'active ' : ''}}vehicle pedestrian"> </div>
           </div>
           <button id="matrix_btn" class ="btnMatrix" type="button">View Matrix</button>
         </div>
