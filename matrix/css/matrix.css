@@ -62,22 +62,6 @@ div[class*="Blocker"] {
   float: left;
 }
 
-#options {
-  margin: 10px 0;
-}
-
-#options::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-#options .vehicle {
-  width: 33.33%;
-  float: left;
-  background-image: url('./images/modes.icons.svg');
-  text-transform: uppercase;
-}
 
 .stitched {
   padding: 8px;
@@ -197,11 +181,27 @@ li .geocode {
 }
 
 .vehicleBox {
-  width: 50px;
-  padding: 10px 16px;
+  width: 150px;
   float:  left;
-  border: 1px solid #000;
+
 }
+
+.vehicleBox .vehicle {
+  width: 40px;
+  height: 40px;
+  float: left;
+  padding: 10px 16px;
+  border: 1px solid #000;
+  background-image: url('../images/modes.icons.svg');
+  background-size: 120px auto;
+}
+.vehicleBox .vehicle.active {
+  background-color: #ff0;
+}
+
+.bike { background-position: 80px 0;}
+.pedestrian { background-position: 40px 0;}
+
 
 .ui-table {
   margin-top: 20px;
