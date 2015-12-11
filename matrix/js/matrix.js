@@ -68,7 +68,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
-    "ationMap" : elevationmap
+    "ElevationMap" : elevationmap
   };
 
   //leaflet slippy map
@@ -351,7 +351,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $scope.$apply();
         return;
         } else {
-          alert("Only 1 end point should be selected for a Many-to-Many.");
+          alert("Only 1 end point should be selected for a Many-to-One.");
         }
       } else {
 
