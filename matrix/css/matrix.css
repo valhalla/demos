@@ -5,9 +5,9 @@ html {
 
 body {
   font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: FFFFFF;
   width: 100%;
   height: 100%;
+  color: #383a3a;
   min-height: 600px;
 }
 
@@ -24,6 +24,10 @@ body {
   padding: 20px;
   float: left;
   overflow-y: auto;
+}
+
+.tableView {
+  padding-top: 20px;
 }
 
 .instruction {
@@ -75,11 +79,11 @@ div[class*="Blocker"] {
 }
 
 button:focus {
-  outline: 2px solid #65B7A1;
+  outline: 2px solid #9ed7a7;
 }
 
 .stitched.selected {
-  color: #65B7A1;
+  color: #68c175;
   border: 2px solid #99cfc1;
   cursor: default;
 }
@@ -110,7 +114,7 @@ li {
   list-style-type: none;
   width: 100%;
   height: 45px;
-  border-bottom: 1px solid #99cfc1;
+  border-bottom: 1px solid #31783c;
   position: relative;
   margin: 5px 0;
 }
@@ -138,14 +142,17 @@ li .end {
 
 li .geocode {
   font-size: 14px;
-  color: #666;
   position: absolute;
   left: 40px;
   bottom: 10px;
 }
 
-.start_mapInstruction, .end_mapInstruction{
+li .placeholder.geocode {
   color: #ccc;
+}
+
+.start_mapInstruction, .end_mapInstruction{
+  color: #666;
   width: 100%;
   text-align: center;
   font-style: italic;
@@ -162,50 +169,51 @@ li .geocode {
 }
 
 .plain {
+  float: left;
   background: transparent;
   border: none;
-  color: #65B7A1;
+  color: #68c175;
+  padding: 10px 16px;
+  margin-top: 2px;
 }
 
 .btnMatrix {
-  background-color: transparent;
+  background-color: #68c175;
   float: left;
-  margin-left: 10px;
-  font-weight: 600;
   padding: 10px 26px;
-  border: 1px solid #000;
+  border: 1px solid #68c175;
+  color: #fff;
+  text-transform: uppercase;
 }
 
-.btn-matrix:hover, .btn-matrix:focus {
-  background-color: #ccc;
+.btnMatrix:hover {
+  background-color: #31783c;
+  border-color: #31783c;
 }
 
 .vehicleBox {
-  width: 150px;
+  width: 170px;
   float:  left;
-
 }
 
 .vehicleBox .vehicle {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 41px;
   float: left;
-  padding: 10px 16px;
-  border: 1px solid #000;
-  background-image: url('../images/modes.icons.svg');
-  background-size: 120px auto;
+  background-color: transparent;
+  border: 2px dashed #DADADA;
+  margin-right: 5px;
+  background-image: url('../images/modes.svg');
+  background-size: 150px 41px;
+  background-repeat: no-repeat;
 }
 .vehicleBox .vehicle.active {
-  background-color: #ff0;
+  color: #68c175;
+  border: 2px solid #68c175;;
 }
 
-.bike { background-position: 80px 0;}
-.pedestrian { background-position: 40px 0;}
-
-
-.ui-table {
-  margin-top: 20px;
-}
+.bike { background-position: -100px 0;}
+.pedestrian { background-position: -50px 0;}
 
 .axisLabel {
     position: absolute;
@@ -236,10 +244,6 @@ body {
 
 .instruction {
   margin: 20px 0;
-}
-
-.ui-table {
-  margin-top: 20px;
 }
 
 html.is-iframed-demo .container-fluid {
