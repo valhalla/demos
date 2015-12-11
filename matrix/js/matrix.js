@@ -189,7 +189,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   $scope.goToControlView = function(e) {
     $scope.appView = 'control';
-    $scope.matrixType = '';
+/*    $scope.matrixType = '';
     $scope.startPoints = [];
     $scope.endPoints = [];
     $scope.appView = 'control'
@@ -198,9 +198,9 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     remove_markers();
     locations = 0;
     counterText = 0;
-    markers = [];
+    markers = [];*/
     $('#columns').columns('destroy');
-    remove_markers();
+  //  remove_markers();
   }
   $scope.goToEndPoints = function(e) {
     $scope.editingFocus = 'end_points'
