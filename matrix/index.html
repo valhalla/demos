@@ -47,7 +47,7 @@
               <span class = "geocode"> <i>{{startgeocode}}</i></span>
             </li>
           </ol>
-          <div class="mapInstruction"> Click on the map to add a point </div>
+          <div class="start_mapInstruction"> {{start_mapInstruction}} </div>
           <button ng-show="matrixType == 'many_to_one'&&editingFocus == 'start_points'" ng-click="goToEndPoints()" class ="done"> Done Selecting start points</button>
         </div>
         <div ng-show = "matrixType == ''||editingFocus=='end_points'" class = "block pointsBlocker"></div>
@@ -67,7 +67,7 @@
               <span class = "geocode"> <i>{{endgeocode}}</i></span>
             </li>
           </ol>
-          <div class="mapInstruction"> Click on the map to add points </div>
+          <div class="end_mapInstruction"> {{end_mapInstruction}} </div>
         </div>
         <div ng-show = "matrixType == ''||editingFocus=='start_points'" class = "block pointsBlocker"></div>
       </div>

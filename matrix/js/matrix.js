@@ -209,8 +209,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.oneToManyClick = function(e) {
     $scope.matrixType = "one_to_many";
     reset_form();
-    $scope.startheader = "Starting point";
-    $scope.endheader = "Ending points";
+    $scope.start_mapInstruction = " Click on the map to add a point";
+    $scope.end_mapInstruction = " Click on the map to add points";
     $scope.startgeocode = "Latitude, Longitude";
     $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
@@ -220,8 +220,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.manyToOneClick = function(e) {
     $scope.matrixType = "many_to_one";
     reset_form();
-    $scope.startheader = "Starting points";
-    $scope.endheader = "Ending point";
+    $scope.start_mapInstruction = " Click on the map to add points";
+    $scope.end_mapInstruction = " Click on the map to add a point";
     $scope.startgeocode = "Latitude, Longitude";
     $scope.endgeocode = "Latitude, Longitude";
     getEnvToken();
@@ -231,7 +231,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.manyToManyClick = function(e) {
     $scope.matrixType = "many_to_many";
     reset_form();
-    $scope.startheader = "Select points";
+    $scope.start_mapInstruction = " Click on the map to add points";
     $scope.startgeocode = "Latitude, Longitude";
     getEnvToken();
     mode = setMode();
@@ -351,7 +351,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
         $scope.$apply();
         return;
         } else {
-          alert("Only 1 end point should be selected.");
+          alert("Only 1 end point should be selected for a Many-to-Many.");
         }
       } else {
 

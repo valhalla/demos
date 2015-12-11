@@ -160,7 +160,7 @@ li .geocode {
   bottom: 10px;
 }
 
-.mapInstruction {
+.start_mapInstruction, .end_mapInstruction{
   color: #ccc;
   width: 100%;
   text-align: center;
