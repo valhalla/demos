@@ -16,29 +16,22 @@
   <script src="js/jquery.columns.min.js"></script>
 </head>
 <body>
-  <div class="container-fluid row" ng-controller="MatrixController">
-    <div id="controls" class = "control-container">
-      <img src="images/timedistancelogo.svg" alt="logo">
-      <!---------control view ------>
-      <div ng-hide="appView == 'matrixTable'" class = "not-table ng-hide">
-        <h4><span class="descriptions"> Select an environment</span></h4>
-        <select id = "env_dropdown" onchange="selectEnv()">
-          <option id=localhost value="http://localhost:8002/">localhost</option>
-          <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
-          <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
-        </select>
-
-      <div class = "show matrixWrapper">
-          <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
-          <h4 class="instruction"> 1. Select a matrix type </h4>
-          <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
-          <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
-          <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
+<div class="container-fluid row" ng-controller="MatrixController">
+  <div id="controls" class = "control-container">
+    <img src="images/timedistancelogo.svg" alt="logo">
+    <!---------control view ------>
+    <div ng-hide="appView == 'matrixTable'" class = "not-table ng-hide">
+      <div class = "matrixWrapper">
+        <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
+        <h4 class="instruction"> 1. Select a matrix type </h4>
+        <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
+        <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
+        <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
       </div>
 
-    <div class = "show startPointsWrapper">
-      <div class="start" id="start" name="start">
-        <h4 class="instruction"> 2. Add start point(s) </h4>
+      <div class = "startPointsWrapper">
+        <div class="start" id="start" name="start">
+          <h4 class="instruction"> 2. Add start point(s) </h4>
           <ol>
             <li id="startpt" ng-repeat="point in startPoints">
               <div class = "start marker">{{point.index}}</div>
@@ -53,10 +46,10 @@
           <button ng-show="matrixType == 'many_to_one'&&editingFocus == 'start_points'" ng-click="goToEndPoints()" class ="done"> Next &gt; </button>
         </div>
         <div ng-show = "matrixType == ''||editingFocus=='end_points'" class = "block pointsBlocker"></div>
-        <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
+          <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
       </div>
 
-      <div ng-hide="matrixType == 'many_to_many'" class = "show endPointsWrapper">
+      <div ng-hide="matrixType == 'many_to_many'" class = "endPointsWrapper">
         <div class="end" id="end" name="end">
           <h4 class="instruction"> 3. Add end point(s) </h4>
           <ol>
@@ -85,36 +78,36 @@
           <button id="matrix_btn" class ="btnMatrix" type="button">View Matrix</button>
         </div>
       </div>
-      </div>
+    </div>
 
-      <!---------table view ------>
-      <div ng-hide="appView == 'control'" class = "tableView ng-hide">
-        <button class = "plain" ng-click="backToControlView()"> &lt; Back</button>
-        <div id="columns"></div>
-        <div class="routingBtns">
-          <button  class="btnMatrix"s ng-click="clearAll()"> start over </button>
-        </div>
+    <!---------table view ------>
+    <div ng-hide="appView == 'control'" class = "tableView ng-hide">
+      <button class = "plain" ng-click="backToControlView()"> &lt; Back</button>
+      <div id="columns"></div>
+      <div class="routingBtns">
+        <button  class="btnMatrix"s ng-click="clearAll()"> start over </button>
       </div>
     </div>
-    <div id="map"></div>
   </div>
+
+  <div id="map"></div>
 </div>
 
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-  <script src="js/leaflet.label.js"></script>
-  <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
-  <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
-  
-  <script type="text/javascript" src="js/matrix.js"></script>
-  <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
-  <script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
-  <script type="text/javascript">
-    // Apply special root-element class for iframed demo situations
-    if (window.self !== window.top) {
-      document.documentElement.className += ' is-iframed-demo';
-    }
-    window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
-  </script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+<script src="js/leaflet.label.js"></script>
+<script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
+<script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
+
+<script type="text/javascript" src="js/matrix.js"></script>
+<script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
+<script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
+<script type="text/javascript">
+  // Apply special root-element class for iframed demo situations
+  if (window.self !== window.top) {
+    document.documentElement.className += ' is-iframed-demo';
+  }
+  window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
+</script>
 </body>
 </html>
 

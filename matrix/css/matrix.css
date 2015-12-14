@@ -20,10 +20,16 @@ body {
 .control-container {
   width: 500px;
   height: 100%;
+  float: left;
   background-color: #eee;
   padding: 20px;
-  float: left;
   overflow-y: auto;
+}
+
+#map {
+  width: calc( 100% - 500px);
+  height: 100%;
+  float: left;
 }
 
 .tableView {
@@ -38,6 +44,7 @@ body {
 
 /* these are for blocking ui */
 div[class*="Wrapper"] {
+  background-color: #fff;
   position: relative;
   padding: 10px;
   margin: 10px 0;
@@ -56,17 +63,9 @@ div[class*="Blocker"] {
   height: 100%;
   background-color:rgba(238,238,238,0.5);
 }
-.show {
-  background-color: #fff;
-}
-
-#map {
-  width: calc( 100% - 500px);
-  height: 100%;
-  float: left;
-}
 
 
+/* matrix type button */
 .stitched {
   padding: 8px;
   margin-right: 7px;
@@ -78,22 +77,14 @@ div[class*="Blocker"] {
   box-shadow: 0;
 }
 
-button:focus {
-  outline: 2px solid #9ed7a7;
-}
-
 .stitched.selected {
   color: #68c175;
   border: 2px solid #99cfc1;
   cursor: default;
 }
 
-input#startpt{
-  background-image:url(../resource/matrix_pin_start.png);
-}
-
-input#endpt{
-  background-image:url(../resource/matrix_pin_end.png);
+button:focus {
+  outline: 2px solid #9ed7a7;
 }
 
 .done {
@@ -131,14 +122,8 @@ li .marker {
   text-align: center;
 }
 
-li .start {
-  background-image:url(../resource/matrix_pin_start.png);
-}
-
-li .end {
-  background-image:url(../resource/matrix_pin_end.png);
-
-}
+li .start { background-image:url(../resource/matrix_pin_start.png); }
+li .end { background-image:url(../resource/matrix_pin_end.png);}
 
 li .geocode {
   font-size: 14px;
@@ -151,12 +136,6 @@ li .placeholder.geocode {
   color: #ccc;
 }
 
-.start_mapInstruction, .end_mapInstruction{
-  color: #666;
-  width: 100%;
-  text-align: center;
-  font-style: italic;
-}
 
 .routingBtns {
   float: right;
@@ -191,6 +170,8 @@ li .placeholder.geocode {
   border-color: #31783c;
 }
 
+/* vehicle mode*/
+
 .vehicleBox {
   width: 170px;
   float:  left;
@@ -215,35 +196,10 @@ li .placeholder.geocode {
 .bike { background-position: -50px 0;}
 .pedestrian { background-position: -100px 0;}
 
-.axisLabel {
-    position: absolute;
-    text-align: center;html {
-  width: 100%;
-  height: 100%;
-}
 
-body {
-  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: #eee;
-  width: 100%;
-  height: 100%;
-  min-height: 600px;
-}
-
-.container-fluid {
-  height: 100%;
-}
-
-#map {
-  height: calc( 100% - 300px ); 
-  width: 100%;
-/*  position: absolute;
-  background: #fff;
-  margin:0;*/
-}
-
-.instruction {
-  margin: 20px 0;
+.leaflet-label-right:before,
+.leaflet-label-left:after {
+  content: none;
 }
 
 html.is-iframed-demo .container-fluid {
@@ -255,6 +211,17 @@ html.is-iframed-demo .container-fluid {
   html.is-iframed-demo #map {
     height: calc( 100% - 550px );
   }
+  .container-fluid {
+    width: 100%;
+    height: auto;
+  }
+  .control-container {
+    width: 100%;
+    height: auto;
+  }
+  #map {
+    width: 500px;
+  }
 }
 
 html.is-iframed-demo .not-map-part {
@@ -264,14 +231,3 @@ html.is-iframed-demo .not-map-part {
 html.is-iframed-demo .hide-if-iframed {
   display: none;
 }
-/*
-#map .leaflet-label {
-  background: #585858;
-  color: #fff;
-  border-radius:  3px;
-  font: 10px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  padding: 2px 2px;
-  user-select: none;
-  white-space: nowrap;
-}*/
