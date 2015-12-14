@@ -158,18 +158,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     return $sce.trustAsHtml(html_code);
   };
 
-  // function setMode() {
-  //   var modeBtn = document.getElementsByName("modebtn");
-  //   for (var i = 0; i < modeBtn.length; i++) {
-  //     if (modeBtn[i].checked) {
-  //       mode = modeBtn[i].value;
-  //     }
-  //   }
-  //   return mode;
-  // }
-
   $scope.setMode = function(mode){
-    console.log(mode);
     $scope.mode = mode;
   }
 
@@ -196,54 +185,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $scope.appView = 'control'
 
 
-  $scope.goToControlView = function(e) {
+  $scope.backToControlView = function(e) {
     $scope.appView = 'control';
-/*    $scope.matrixType = '';
-    $scope.startPoints = [];
-    $scope.endPoints = [];
-    $scope.appView = 'control'
-    $scope.editingFocus = 'start_points'
-    sentManyToManyEnd = false
-    remove_markers();
-    locations = 0;
-    counterText = 0;
-    markers = [];*/
     $('#columns').columns('destroy');
-  //  remove_markers();
-  }
-  $scope.goToEndPoints = function(e) {
-    $scope.editingFocus = 'end_points'
   }
 
-  $scope.oneToManyClick = function(e) {
-    $scope.matrixType = "one_to_many";
-    reset_form();
-    $scope.start_mapInstruction = " Click on the map to add a point";
-    $scope.end_mapInstruction = " Click on the map to add points";
-    $scope.startgeocode = "Latitude, Longitude";
-    $scope.endgeocode = "Latitude, Longitude";
-    getEnvToken();
-  }
-
-  $scope.manyToOneClick = function(e) {
-    $scope.matrixType = "many_to_one";
-    reset_form();
-    $scope.start_mapInstruction = " Click on the map to add points";
-    $scope.end_mapInstruction = " Click on the map to add a point";
-    $scope.startgeocode = "Latitude, Longitude";
-    $scope.endgeocode = "Latitude, Longitude";
-    getEnvToken();
-  };
-
-  $scope.manyToManyClick = function(e) {
-    $scope.matrixType = "many_to_many";
-    reset_form();
-    $scope.start_mapInstruction = " Click on the map to add points";
-    $scope.startgeocode = "Latitude, Longitude";
-    getEnvToken();
-  };
-
-  clearBtn.addEventListener('click', function(e) {
+  $scope.clearAll = function(e) {
     $scope.matrixType = '';
     $scope.startPoints = [];
     $scope.endPoints = [];
@@ -255,8 +202,38 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     counterText = 0;
     markers = [];
     remove_markers();
-    $scope.$apply();
-  });
+    $('#columns').columns('destroy');
+  }
+
+
+  $scope.goToEndPoints = function(e) {
+    $scope.editingFocus = 'end_points'
+  }
+
+  $scope.oneToManyClick = function(e) {
+    $scope.matrixType = "one_to_many";
+    reset_form();
+    $scope.start_mapInstruction = " Click on the map to add a point";
+    $scope.end_mapInstruction = " Click on the map to add points";
+    $scope.startgeocode = "lat, long";
+    $scope.endgeocode = "lat, long";
+    getEnvToken();
+  }
+
+  $scope.manyToOneClick = function(e) {
+    $scope.matrixType = "many_to_one";
+    reset_form();
+    $scope.start_mapInstruction = " Click on the map to add points";
+    $scope.end_mapInstruction = " Click on the map to add a point";
+    getEnvToken();
+  };
+
+  $scope.manyToManyClick = function(e) {
+    $scope.matrixType = "many_to_many";
+    reset_form();
+    $scope.start_mapInstruction = " Click on the map to add points";
+    getEnvToken();
+  };
 
   matrixBtn.addEventListener('click', function(e) {
     var waypoints = [];
