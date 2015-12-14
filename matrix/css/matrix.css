@@ -1,0 +1,277 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 100%;
+  height: 100%;
+  color: #383a3a;
+  min-height: 600px;
+}
+
+.container-fluid {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.control-container {
+  width: 500px;
+  height: 100%;
+  background-color: #eee;
+  padding: 20px;
+  float: left;
+  overflow-y: auto;
+}
+
+.tableView {
+  padding-top: 20px;
+}
+
+.instruction {
+  text-align: center;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+/* these are for blocking ui */
+div[class*="Wrapper"] {
+  position: relative;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+div[class*="Blocker"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1050;
+}
+
+.block {
+  width: 100%;
+  height: 100%;
+  background-color:rgba(238,238,238,0.5);
+}
+.show {
+  background-color: #fff;
+}
+
+#map {
+  width: calc( 100% - 500px);
+  height: 100%;
+  float: left;
+}
+
+
+.stitched {
+  padding: 8px;
+  margin-right: 7px;
+  margin-bottom: 20px;
+  background: #FFFFFF;
+  color: #A4A4A4;
+  font-size: 16px;
+  border: 2px dashed #DADADA;
+  box-shadow: 0;
+}
+
+button:focus {
+  outline: 2px solid #9ed7a7;
+}
+
+.stitched.selected {
+  color: #68c175;
+  border: 2px solid #99cfc1;
+  cursor: default;
+}
+
+input#startpt{
+  background-image:url(../resource/matrix_pin_start.png);
+}
+
+input#endpt{
+  background-image:url(../resource/matrix_pin_end.png);
+}
+
+.done {
+  background-color: #fff;
+  padding: 3px 8px;
+  margin: 15px auto;
+  width: auto;
+  text-align: center;
+  border: 1px solid #666;
+  cursor: pointer;
+}
+
+ol {
+  padding: 0 30px;
+}
+
+li {
+  list-style-type: none;
+  width: 100%;
+  height: 45px;
+  border-bottom: 1px solid #31783c;
+  position: relative;
+  margin: 5px 0;
+}
+li .marker {
+  width: 28px;
+  height: 36px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-repeat: no-repeat;
+  float: left;
+  color: #fff;
+  padding-top: 5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+li .start {
+  background-image:url(../resource/matrix_pin_start.png);
+}
+
+li .end {
+  background-image:url(../resource/matrix_pin_end.png);
+
+}
+
+li .geocode {
+  font-size: 14px;
+  position: absolute;
+  left: 40px;
+  bottom: 10px;
+}
+
+li .placeholder.geocode {
+  color: #ccc;
+}
+
+.start_mapInstruction, .end_mapInstruction{
+  color: #666;
+  width: 100%;
+  text-align: center;
+  font-style: italic;
+}
+
+.routingBtns {
+  float: right;
+}
+
+.btnWrapper::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.plain {
+  float: left;
+  background: transparent;
+  border: none;
+  color: #68c175;
+  padding: 10px 16px;
+  margin-top: 2px;
+}
+
+.btnMatrix {
+  background-color: #68c175;
+  float: left;
+  padding: 10px 26px;
+  border: 1px solid #68c175;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.btnMatrix:hover {
+  background-color: #31783c;
+  border-color: #31783c;
+}
+
+.vehicleBox {
+  width: 170px;
+  float:  left;
+}
+
+.vehicleBox .vehicle {
+  width: 50px;
+  height: 41px;
+  float: left;
+  background-color: transparent;
+  border: 2px dashed #DADADA;
+  margin-right: 5px;
+  background-image: url('../images/modes.svg');
+  background-size: 150px 41px;
+  background-repeat: no-repeat;
+}
+.vehicleBox .vehicle.active {
+  color: #68c175;
+  border: 2px solid #68c175;;
+}
+
+.bike { background-position: -100px 0;}
+.pedestrian { background-position: -50px 0;}
+
+.axisLabel {
+    position: absolute;
+    text-align: center;html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #eee;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+#map {
+  height: calc( 100% - 300px ); 
+  width: 100%;
+/*  position: absolute;
+  background: #fff;
+  margin:0;*/
+}
+
+.instruction {
+  margin: 20px 0;
+}
+
+html.is-iframed-demo .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 767px) {
+  html.is-iframed-demo #map {
+    height: calc( 100% - 550px );
+  }
+}
+
+html.is-iframed-demo .not-map-part {
+  margin: 0 auto;
+}
+
+html.is-iframed-demo .hide-if-iframed {
+  display: none;
+}
+/*
+#map .leaflet-label {
+  background: #585858;
+  color: #fff;
+  border-radius:  3px;
+  font: 10px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  padding: 2px 2px;
+  user-select: none;
+  white-space: nowrap;
+}*/

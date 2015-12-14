@@ -1,0 +1,120 @@
+
+
+<html class="matrix-widget" data-ng-app="matrix">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+  <link rel="stylesheet" href="css/classic.css" />
+  <link rel="stylesheet" href="css/leaflet.label.css" />
+  <link rel="stylesheet" href="css/matrix.css" />
+  <script src="conf/env.conf"></script>
+    <!-- Main tangram library -->
+  <script src="https://mapzen.com/tangram/0.4/tangram.min.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+  <script src="js/jquery.columns.min.js"></script>
+</head>
+<body>
+  <div class="container-fluid row" ng-controller="MatrixController">
+    <div id="controls" class = "control-container">
+      <img src="images/timedistancelogo.svg" alt="logo">
+      <!---------control view ------>
+      <div ng-hide="appView == 'matrixTable'" class = "not-table ng-hide">
+        <h4><span class="descriptions"> Select an environment</span></h4>
+        <select id = "env_dropdown" onchange="selectEnv()">
+          <option id=localhost value="http://localhost:8002/">localhost</option>
+          <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
+          <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
+        </select>
+
+      <div class = "show matrixWrapper">
+          <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
+          <h4 class="instruction"> 1. Select a matrix type </h4>
+          <button id="one_to_many" ng-click="oneToManyClick()" class = "{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
+          <button id="many_to_one" ng-click="manyToOneClick()" class = "{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
+          <button id="many_to_many" ng-click="manyToManyClick()" class = "{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
+      </div>
+
+    <div class = "show startPointsWrapper">
+      <div class="start" id="start" name="start">
+        <h4 class="instruction"> 2. Add start point(s) </h4>
+          <ol>
+            <li id="startpt" ng-repeat="point in startPoints">
+              <div class = "start marker">{{point.index}}</div>
+              <span class = "geocode"> {{point.latlon}}  </span>
+            </li>
+            <li ng-hide="startPoints.length != 0">
+              <div class = "start marker"></div>
+              <span class = "placeholder geocode"> <i>{{startgeocode}}</i></span>
+            </li>
+          </ol>
+          <div class="start_mapInstruction"> {{start_mapInstruction}} </div>
+          <button ng-show="matrixType == 'many_to_one'&&editingFocus == 'start_points'" ng-click="goToEndPoints()" class ="done"> Next &gt; </button>
+        </div>
+        <div ng-show = "matrixType == ''||editingFocus=='end_points'" class = "block pointsBlocker"></div>
+        <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
+      </div>
+
+      <div ng-hide="matrixType == 'many_to_many'" class = "show endPointsWrapper">
+        <div class="end" id="end" name="end">
+          <h4 class="instruction"> 3. Add end point(s) </h4>
+          <ol>
+            <li ng-repeat="point in endPoints">
+              <div class = "end marker">{{point.index}}</div>
+              <span class = "geocode"> {{point.latlon}}</span>
+            </li>
+            <li ng-hide="endPoints.length != 0">
+              <div class = "end marker"></div>
+              <span class = "placeholder geocode"> <i>{{endgeocode}}</i></span>
+            </li>
+          </ol>
+          <div class="end_mapInstruction"> {{end_mapInstruction}} </div>
+        </div>
+        <div ng-show = "matrixType == ''||editingFocus=='start_points'" class = "block pointsBlocker"></div>
+      </div>
+
+      <div class = "btnWrapper">
+        <button ng-click="clearAll()" class="plain" id="clear_btn" type="button">Clear All</button>
+        <div class = "routingBtns">
+          <div class="vehicleBox" id="vehicleoptions">
+            <button ng-click="setMode('auto')" name="auto" class = "{{mode == 'auto' ? 'active ' : ''}}vehicle auto"> </button>
+            <button ng-click="setMode('bicycle')" name="bike" class = "{{mode == 'bicycle' ? 'active ' : ''}}vehicle bike"> </button>
+            <button ng-click="setMode('pedestrian')" name="pedestrain" class = "{{mode == 'pedestrian' ? 'active ' : ''}}vehicle pedestrian"> </button>
+          </div>
+          <button id="matrix_btn" class ="btnMatrix" type="button">View Matrix</button>
+        </div>
+      </div>
+      </div>
+
+      <!---------table view ------>
+      <div ng-hide="appView == 'control'" class = "tableView ng-hide">
+        <button class = "plain" ng-click="backToControlView()"> &lt; Back</button>
+        <div id="columns"></div>
+        <div class="routingBtns">
+          <button  class="btnMatrix"s ng-click="clearAll()"> start over </button>
+        </div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+  <script src="js/leaflet.label.js"></script>
+  <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
+  <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
+  
+  <script type="text/javascript" src="js/matrix.js"></script>
+  <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
+  <script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
+  <script type="text/javascript">
+    // Apply special root-element class for iframed demo situations
+    if (window.self !== window.top) {
+      document.documentElement.className += ' is-iframed-demo';
+    }
+    window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
+  </script>
+</body>
+</html>
+
