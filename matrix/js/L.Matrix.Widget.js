@@ -245,6 +245,9 @@
                console.log(this.options.serviceUrl + this._matrixtype + '?json=' +
                       params + '&api_key=' + this._accessToken);
                
+               document.getElementById('matrixResponse').innerHTML =
+               "<a href='" + this.options.serviceUrl + this._matrixtype + '?json=' + params + '&api_key=' + this._accessToken + "' target='_blank'>JSON Matrix Response Link</a>";
+
               return this.options.serviceUrl + this._matrixtype + '?json=' +
                       params + '&api_key=' + this._accessToken;
             },
