@@ -82,7 +82,13 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     layers : [ roadmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
+  
+  // Add geocoding plugin
+  var options = {
+    layers: 'coarse'
+  };
 
+  L.control.geocoder('search-8LtGSDw', options).addTo(map);
   L.control.layers(baseMaps, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction

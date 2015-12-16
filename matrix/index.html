@@ -6,14 +6,16 @@
   <link rel="stylesheet" href="css/classic.css" />
   <link rel="stylesheet" href="css/leaflet.label.css" />
   <link rel="stylesheet" href="css/matrix.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css">
   <script src="conf/env.conf"></script>
-    <!-- Main tangram library -->
+  <!-- Main tangram library -->
   <script src="https://mapzen.com/tangram/0.4/tangram.min.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script src="js/jquery.columns.min.js"></script>
 </head>
 <body>
+
 <div class="container-fluid row" ng-controller="MatrixController">
   <div id="controls" class = "control-container">
     <img src="images/timedistancelogo.svg" alt="logo">
@@ -96,12 +98,13 @@
   </div>
 
   <div id="map"></div>
-</div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 <script src="js/leaflet.label.js"></script>
 <script src="../routing/js/lrm/leaflet-routing-machine.js"></script>
 <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
+<!-- Load geocoding plugin after Leaflet -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
 <script type="text/javascript" src="js/matrix.js"></script>
 <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
