@@ -69,8 +69,8 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
   
   var baseMaps = {
-    "RoadMap" : roadmap,
     "TangramZinc" : tangramZinc,
+    "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap
   };
@@ -79,7 +79,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ roadmap ],
+    layers : [ tangramZinc ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -137,12 +137,17 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
       var marker = new L.marker(geo, {
-        icon : getOriginIcon()
-      }).bindLabel((locCount).toString(), {
-        position: [geo.lat,geo.lon],
-        noHide: true,
-        offset: [-10,-11]
-      });
+          icon : getOriginIcon()
+          }).bindLabel((locCount).toString(), (locCount < 10) ? {
+          position: [geo.lat,geo.lon],
+          noHide: true,
+          offset: [-9,-12]
+          } : {
+          position: [geo.lat,geo.lon],
+          noHide: true,
+          offset: [-12,-12]
+          }
+        );
     map.addLayer(marker);
     markers.push(marker);
   });
@@ -151,11 +156,16 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
       var marker = new L.marker(geo, {
         icon : getDestinationIcon()
-      }).bindLabel((locCount).toString(), {
+      }).bindLabel((locCount).toString(), (locCount < 10) ? {
         position: [geo.lat,geo.lon],
         noHide: true,
-        offset: [-10,-11]
-      });
+        offset: [-9,-12]
+      } : {
+        position: [geo.lat,geo.lon],
+        noHide: true,
+        offset: [-13,-12]
+        }
+      );  
     map.addLayer(marker);
     markers.push(marker);
   });
