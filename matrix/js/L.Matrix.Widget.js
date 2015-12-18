@@ -141,7 +141,7 @@
 
         L.Matrix.Widget = L.Class.extend({
           options : {
-            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
+            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.prod,
             timeout : 30 * 1000,
             mode: 'auto'
           },
@@ -239,8 +239,8 @@
                });
 
                //reset service url & access token if environment has changed
-               (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
-               (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
+               (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.prod;
+               (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.prod;
 
                console.log(this.options.serviceUrl + this._matrixtype + '?json=' +
                       params + '&api_key=' + this._accessToken);
