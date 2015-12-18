@@ -55,8 +55,8 @@
       }
 
       // reset service url & access token if environment has changed
-      (typeof this.elevServiceUrl != 'undefined' || this.elevServiceUrl != null) ? this.options.serviceUrl = this.elevServiceUrl : this.options.serviceUrl = this.elevationServer.dev;
-      (typeof this.elevToken != "undefined" || this.elevToken != null) ? this._accessToken = this.elevToken : this._accessToken = this.elevAccessToken.dev;
+      (typeof this.elevServiceUrl != 'undefined' || this.elevServiceUrl != null) ? this.elevServiceUrl = this.elevServiceUrl : this.elevServiceUrl = this.elevationServer.prod;
+      (typeof this.elevToken != "undefined" || this.elevToken != null) ? this._accessToken = this.elevToken : this._accessToken = this.elevAccessToken.prod;
 
       var params = JSON.stringify({
         encoded_polyline : rrshape,
@@ -105,7 +105,7 @@
 
         L.Elevation = L.Class.extend({
           options : {
-            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : elevationServer.dev,
+            elevServiceUrl : (typeof elevServiceUrl != "undefined" || elevServiceUrl != null) ? elevServiceUrl : elevationServer.prod,
             timeout : 30 * 1000
           },
 

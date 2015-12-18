@@ -952,13 +952,17 @@ if (typeof module !== undefined) module.exports = polyline;
       var container = this._itineraryBuilder.createContainer(),
           steps = this._itineraryBuilder.createStepsContainer(),
           i,
-          instr,
           step,
           distance,
           text,
           verbal_alert,
+          depart_instr,
+          verbal_depart,
+          instr,
           verbal_pre,
           verbal_post,
+          arrive_instr,
+          verbal_arrive,
           icon;
 
       container.appendChild(steps);
@@ -966,13 +970,16 @@ if (typeof module !== undefined) module.exports = polyline;
       for (i = 0; i < r.instructions.length; i++) {
         instr = r.instructions[i];
         text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+        depart_instr = (typeof instr.depart_instruction != "undefined" ? instr.depart_instruction : "");
         verbal_alert = (typeof instr.verbal_transition_alert_instruction != "undefined" ?  "VERBAL_ALERT: " + instr.verbal_transition_alert_instruction : "");
+        verbal_depart = (typeof instr.verbal_depart_instruction != "undefined" ?  "VERBAL_DEPART: " + instr.verbal_depart_instruction : "");
         verbal_pre =  (typeof instr.verbal_pre_transition_instruction != "undefined" ? "VERBAL_PRE: " + instr.verbal_pre_transition_instruction : "");
         verbal_post = (typeof instr.verbal_post_transition_instruction != "undefined" ? "VERBAL_POST: " + instr.verbal_post_transition_instruction : "");
+        arrive_instr = (typeof instr.arrive_instruction != "undefined" ? instr.arrive_instruction : "");
+        verbal_arrive = (typeof instr.verbal_arrive_instruction != "undefined" ?  "VERBAL_ARRIVE: " + instr.verbal_arrive_instruction : "");
         distance = this._formatter.formatDistance(instr.distance);
         icon = this._formatter.getIconName(instr, i);
-        step = this._itineraryBuilder.createStep(text, verbal_alert, verbal_pre, verbal_post, distance, icon, steps);
-
+        step = this._itineraryBuilder.createStep(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps);
         this._addRowListeners(step, r.coordinates[instr.index]);
       }
 
@@ -1073,7 +1080,7 @@ if (typeof module !== undefined) module.exports = polyline;
       return L.DomUtil.create('tbody', '');
     },
 
-    createStep: function(text, verbal_alert, verbal_pre, verbal_post, distance, icon, steps) {
+    createStep: function(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps) {
       var row = L.DomUtil.create('tr', '', steps),
         span,
         td,
@@ -1082,6 +1089,12 @@ if (typeof module !== undefined) module.exports = polyline;
       span = L.DomUtil.create('span', 'leaflet-routing-icon leaflet-routing-icon-'+icon, td);
       td.appendChild(span);
       td = L.DomUtil.create('td', 'text', row);
+        ul = L.DomUtil.create('ul', 'depart_instr', row);
+        ul.appendChild(document.createTextNode(depart_instr));
+        td.appendChild(ul);
+        ul = L.DomUtil.create('ul', 'verbal_depart', row);
+        ul.appendChild(document.createTextNode(verbal_depart));
+        td.appendChild(ul);
       td.appendChild(document.createTextNode(text));
         ul = L.DomUtil.create('ul', 'verbal_alert', row);
         ul.appendChild(document.createTextNode(verbal_alert));
@@ -1091,7 +1104,13 @@ if (typeof module !== undefined) module.exports = polyline;
         td.appendChild(ul);
         ul = L.DomUtil.create('ul', 'verbal_post', row);
         ul.appendChild(document.createTextNode(verbal_post));
-      td.appendChild(ul);
+        td.appendChild(ul);
+        ul = L.DomUtil.create('ul', 'arrive_instr', row);
+        ul.appendChild(document.createTextNode(arrive_instr));
+        td.appendChild(ul);
+        ul = L.DomUtil.create('ul', 'verbal_arrive', row);
+        ul.appendChild(document.createTextNode(verbal_arrive));
+        td.appendChild(ul);
       td = L.DomUtil.create('td', '', row);
       td.appendChild(document.createTextNode(distance));
       return row;

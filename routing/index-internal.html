@@ -62,6 +62,13 @@
             <h6>Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6>
             <h6><b>NOTE: Transit is not currently working in production</b></h6>
             <hr>
+            <span style="color:black" class="descriptions">Select an environment:</span><br>
+			  <select id = "env_dropdown" onchange="selectEnv()">
+				<option id=localhost value="http://localhost:8002/">localhost</option>
+				<option id=development value="http://valhalla.dev.mapzen.com/">development</option>
+				<option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
+			</select>
+		    <br>
 		    <div>
 		    <span style="color:black" class="descriptions">Routing Options: </span><br>
 				<form>

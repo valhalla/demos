@@ -195,10 +195,10 @@ if (typeof module !== undefined) module.exports = polyline;
   var polyline = require('polyline');
   
   L.Routing = L.Routing || {};
-  
+
   L.Routing.Valhalla = L.Class.extend({
     options: {
-      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
+      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.prod,
       timeout: 30 * 1000,
       transitmode: 'auto'
     },
@@ -361,47 +361,58 @@ if (typeof module !== undefined) module.exports = polyline;
         var streetName = options.street;
         this._transitmode = transitM;
         var costing_options = options.costing_options;
+        var date_time = (typeof this.options.date_time != 'undefined') ? this.options.date_time :  options.date_time;
+        var directions_options = this.options.directions_options;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
-              locationKey = this._locationKey(waypoints[i].latLng).split(',');
-          
+          locationKey = this._locationKey(waypoints[i].latLng).split(',');
           if(i === 0 || i === waypoints.length-1){
             loc = {
               lat: parseFloat(locationKey[0]),
               lon: parseFloat(locationKey[1]),
-              type: "break"
+              type: "break",
+              name: waypoints[i].name,
+              street: waypoints[i].street,
+              city: waypoints[i].city,
+              state: waypoints[i].state
             }
           }else{
             loc = {
               lat: parseFloat(locationKey[0]),
               lon: parseFloat(locationKey[1]),
-              type: "through"
+              type: "through",
+              name: waypoints[i].name,
+              street: waypoints[i].street,
+              city: waypoints[i].city,
+              state: waypoints[i].state
             }
           }
-  	    if (i === 0 && transitM === "multimodal") loc.date_time = options.date_time;
           locs.push(loc);
         }
+          var params = JSON.stringify({
+            locations: locs,
+            street: streetName,
+            costing: transitM,
+            costing_options: costing_options,
+            //directions_options: directions_options,
+            date_time: date_time
+          });
         
-        var params = JSON.stringify({
-           locations: locs,
-           street: streetName,
-           costing: transitM,
-           costing_options: costing_options
-         });
-
          //reset service url & access token if environment has changed
-         (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
-         (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
+         (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.prod;
+         (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.prod;
 
          console.log(this.options.serviceUrl + 'route?json=' +
                 params + '&api_key=' + this._accessToken);
          
+       /*  document.getElementById('routeResponse').innerHTML =
+           "<a href='" + this.options.serviceUrl + 'route?json=' + params + '&api_key=' + this._accessToken + "' target='_blank'>JSON Route Response Link</a>";*/
+         
         return this.options.serviceUrl + 'route?json=' +
                 params + '&api_key=' + this._accessToken;
       },
-      
-      
+
       _locationKey: function(location) {
         return location.lat + ',' + location.lng;
       },
@@ -497,7 +508,6 @@ if (typeof module !== undefined) module.exports = polyline;
         indices[i] = Math.min(maxCoordIndex, Math.max(indices[i], 0));
       }
     }
-    
   });
 
   L.Routing.valhalla = function(accessToken, transitmode, options) {
