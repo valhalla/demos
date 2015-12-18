@@ -9,13 +9,15 @@ var mode_mapping = {
 var date = new Date();
 var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
 var serviceUrl;
-var envToken;
-var elevToken;
-var envServer;
-var elevServiceUrl;
+var envToken = accessToken.prod;
+var elevToken = elevAccessToken.prod;
+var envServer = server.prod;
+var elevServiceUrl = elevationServer.prod;
+var exists = false; 
 
 function selectEnv() {
   $("option:selected").each(function() {
+    exists = true; 
     envServer = $(this).text();
     serviceUrl = document.getElementById(envServer).value;
     getEnvToken();
@@ -556,7 +558,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     elevationBtn.addEventListener('click', function(e) {
       if (!rr) return;
-      selectEnv();
+      if (exists) 
+        selectEnv();
+      else getEnvToken();
+      
       var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
       elev.resetChart();
       elev.profile(elev._rrshape);
