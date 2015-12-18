@@ -21,12 +21,12 @@
     <img src="images/timedistancelogo.svg" alt="logo">
     <!---------control view ------>
     <div ng-hide="appView == 'matrixTable'" class = "not-table ng-hide">
-      <h4><span class="descriptions"> Select an environment</span></h4>
+     <!-- <h4><span class="descriptions"> Select an environment</span></h4>
       <select id = "env_dropdown" onchange="selectEnv()">
         <option id=localhost value="http://localhost:8002/">localhost</option>
         <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
         <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
-      </select>
+      </select> -->
       <div class = "matrixWrapper">
         <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
         <h4 class="instruction"> 1. Select a matrix type </h4>

@@ -13,6 +13,13 @@ body {
   margin:0;*/
 }
 
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #A4A4A4;
+}
+
 .modes {
   width:20px;
   height:20px;
@@ -23,7 +30,7 @@ body {
 }
 
 div#route_inst {
-  height: 50vh;
+  height: auto;
   overflow: auto;
   color: #ccc;
 }
@@ -58,13 +65,17 @@ div#route_inst table td.distance{
 
 }
 
-#drive_btn, #bike_btn, #walk_btn, #multi_btn {
+##hidechart {
   min-width: 40px;
   text-align: center;
 }
-#elevation_btn {
-  width: 120px;
+
+#drive_btn, #bike_btn, #walk_btn, #multi_btn, #elevation_btn {
+  border-color: #A4A4A4;
+  background-color: #A4A4A4;
+  color: #fff;
 }
+
 #clearbtn {
   width: 120px;
   text-align: center;
@@ -75,6 +86,23 @@ div#route_inst table td.distance{
   background-color: #d4645c;
   color: #fff;
 }
+
+#routeResponse {
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.reset {
+  border-color: #d4645c;
+  background-color: #d4645c;
+  color: #fff;
+  float: left;
+  padding: 10px 26px;
+  border: 1px solid #68c175;
+  text-transform: uppercase;
+}
+
+
 
 #flot-tooltip {
   font-size: 12px;

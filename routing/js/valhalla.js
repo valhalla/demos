@@ -42,10 +42,14 @@ function getEnvToken() {
   }
 }
 
-// sets ISO date time to 12:15 of current date on initial transit run
+//format needs to be YYYY-MM-DDTHH:MM
 function parseIsoDateTime(dtStr) {
-  var dt = dtStr.split("T");
-  return dtStr.replace(dt[1], "12:15:00");
+  var dt = dtStr.split(".");
+  var datestr = "";
+  //YYYY-MM-DDTHH:MM:SS
+  str = dt[0].split(":");
+  datestr = str[0] + ":" + str[1];
+  return datestr;
 }
 var dateStr = parseIsoDateTime(isoDateTime.toString());
 
@@ -72,11 +76,11 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  /*var roadmap = L.tileLayer('http://otile3.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-    attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-  }),*/
   var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+  }), tangramZinc = Tangram.leafletLayer({
+    scene: 'https://raw.githubusercontent.com/tangrams/zinc-style-no-labels/gh-pages/zinc-style-no-labels.yaml',
+    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
@@ -86,6 +90,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var baseMaps = {
+    "TangramZinc" : tangramZinc,
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap,
@@ -94,11 +99,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
-    zoomControl : false,
-    layers : [ roadmap ],
+    zoomControl : true,
+    layers : [ transitmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
+  
+  // Add geocoding plugin
+  var options = {
+    layers: 'coarse'
+  };
 
+  L.control.geocoder('search-8LtGSDw', options).addTo(map);
   L.control.layers(baseMaps, null).addTo(map);
 
   $scope.route_instructions = '';
@@ -345,7 +356,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       'lon' : e.latlng.lng
     };
 
-    var eventObj = window.event ? event : e.originalEvent;
+  var eventObj = window.event ? event : e.originalEvent;
     //way to test multi-locations
     if(eventObj.ctrlKey) {
       if (locations == 0) {
@@ -479,41 +490,67 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var walkBtn = document.getElementById("walk_btn");
     var multiBtn = document.getElementById("multi_btn");
     var elevationBtn = document.getElementById("elevation_btn");
-    var clearBtn = document.getElementById("clear_btn");
     var routeresponse;
 
     driveBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
+      
+      var calendarInput = document.getElementById("datepicker").value;
+      if (typeof calendarInput != "undefined") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);
+      }
       rr.route({
-        transitmode : 'auto'
+        transitmode : 'auto',
+        date_time : dtoptions
       });
     });
 
     bikeBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
+            
       var bikeoptions = setBikeOptions();
+      var calendarInput = document.getElementById("datepicker").value;
+      if (typeof calendarInput != "undefined") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);
+      }
       rr.route({
         transitmode : 'bicycle',
-        costing_options : bikeoptions
+        costing_options : bikeoptions,
+        date_time : dtoptions
       });
     });
 
     walkBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
+
+      var calendarInput = document.getElementById("datepicker").value;
+      if (typeof calendarInput != "undefined") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);   
+      }
       rr.route({
-        transitmode : 'pedestrian'
+        transitmode : 'pedestrian',
+        date_time : dtoptions
       });
     });
 
     multiBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
+
+      var calendarInput = document.getElementById("datepicker").value;
+      if (typeof calendarInput != "undefined") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);    
+      }
       rr.route({
         transitmode : 'multimodal',
-        date_time : dateStr
+        date_time : dtoptions
       });
     });
 
@@ -524,15 +561,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       elev.resetChart();
       elev.profile(elev._rrshape);
       document.getElementById('graph').style.display = "block";
-    });
-
-    clearBtn.addEventListener('click', function(e) {
-      Locations = [];
-      var elev = (rr && typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
-      reset();
-      elev.resetChart();
-      document.getElementById('permalink').innerHTML = "";
-      window.location.hash = "";
     });
 
     function setBikeOptions() {
@@ -556,6 +584,25 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         }
       };
       return bikeoptions;
+    }
+    
+    function setDateTime(dateStr) {
+      var dttype = document.getElementsByName("dttype");
+      for (var i = 0; i < dttype.length; i++) {
+        if (dttype[i].checked) {
+          dt_type = dttype[i].value;
+        }
+      }
+      //if user selects current, then we reset time to current date time
+      if (dt_type == 0)
+        dateStr = parseIsoDateTime(this.date.toISOString().toString());
+      else
+        dateStr = parseIsoDateTime(dateStr);
+      var datetimeoptions = {
+        type : parseInt(dt_type),
+        value : dateStr.toString()
+      };
+      return datetimeoptions;
     }
 
     /*
@@ -590,8 +637,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         } else {
           dateStr = parseIsoDateTime(isoDateTime.toString());
         }
-        multiBtn.click();
       }
+      return dateStr;
     }
 
     $(document).on('mode-alert', function(e, m) {
@@ -605,11 +652,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       $scope.$emit('setRouteInstruction', instructions);
     });
 
-    $("#datepicker").on("click", function() {
-      datetimeUpdate(this.value);
-    });
-
-
   // ask the service for information about this location
   map.on("contextmenu", function(e) {
     var ll = {
@@ -620,13 +662,40 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var locate = L.locate(envToken);
     locate.locate(ll, locateEdgeMarkers);
   });
+  
+  $scope.clearAll = function(e) {
+    if (rr) {
+      rr.removeFrom(map);
+      rr = null;
+    }
+    $scope.$emit('resetRouteInstruction');
+    $scope.appView = 'control'
+    locations = 0;
+    remove_markers();
+    if (typeof elev != "undefined")
+      elev.resetChart();
+    $('#graph').empty();
+    //reset datetime calendar and type
+    this.datetime=[];
+    Locations = [];
+    document.getElementById('permalink').innerHTML = "";
+    window.location.hash = "";
+  }
 
   $("#showbtn").on("click", function() {
-    document.getElementById('options').style.display = "block";
+    document.getElementById('doptions').style.display = "block";
+    document.getElementById('boptions').style.display = "block";
+    document.getElementById('woptions').style.display = "block";
+    document.getElementById('toptions').style.display = "block";
+    document.getElementById('dtoptions').style.display = "block";
   });
 
   $("#hidebtn").on("click", function() {
-    document.getElementById('options').style.display = "none";
+    document.getElementById('doptions').style.display = "none";
+    document.getElementById('boptions').style.display = "none";
+    document.getElementById('woptions').style.display = "none";
+    document.getElementById('toptions').style.display = "none";
+    document.getElementById('dtoptions').style.display = "none";
   });
 
   $("#hidechart").on("click", function() {

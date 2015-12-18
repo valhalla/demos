@@ -10,8 +10,11 @@
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/valhalla.css" />
     <link rel="stylesheet" href="css/elevation.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css"  >
 
     <script src="conf/env.conf"></script>
+    <!-- Main tangram library -->
+    <script src="https://mapzen.com/tangram/0.4/tangram.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
     <script language="javascript" type="text/javascript" src="js/calendar/datetimepicker.js">
@@ -30,7 +33,6 @@
         body{
             width: 100%;
             height: 100%;
-            overflow: hidden;
         }
         #mapwrapper{
             padding:0;
@@ -42,25 +44,30 @@
         .transparent_btn:hover{
             background-color:#ccc;
         }
+        .info {
+          display: inline-block;
+          height: 100%;
+          overflow-x: hidden;
+          overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 	<div class="container-fluid" data-ng-controller="RouteController">
-      <div class="row">
-        <div class="col-md-2">
+	
+        <div class="col-md-2 info">
           <div id="instructions">
-            <h3><b>Routing<br>Backend Test Utility</b></h3>
-            <h6>Point & click on the map to select a start & end point. Defaults to car.</h6>
-            <h6>Change route to use other methods of travel (car, bike, walk, or transit) from one of the mode buttons below.</h6>
-            <h6>NOTE: Transit defaults to 12:15 on current date.</h6>
+            <img src="images/turnbyturnlogo.png" alt="logo">
+            <h6><b>Point & click on the map to select a start & end point.</b> Defaults to car.</h6>
+            <h6>Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6>
+            <h6><b>NOTE: Transit is not currently working in production</b></h6>
             <hr>
-            <span style="color:black" class="descriptions">Select an environment:</span><br>
-			<select id = "env_dropdown" onchange="selectEnv()">
-				  <option id=localhost value="http://localhost:8002/">localhost</option>
-				  <option id=development selected="selected" value="http://valhalla.dev.mapzen.com/">development</option>
-				  <option id=production value="http://valhalla.mapzen.com/">production</option>
-				</select>
-		    <br>
+              <span style="color:black" class="descriptions">Select an environment:</span><br>
+ 			  <select id = "env_dropdown" onchange="selectEnv()">
+	            <option id=localhost value="http://localhost:8002/">localhost</option>
+	            <option id=development value="http://valhalla.dev.mapzen.com/">development</option>
+	            <option id=production selected="selected" value="http://valhalla.mapzen.com/">production</option>
+               </select>	
 		    <div>
 		    <span style="color:black" class="descriptions">Routing Options: </span><br>
 				<form>
@@ -68,13 +75,18 @@
 				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
 				</form>
 			</div>
-            <br>
-            <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
-            <div id="options" name="options" style="display:none">
+            <div id="doptions" name="doptions" style="display:none">
+			  <form id="auto" name="auto" ><span style="color:black">
+				<h5><b>Auto Options:</b></h5><p>
+				<i>Coming soon!</i>
+			  </form>
+		      <hr>
+		    </div>
+		    <div id="boptions" name="boptions" style="display:none">
 			  <form id="bike" name="bike" ><span style="color:black">
-				<h2><b>Bike Options:</b></h2><br>
+				<h5><b>Bicycle Options:</b></h5><p>
 				  road: <input type="radio" name="btype" value="Road" checked/>
-				  cross: <input style="color:black" type="radio" name="btype" value="Cross" />
+				  cross: <input type="radio" name="btype" value="Cross" />
                   hybrid: <input type="radio" name="btype" value="Hybrid" />
                   mountain: <input type="radio" name="btype" value="Mountain"/>
                   <br>
@@ -82,43 +94,73 @@
                   cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
                   use hills (0-1): <input type="textbox" id="use_hills" value="0.5" class="biketextbox"/>
                   </span>
-                  <br>
+			  </form>
+		      <hr>
+		    </div>
+	        <div id="woptions" name="woptions" style="display:none">
+		      <form id="walk" name="walk" ><span style="color:black">
+			    <h5><b>Pedestrian Options:</b></h5><p>
+			    <i>Coming soon!</i>
+		      </form>
+		      <hr>
+	        </div>
+	        <div id="toptions" name="toptions" style="display:none">
+		      <form id="transit" name="transit" ><span style="color:black">
+			    <h5><b>Transit Options:</b></h5><p>
+			    <i>Coming soon!</i>
+		      </form>
+	        <hr>
+	        </div>
+            <div id="dtoptions" name="dtoptions" style="display:none">
+			  <form id="datetime" name="datetime" ><span style="color:black">
+				<h5><b>Date & Time Options:</b></h5><p>
+				  Current: <input type="radio" name="dttype" value="0" checked/>
+				  Depart: <input type="radio" name="dttype" value="1"/>
+				  Arrive: <input type="radio" name="dttype" value="2"/>
+				  <br><p>
+                  <span style="color:black" class="descriptions"><b>Select a new date and/or time, then click a mode of travel.</b></span><br>
+                  <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
 			  </form>
 		    </div>
-		    <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
+		    <br>
+	        <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
+            <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
-			<br>
-			<div id='permalink' style='display:inline-block; color:black'></div>
-			<br>
-            <span style="color:black" class="descriptions">Select a new date and/or time, then click in the text box to trigger the new transit route.</span><br>
-            <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
-          </div>
+		  </div>
+		  <div id='permalink' style='display:inline-block;'></div><br>
+		<!--  <div id="routeResponse" style="display:inline-block;">JSON Route Response Link</div> -->
           <br>
-          <div class = "col-md-15" >
+           <div class = "col-md-15" >
       	    <div id="graph" style= "display:none; height:200px; width: 100%; position: bottom; float:center;"></div>
-          </div>
+          </div><br>
           <button id="elevation_btn" class = "transparent_btn" type="button">Get Elevation</button>
           <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
-          <br><br>
-          <div><button id="clear_btn" class = "transparent_btn" type="button">Clear Routes</button></div>
           
+          <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
           <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
           <h6>Point & click on map to place the origin.  Press & hold the
           ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
           key + click on your destination.  Clear your routes by clicking the red 'Clear Routes' button. </h6>
           
-          <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
+        <div>
+          <button  class="reset" ng-click="clearAll()"> clear all </button>
         </div>
+       
+        </div>
+
         <div id="mapwrapper" class="col-md-10">
-        <div id="map"></div>
+          <div id="map"></div>
         </div>
-      </div>
+        
     </div>
     
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
     <script src="js/lrm/leaflet-routing-machine.js"></script>
+    <!-- Load geocoding plugin after Leaflet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
+
     <script src="js/valhalla.js"></script>
     <script src="js/lrm/L.Routing.Valhalla.js"></script>
     <script src="js/lrm/L.Routing.Valhalla.Formatter.js"></script>
