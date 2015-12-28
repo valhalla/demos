@@ -13,11 +13,11 @@ var envToken = accessToken.prod;
 var elevToken = elevAccessToken.prod;
 var envServer = server.prod;
 var elevServiceUrl = elevationServer.prod;
-var exists = false; 
+var environmentExists = false; 
 
 function selectEnv() {
   $("option:selected").each(function() {
-    exists = true; 
+    environmentExists = true; 
     envServer = $(this).text();
     serviceUrl = document.getElementById(envServer).value;
     getEnvToken();
@@ -499,14 +499,18 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       getEnvToken();
       
       var calendarInput = document.getElementById("datepicker").value;
-      if (typeof calendarInput != "undefined") {
+      if (calendarInput != "") {
         dateStr = datetimeUpdate(calendarInput);
         var dtoptions = setDateTime(dateStr);
+        rr.route({
+          transitmode : 'auto',
+          date_time : dtoptions
+        });
+      } else {
+        rr.route({
+          transitmode : 'auto'
+        });
       }
-      rr.route({
-        transitmode : 'auto',
-        date_time : dtoptions
-      });
     });
 
     bikeBtn.addEventListener('click', function(e) {
@@ -515,15 +519,20 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             
       var bikeoptions = setBikeOptions();
       var calendarInput = document.getElementById("datepicker").value;
-      if (typeof calendarInput != "undefined") {
+      if (calendarInput != "") {
         dateStr = datetimeUpdate(calendarInput);
         var dtoptions = setDateTime(dateStr);
+        rr.route({
+          transitmode : 'bicycle',
+          costing_options : bikeoptions,
+          date_time : dtoptions
+        });
+      } else {
+        rr.route({
+          transitmode : 'bicycle',
+          costing_options : bikeoptions
+        });
       }
-      rr.route({
-        transitmode : 'bicycle',
-        costing_options : bikeoptions,
-        date_time : dtoptions
-      });
     });
 
     walkBtn.addEventListener('click', function(e) {
@@ -531,23 +540,27 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       getEnvToken();
 
       var calendarInput = document.getElementById("datepicker").value;
-      if (typeof calendarInput != "undefined") {
+      if (calendarInput != "") {
         dateStr = datetimeUpdate(calendarInput);
-        var dtoptions = setDateTime(dateStr);   
+        var dtoptions = setDateTime(dateStr); 
+        rr.route({
+          transitmode : 'pedestrian',
+          date_time : dtoptions
+        });
+      } else {
+        rr.route({
+          transitmode : 'pedestrian'
+        });
       }
-      rr.route({
-        transitmode : 'pedestrian',
-        date_time : dtoptions
-      });
     });
 
     multiBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
 
-      var calendarInput = document.getElementById("datepicker").value;
-      if (typeof calendarInput != "undefined") {
-        dateStr = datetimeUpdate(calendarInput);
+      var calInput = document.getElementById("datepicker").value;
+      if (calInput != "undefined") {
+        dateStr = datetimeUpdate(calInput);
         var dtoptions = setDateTime(dateStr);    
       }
       rr.route({
@@ -555,10 +568,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         date_time : dtoptions
       });
     });
-
+    
     elevationBtn.addEventListener('click', function(e) {
       if (!rr) return;
-      if (exists) 
+      if (environmentExists) 
         selectEnv();
       else getEnvToken();
       
@@ -680,8 +693,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (typeof elev != "undefined")
       elev.resetChart();
     $('#graph').empty();
+    $("[name=btype]").filter("[value='Road']").prop("checked",true);
+    $('input#use_roads').val("0.5");
+    $('input#cycle_speed').val("25.0");
+    $('input#use_hills').val("0.5");
     //reset datetime calendar and type
     this.datetime=[];
+    dateStr="";
+    $("[name=dttype]").filter("[value='0']").prop("checked",true);
+    $('input#datepicker').val("");
     Locations = [];
     document.getElementById('permalink').innerHTML = "";
     window.location.hash = "";
