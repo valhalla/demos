@@ -360,7 +360,7 @@ if (typeof module !== undefined) module.exports = polyline;
         var transitM = options.transitmode || this._transitmode;
         var streetName = options.street;
         this._transitmode = transitM;
-        var costing_options = options.costing_options;
+        var costing_options = (typeof this.options.costing_options != 'undefined') ? this.options.costing_options :  options.costing_options;
         var date_time = (typeof this.options.date_time != 'undefined') ? this.options.date_time :  options.date_time;
         var directions_options = this.options.directions_options;
 
