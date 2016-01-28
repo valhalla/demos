@@ -1,8 +1,8 @@
 var app = angular.module('routing', []);
 var hash_params = L.Hash.parseHash(location.hash);
 var mode_mapping = {
-  'foot' : 'pedestrian',
-  'car' : 'auto',
+  'foot'    : 'pedestrian',
+  'car'     : 'auto',
   'bicycle' : 'bicycle',
   'transit' : 'multimodal'
 };
@@ -160,7 +160,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   };
 
-  // allow hash links
+ // allow hash links
   var hash = new L.Hash(map);
   var markers = [];
 
@@ -203,10 +203,32 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
         extra = extra + (extra.length ? '&' : '') + e;
     });
-    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(locs) + '&costing=' + JSON.stringify(costing);
+    var hash_locs = [];
+    locs.forEach(function(locs) {
+      hash_locs.push({
+        'lat' : locs.lat,
+        'lon' : locs.lng
+      })
+    });
+    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(hash_locs) + '&costing=' + JSON.stringify(costing);
     force = show;
     window.location.hash = '#' + extra + parameter;
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+  };
+  
+  var updateHashCosting = function(costing,costing_options,datetime) {
+    // update the permalink hash
+    var pieces = parseHash();
+    if (pieces[2].indexOf('&costing=auto'))
+      extra = '&costing=' + JSON.stringify(costing);
 
+    if (costing_options != null)
+      extra = extra + '&costing_options' + JSON.stringify(costing_options);
+    
+    if (datetime != null)
+      extra = extra + '&date_time=' + JSON.stringify(datetime);
+
+    window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
 
@@ -224,13 +246,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     var locs = [];
     waypoints.forEach(function(waypoints) {
-      locs.push(L.latLng(waypoints.lat, waypoints.lng));
+      locs.push(L.latLng(waypoints.lat, waypoints.lon));
     });
 
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
-
-    rr = createRouting({waypoints: locs, transitmode: costing}, true);
+    
+    if (parameters.costing_options !== undefined)
+      var costing_options = JSON.parse(parameters.costing_options);
+    
+    if (parameters.date_time !== undefined)
+      var date_time = JSON.parse(parameters.date_time);
+    
+    rr = createRouting({waypoints: locs, transitmode: costing, costing_options: costing_options, date_time: date_time}, true);
     locations = locs.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -435,7 +463,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
-          router : L.Routing.valhalla(envToken, 'auto'),
+          router : L.Routing.valhalla(envToken, options.transitmode, options),
           summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 
           createMarker : function(i, wp, n) {
@@ -497,48 +525,56 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     driveBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
-      
+      var costing = 'auto';
       var calendarInput = document.getElementById("datepicker").value;
       if (calendarInput != "") {
         dateStr = datetimeUpdate(calendarInput);
         var dtoptions = setDateTime(dateStr);
         rr.route({
-          transitmode : 'auto',
+          transitmode : costing,
           date_time : dtoptions
         });
       } else {
         rr.route({
-          transitmode : 'auto'
+          transitmode : costing
         });
       }
+      updateHashCosting(costing,null,dtoptions);
     });
 
     bikeBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
-            
-      var bikeoptions = setBikeOptions();
-      var calendarInput = document.getElementById("datepicker").value;
-      if (calendarInput != "") {
-        dateStr = datetimeUpdate(calendarInput);
-        var dtoptions = setDateTime(dateStr);
-        rr.route({
-          transitmode : 'bicycle',
-          costing_options : bikeoptions,
-          date_time : dtoptions
-        });
+      var costing = 'bicycle';
+      if (document.getElementById('bikeoptions').style.display == "block") {
+        var bikeoptions = setBikeOptions();
+        var calendarInput = document.getElementById("datepicker").value;
+        if (calendarInput != "") {
+          dateStr = datetimeUpdate(calendarInput);
+          var dtoptions = setDateTime(dateStr);
+          rr.route({
+            transitmode : 'bicycle',
+            costing_options : bikeoptions,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            transitmode : 'bicycle',
+            costing_options : bikeoptions
+          });
+        }
       } else {
         rr.route({
-          transitmode : 'bicycle',
-          costing_options : bikeoptions
+          transitmode : 'bicycle'
         });
       }
+      updateHashCosting(costing,bikeoptions,dtoptions);
     });
 
     walkBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
-
+      var costing = 'pedestrian';
       var calendarInput = document.getElementById("datepicker").value;
       if (calendarInput != "") {
         dateStr = datetimeUpdate(calendarInput);
@@ -552,21 +588,24 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           transitmode : 'pedestrian'
         });
       }
+      updateHashCosting(costing,null,dtoptions);
     });
 
     multiBtn.addEventListener('click', function(e) {
       if (!rr) return;
       getEnvToken();
-
+      var costing = 'multimodal';
       var calInput = document.getElementById("datepicker").value;
+      var dtoptions = "";
       if (calInput != "undefined") {
         dateStr = datetimeUpdate(calInput);
-        var dtoptions = setDateTime(dateStr);    
+        dtoptions = setDateTime(dateStr);    
       }
       rr.route({
         transitmode : 'multimodal',
         date_time : dtoptions
       });
+      updateHashCosting(costing,null,dtoptions);
     });
     
     elevationBtn.addEventListener('click', function(e) {
@@ -611,15 +650,20 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           dt_type = dttype[i].value;
         }
       }
-      //if user selects current, then we reset time to current date time
-      if (dt_type == 0)
+      //if user selects current, then only send type = 0
+      if (dt_type == 0) {
         dateStr = parseIsoDateTime(this.date.toISOString().toString());
-      else
+        var datetimeoptions = {
+          type : parseInt(dt_type),
+        };
+      }
+      else {
         dateStr = parseIsoDateTime(dateStr);
-      var datetimeoptions = {
-        type : parseInt(dt_type),
-        value : dateStr.toString()
-      };
+        var datetimeoptions = {
+          type : parseInt(dt_type),
+          value : dateStr.toString()
+        };
+      }
       return datetimeoptions;
     }
 
@@ -708,18 +752,18 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }
 
   $("#showbtn").on("click", function() {
-    document.getElementById('doptions').style.display = "block";
-    document.getElementById('boptions').style.display = "block";
-    document.getElementById('woptions').style.display = "block";
-    document.getElementById('toptions').style.display = "block";
+    document.getElementById('driveoptions').style.display = "block";
+    document.getElementById('bikeoptions').style.display = "block";
+    document.getElementById('walkoptions').style.display = "block";
+    document.getElementById('transitoptions').style.display = "block";
     document.getElementById('dtoptions').style.display = "block";
   });
 
   $("#hidebtn").on("click", function() {
-    document.getElementById('doptions').style.display = "none";
-    document.getElementById('boptions').style.display = "none";
-    document.getElementById('woptions').style.display = "none";
-    document.getElementById('toptions').style.display = "none";
+    document.getElementById('driveoptions').style.display = "none";
+    document.getElementById('bikeoptions').style.display = "none";
+    document.getElementById('walkoptions').style.display = "none";
+    document.getElementById('transitoptions').style.display = "none";
     document.getElementById('dtoptions').style.display = "none";
   });
 
