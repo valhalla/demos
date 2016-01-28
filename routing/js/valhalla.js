@@ -216,11 +216,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
   
-  var updateHashCosting = function(costing) {
+  var updateHashCosting = function(costing,costing_options,datetime) {
     // update the permalink hash
     var pieces = parseHash();
     if (pieces[2].indexOf('&costing=auto'))
-        extra = '&costing=' + JSON.stringify(costing);
+      extra = '&costing=' + JSON.stringify(costing);
+
+    if (costing_options != null)
+      extra = extra + '&costing_options' + JSON.stringify(costing_options);
+    
+    if (datetime != null)
+      extra = extra + '&date_time=' + JSON.stringify(datetime);
 
     window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -245,8 +251,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
-
-    rr = createRouting({waypoints: locs, transitmode: costing}, true);
+    
+    if (parameters.costing_options !== undefined)
+      var costing_options = JSON.parse(parameters.costing_options);
+    
+    if (parameters.date_time !== undefined)
+      var date_time = JSON.parse(parameters.date_time);
+    
+    rr = createRouting({waypoints: locs, transitmode: costing, costing_options: costing_options, date_time: date_time}, true);
     locations = locs.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -451,7 +463,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
-          router : L.Routing.valhalla(envToken, options.transitmode),
+          router : L.Routing.valhalla(envToken, options.transitmode, options),
           summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 
           createMarker : function(i, wp, n) {
@@ -527,7 +539,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           transitmode : costing
         });
       }
-      updateHashCosting(costing);
+      updateHashCosting(costing,null,dtoptions);
     });
 
     bikeBtn.addEventListener('click', function(e) {
@@ -556,7 +568,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           transitmode : 'bicycle'
         });
       }
-      updateHashCosting(costing);
+      updateHashCosting(costing,bikeoptions,dtoptions);
     });
 
     walkBtn.addEventListener('click', function(e) {
@@ -576,7 +588,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           transitmode : 'pedestrian'
         });
       }
-      updateHashCosting(costing);
+      updateHashCosting(costing,null,dtoptions);
     });
 
     multiBtn.addEventListener('click', function(e) {
@@ -593,7 +605,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         transitmode : 'multimodal',
         date_time : dtoptions
       });
-      updateHashCosting(costing);
+      updateHashCosting(costing,null,dtoptions);
     });
     
     elevationBtn.addEventListener('click', function(e) {
