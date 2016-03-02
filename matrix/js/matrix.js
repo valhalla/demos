@@ -59,8 +59,8 @@ app.run(function($rootScope) {
 app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }), tangramZinc = Tangram.leafletLayer({
-    scene: 'https://raw.githubusercontent.com/tangrams/zinc-style-no-labels/gh-pages/zinc-style-no-labels.yaml',
+  }), tangramCinnabar = Tangram.leafletLayer({
+    scene: 'https://raw.githubusercontent.com/tangrams/cinnabar-style-more-labels/gh-pages/cinnabar-style-more-labels.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
   }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -69,7 +69,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
   
   var baseMaps = {
-    "TangramZinc" : tangramZinc,
+    "TangramCinnabar" : tangramCinnabar,
     "RoadMap" : roadmap,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap
@@ -79,7 +79,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ tangramZinc ],
+    layers : [ tangramCinnabar ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
