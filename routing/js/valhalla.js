@@ -80,10 +80,10 @@ app.run(function($rootScope) {
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }), tangramCinnabar = Tangram.leafletLayer({
+  }),/*tangramCinnabar = Tangram.leafletLayer({
     scene: 'https://github.com/tangrams/cinnabar-style-more-labels/blob/gh-pages/cinnabar-style-more-labels.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }),/* tangramCrossHatch = Tangram.leafletLayer({
+  }), */tangramCrossHatch = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/tangram-sandbox/gh-pages/styles/crosshatch.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
   }), /*tangramZinc = Tangram.leafletLayer({
@@ -98,9 +98,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var baseMaps = {
-    "TangramCinnabar" : tangramCinnabar,
     "RoadMap" : roadmap,
-   // "TangramCrossHatch" : tangramCrossHatch,
+   // "TangramCinnabar" : tangramCinnabar,
+    "TangramCrossHatch" : tangramCrossHatch,
    // "TangramZinc" : tangramZinc,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap,
@@ -110,7 +110,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ tangramCinnabar ],
+    layers : [ roadmap ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
