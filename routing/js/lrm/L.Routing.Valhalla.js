@@ -200,7 +200,7 @@ if (typeof module !== undefined) module.exports = polyline;
     options: {
       serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.prod,
       timeout: 30 * 1000,
-      transitmode: 'auto'
+      transitmode: 'multimodal'
     },
 
     initialize: function(accessToken, transitmode, options) {

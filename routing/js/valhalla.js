@@ -125,7 +125,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $scope.route_instructions = '';
 
   var Locations = [];
-  var mode = 'car';
+  var mode = 'transit';
 
   var icon = L.icon({
     iconUrl : 'resource/via_dot.png',
@@ -227,7 +227,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var updateHashCosting = function(costing,costing_options,datetime) {
     // update the permalink hash
     var pieces = parseHash();
-    if (pieces[2].indexOf('&costing=auto'))
+    if (pieces[2].indexOf('&costing=multimodal'))
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costing_options != null)
@@ -292,13 +292,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon(m || 'car')
+        icon : getDestinationIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -310,13 +310,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon(m || 'car')
+        icon : getViaIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
