@@ -126,6 +126,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         mobileRouteEL.classList.add('show-route');
         mobileRouteEL.classList.remove('hide-route');
       }else{
+        //if is small hack to load the narrative on the initial mobile load
+        if (document.getElementsByClassName('leaflet-routing-container')[0].innerText == ""){
+          window.location.reload();
+        }
         routingContainer.classList.add('left-align');
         mobileRouteEL.classList.remove('show-route');
         mobileRouteEL.classList.add('hide-route');
