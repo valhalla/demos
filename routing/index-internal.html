@@ -44,12 +44,12 @@
         .transparent_btn:hover{
             background-color:#ccc;
         }
-        .info {
+       /* .info {
           display: inline-block;
           height: 100%;
           overflow-x: hidden;
           overflow-y: auto;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -139,11 +139,12 @@
           <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
           
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
+          <!--
           <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
           <h6>Point & click on map to place the origin.  Press & hold the
           ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
           key + click on your destination.  Clear your routes by clicking the red 'Clear Routes' button. </h6>
-          
+          -->
         <div>
           <button  class="reset" ng-click="clearAll()"> clear all </button>
         </div>
@@ -157,10 +158,10 @@
     </div>
     
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    <!-- Load geocoding plugin after Leaflet -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
     <script src="js/lrm/leaflet-routing-machine.js"></script>
+    <!-- Load geocoding plugin after Leaflet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
     <script src="js/valhalla.js"></script>
     <script src="js/lrm/L.Routing.Valhalla.js"></script>

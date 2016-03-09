@@ -86,7 +86,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }),/* tangramCrossHatch = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/tangram-sandbox/gh-pages/styles/crosshatch.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }), /*tangramZinc = Tangram.leafletLayer({
+  }), tangramZinc = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/zinc-style-no-labels/gh-pages/zinc-style-no-labels.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
   }), */ cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
@@ -113,6 +113,25 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     layers : [ tangramCinnabar ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
+  
+  //mobile narrative display logic
+  var mobileRouteEL = document.createElement('div');
+    mobileRouteEL.className = 'mobile-route';
+    mobileRouteEL.classList.add('show-route');
+    mobileRouteEL.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var routingContainer = document.getElementsByClassName('leaflet-routing-container')[0];
+      if(routingContainer.classList.contains('left-align')){
+        routingContainer.classList.remove('left-align');
+        mobileRouteEL.classList.add('show-route');
+        mobileRouteEL.classList.remove('hide-route');
+      }else{
+        routingContainer.classList.add('left-align');
+        mobileRouteEL.classList.remove('show-route');
+        mobileRouteEL.classList.add('hide-route');
+      }
+    }, true);
+  document.querySelector('.leaflet-top.leaflet-right').appendChild(mobileRouteEL);
   
   // Add geocoding plugin
   var options = {

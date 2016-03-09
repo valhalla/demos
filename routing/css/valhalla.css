@@ -33,6 +33,7 @@ div#route_inst {
   height: auto;
   overflow: auto;
   color: #ccc;
+  border-collapse: collapse;
 }
 
 div#route_inst table td.distance{

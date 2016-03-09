@@ -44,12 +44,12 @@
         .transparent_btn:hover{
             background-color:#ccc;
         }
-        .info {
+       /* .info {
           display: inline-block;
           height: 100%;
           overflow-x: hidden;
           overflow-y: auto;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -122,7 +122,7 @@
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 		  </div>
-		  <div id='permalink' style='display:inline-block;'></div><br>
+		  <div id='permalink' style='display:inline-block;'></div>
 		<!--  <div id="routeResponse" style="display:inline-block;">JSON Route Response Link</div> -->
           <br>
            <div class = "col-md-15" >
@@ -132,15 +132,15 @@
           <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
           
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
+          <!--
           <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
           <h6>Point & click on map to place the origin.  Press & hold the
           ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
           key + click on your destination.  Clear your routes by clicking the red 'Clear Routes' button. </h6>
-          
-        <div>
+          -->
+        <!--div>
           <button  class="reset" ng-click="clearAll()"> clear all </button>
-        </div>
-       
+        </div-->
         </div>
 
         <div id="mapwrapper" class="col-md-10">
