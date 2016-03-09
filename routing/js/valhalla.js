@@ -139,7 +139,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   };
 
   L.control.geocoder('search-8LtGSDw', options).addTo(map);
-  L.control.layers(baseMaps, null).addTo(map);
+  //L.control.layers(baseMaps, null).addTo(map);
 
   $scope.route_instructions = '';
 
