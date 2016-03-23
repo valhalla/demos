@@ -200,13 +200,17 @@ if (typeof module !== undefined) module.exports = polyline;
     options: {
       serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.prod,
       timeout: 30 * 1000,
-      transitmode: 'multimodal'
+      transitmode: 'auto'
     },
 
-    initialize: function(accessToken, transitmode, options) {
+    initialize: function(accessToken, transitmode, costingOptions, directionsOptions, dateTime, options) {
       L.Util.setOptions(this, options);
       this._accessToken = accessToken;
       this._transitmode = transitmode;
+      this._costingOptions = costingOptions;
+      this._directionsOptions = directionsOptions;
+      this._dateTime = dateTime;
+
       this._hints = {
         locations: {}
       };
@@ -357,12 +361,13 @@ if (typeof module !== undefined) module.exports = polyline;
         var locs = [],
             locationKey,
             hint;
+
         var transitM = options.transitmode || this._transitmode;
         var streetName = options.street;
         this._transitmode = transitM;
-        var costing_options = (typeof this.options.costing_options != 'undefined') ? this.options.costing_options :  options.costing_options;
-        var date_time = (typeof this.options.date_time != 'undefined') ? this.options.date_time :  options.date_time;
-        var directions_options = this.options.directions_options;
+        var costingOptions = options.costing_options;
+        var directionsOptions = options.directions_options;
+        var dateTime = options.date_time;
 
         for (var i = 0; i < waypoints.length; i++) {
           var loc;
@@ -394,9 +399,9 @@ if (typeof module !== undefined) module.exports = polyline;
             locations: locs,
             street: streetName,
             costing: transitM,
-            costing_options: costing_options,
-            //directions_options: directions_options,
-            date_time: date_time
+            costing_options: costingOptions,
+            directions_options: directionsOptions,
+            date_time: dateTime
           });
         
          //reset service url & access token if environment has changed

@@ -80,16 +80,16 @@ app.run(function($rootScope) {
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }),tangramCinnabar = Tangram.leafletLayer({
+  }),/*tangramCinnabar = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/cinnabar-style-more-labels/gh-pages/cinnabar-style-more-labels.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }),/* tangramCrossHatch = Tangram.leafletLayer({
+  }), tangramCrossHatch = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/tangram-sandbox/gh-pages/styles/crosshatch.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }), tangramZinc = Tangram.leafletLayer({
+  }),*/tangramZinc = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/zinc-style-no-labels/gh-pages/zinc-style-no-labels.yaml',
     attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }), */ cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+  }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -99,9 +99,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   var baseMaps = {
     "RoadMap" : roadmap,
-    "TangramCinnabar" : tangramCinnabar,
+   // "TangramCinnabar" : tangramCinnabar,
    // "TangramCrossHatch" : tangramCrossHatch,
-   // "TangramZinc" : tangramZinc,
+    "TangramZinc" : tangramZinc,
     "CycleMap" : cyclemap,
     "ElevationMap" : elevationmap,
     "TransitMap" : transitmap
@@ -143,12 +143,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   };
 
   L.control.geocoder('search-8LtGSDw', options).addTo(map);
-  //L.control.layers(baseMaps, null).addTo(map);
+  L.control.layers(baseMaps, null).addTo(map);
 
   $scope.route_instructions = '';
 
   var Locations = [];
-  var mode = 'transit';
+  var mode = 'car';
 
   var icon = L.icon({
     iconUrl : 'resource/via_dot.png',
@@ -247,17 +247,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
   
-  var updateHashCosting = function(costing,costing_options,datetime) {
+  var updateHashCosting = function(costing, costingOptions, dateTime) {
     // update the permalink hash
     var pieces = parseHash();
-    if (pieces[2].indexOf('&costing=multimodal'))
+    if (pieces[2].indexOf('&costing=auto'))
       extra = '&costing=' + JSON.stringify(costing);
 
-    if (costing_options != null)
-      extra = extra + '&costing_options' + JSON.stringify(costing_options);
+    if (costingOptions != null)
+      extra = extra + '&costing_options' + JSON.stringify(costingOptions);
     
-    if (datetime != null)
-      extra = extra + '&date_time=' + JSON.stringify(datetime);
+    if (dateTime != null)
+      extra = extra + '&date_time=' + JSON.stringify(dateTime);
 
     window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -283,11 +283,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
     
-    if (parameters.costing_options !== undefined)
-      var costing_options = JSON.parse(parameters.costing_options);
+    if (parameters.costingOptions !== undefined)
+      var costing_options = JSON.parse(parameters.costingOptions);
     
-    if (parameters.date_time !== undefined)
-      var date_time = JSON.parse(parameters.date_time);
+    if (parameters.dateTime !== undefined)
+      var date_time = JSON.parse(parameters.dateTime);
     
     rr = createRouting({waypoints: locs, transitmode: costing, costing_options: costing_options, date_time: date_time}, true);
     locations = locs.length;
@@ -315,13 +315,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'transit')
+        icon : getOriginIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon(m || 'transit')
+        icon : getDestinationIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -333,13 +333,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'transit')
+        icon : getOriginIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon(m || 'transit')
+        icon : getViaIcon(m || 'car')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -494,7 +494,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
-          router : L.Routing.valhalla(envToken, options.transitmode, options),
+          router : L.Routing.valhalla(envToken, options.transitmode, options.costing_options, options.date_time),
           summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
 
           createMarker : function(i, wp, n) {
