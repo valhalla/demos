@@ -108,7 +108,23 @@
 	        <div id="transitoptions" name="transitoptions" style="display:none">
 		      <form id="transit" name="transit" ><span style="color:black">
 			    <h5><b>Transit Options:</b></h5><p>
-			    <i>Coming soon!</i>
+                  use_bus (0-1): <input type="textbox" id="use_bus" value="0.3" class="transittextbox"/><br>
+                  use_rail (0-1): <input type="textbox" id="use_rail" value="0.6" class="transittextbox"/><br>
+                  use_transfers (0-1): <input type="textbox" id="use_transfers" value="0.3" class="transittextbox"/>
+                  </span>
+		      </form>
+	        <hr>
+	        </div>
+	        <div id="truckoptions" name="truckoptions" style="display:none">
+		      <form id="truck" name="truck" ><span style="color:black">
+			    <h5><b>Truck Options:</b></h5><p>
+	            height (m): <input type="textbox" id="height" value="4.11" class="trucktextbox"/><br>
+	            width (m): <input type="textbox" id="width" value="2.6" class="trucktextbox"/><br>
+	            length (m): <input type="textbox" id="length" value="21.64" class="trucktextbox"/><br>
+	            weight (metric ton): <input type="textbox" id="weight" value="21.77" class="trucktextbox"/><br>
+	            axle_load (metric ton): <input type="textbox" id="axle_load" value="9.07" class="trucktextbox"/><br>
+	            hazmat: <input type="checkbox" id="isHazmat"/>
+	            </span>
 		      </form>
 	        <hr>
 	        </div>

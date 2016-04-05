@@ -954,6 +954,7 @@ if (typeof module !== undefined) module.exports = polyline;
           i,
           step,
           distance,
+          walk_text,
           text,
           depart_instr,
           instr,
@@ -964,10 +965,15 @@ if (typeof module !== undefined) module.exports = polyline;
       
       for (i = 0; i < r.instructions.length; i++) {
         instr = r.instructions[i];
-        text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+        var travelmode = (typeof instr.travel_mode != "undefined" ? instr.travel_mode : "");
+        if ((instr.type === 1 || instr.type === 2 || instr.type === 3 || instr.type === 36) && travelmode == 'pedestrian') {
+          walk_text = this._formatter.formatInstruction(instr, i).replace("Head", "Walk");
+          text = instr.maneuvernum + ": " + walk_text;
+        } else
+          text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
         depart_instr = (typeof instr.depart_instruction != "undefined" ? instr.depart_instruction : "");
         arrive_instr = (typeof instr.arrive_instruction != "undefined" ? instr.arrive_instruction : "");
-        distance = this._formatter.formatDistance(instr.distance);
+        distance = (instr.travel_type != '04' || instr.travel_type != '05' || instr.travel_type != '06') ? this._formatter.formatDistance(instr.distance) : '';
         icon = this._formatter.getIconName(instr, i);
         step = this._itineraryBuilder.createStep(text, depart_instr, arrive_instr, distance, icon, steps);
         this._addRowListeners(step, r.coordinates[instr.index]);
@@ -1110,14 +1116,13 @@ if (typeof module !== undefined) module.exports = polyline;
 
 		options: {
 			styles: [
-			    {color: 'black', opacity: 0.15, weight: 8},
-			    {color: 'white', opacity: 0.9, weight: 4},
-				{color: '#25A5FA', opacity: 1, weight: 6}
+                          { color: 'white', opacity: 0.8, weight: 10 },
+                          { color: '#3455db', opacity: 1, weight: 6 }
 			],
 			missingRouteStyles: [
-				{color: 'black', opacity: 0.15, weight: 7},
-				{color: 'white', opacity: 0.6, weight: 4},
-				{color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+                          {color: 'black', opacity: 0.15, weight: 7},
+                          {color: 'white', opacity: 0.6, weight: 4},
+                          {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
 			],
 			addWaypoints: true,
 			extendToWaypoints: true,
@@ -1137,7 +1142,8 @@ if (typeof module !== undefined) module.exports = polyline;
       this._addSegment(
         route.coordinates,
         this.options.styles,
-        this.options.addWaypoints);
+        this.options.addWaypoints
+        );
     },
 
     addTo: function(map) {
@@ -1189,13 +1195,13 @@ if (typeof module !== undefined) module.exports = polyline;
         routeCoord = L.latLng(this._route.coordinates[wpIndices[i]]);
         if (wpLatLng.distanceTo(routeCoord) >
           this.options.missingRouteTolerance) {
-          this._addSegment([wpLatLng, routeCoord],
+          this._addSegmentNoTransit([wpLatLng, routeCoord],
             this.options.missingRouteStyles);
         }
       }
     },
 
-    _addSegment: function(coords, styles, mouselistener) {
+    _addSegmentNoTransit: function(coords, styles, mouselistener) {
       var i,
         pl;
 
@@ -1206,6 +1212,91 @@ if (typeof module !== undefined) module.exports = polyline;
           pl.on('mousedown', this._onLineTouched, this);
         }
       }
+    },
+
+    //didnt rename because I believe this gets called from leaflet.js automatically so doing array chunking logic here
+    _addSegment: function(coords, styles, mouselistener) {
+      var i,j,
+        pl;
+
+      //need to split array where colors are located
+      var chunkStart, chunkEnd, colors, polyline, set;
+      var all_markers = [];
+      var arrayChunk = coords;
+      var transitLineMarker = {
+          radius: 5,
+          color: 'white',
+          fillColor: '#20345b',
+          opacity: 1,
+          fillOpacity: 1
+        };
+
+        for (var i = 0; i < arrayChunk.length; i++){
+          //if the first coord is not transit (no style stored with coords)
+          if (!arrayChunk[0][2]) {
+            for (var i = 0; arrayChunk[i].length < 3; i++){
+              chunkStart = 0;
+              chunkEnd = i;
+              if (i == arrayChunk.length-1)
+                break;
+            }
+          //remove the chunk that is ready with styling and create polyline layer
+            set = arrayChunk.slice(chunkStart, chunkEnd+2);
+
+            for (var s = 0; s < styles.length; s++) {
+              //dashed for walking mode in transit routes
+              if (this._route.transitmode=='multimodal' || this._route.transitmode=='pedestrian')
+                styles[s].dashArray = '4,10';
+              else styles[s].dashArray = '0,0';
+
+              polyline = new L.polyline(set, styles[s]);
+              this.addLayer(polyline);
+              if (mouselistener) {
+                polyline.on('mousedown', this._onLineTouched, this);
+              }
+            }
+          }
+          //if the first coord is transit (style is stored with coords)
+          else {
+            for (var i = 0; arrayChunk[i].length>=3; i++){
+              chunkStart = 0;
+              chunkEnd = i;
+              if (arrayChunk[i].length>3){
+                //this happens when there is a back-to-back transfer (2 colors on same index) so we need to separate chunk here
+                colors = arrayChunk[i][3].styles;
+                var modeCircle = L.circleMarker (arrayChunk[i], transitLineMarker);
+                all_markers.push(modeCircle);
+                break;
+              }
+              else colors = arrayChunk[i][2].styles;
+              if (i == arrayChunk.length-1)
+                break;
+            }
+            //remove the chunk that is ready with styling and create polyline layer
+            set = arrayChunk.slice(chunkStart, chunkEnd+2);
+            //adds transit polyline to map
+            for(var c = 0; c < colors.length; c++)
+            {
+                polyline = new L.polyline(set, colors[c]);
+                this.addLayer(polyline);
+            }
+            // Add a circle to indicate the transition point from walking to transit
+            var modeCircle = L.circleMarker (set[chunkStart], transitLineMarker);
+            all_markers.push(modeCircle);
+            var modeCircle = L.circleMarker (set[chunkEnd+1], transitLineMarker);
+            all_markers.push(modeCircle);
+
+            if (mouselistener) {
+              polyline.on('mousedown', this._onLineTouched, this);
+            }
+          }
+          //continue until chunking and styling is complete
+          arrayChunk = arrayChunk.slice(chunkEnd+1, arrayChunk.length);
+          i=0;
+        }
+        //Want to add the marker layers at the end so they appear on top
+        for (var m=0; m < all_markers.length; m++)
+          this.addLayer(all_markers[m]);
     },
 
     _findNearestWpBefore: function(i) {

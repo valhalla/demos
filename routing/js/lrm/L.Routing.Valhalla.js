@@ -273,66 +273,111 @@ if (typeof module !== undefined) module.exports = polyline;
     },
 
     _routeDone: function(response, inputWaypoints, callback, context) {
-        var coordinates,
-            alts,
-            actualWaypoints,
-            i;
-        context = context || callback;
-        if (response.trip.status !== 0) {
-          callback.call(context, {
-            status: response.status,
-            message: response.status_message
-          });
-          return;
+      var coordinates,
+          alts,
+          actualWaypoints,
+          i;
+      context = context || callback;
+      if (response.trip.status !== 0) {
+        callback.call(context, {
+          status: response.status,
+          message: response.status_message
+        });
+        return;
+      }
+
+      var insts = [];
+      var coordinates = [];
+      var index = 0;
+      var eIndex = 0;
+      var transitStyle = [];
+
+      for(var i = 0; i < response.trip.legs.length; i++){
+        var coord = polyline.decode(response.trip.legs[i].shape, 6);
+
+        for(var k = 0; k < coord.length; k++){
+          coordinates.push(coord[k]);
         }
 
-       //if valhalla changes to array of objects
-        var insts = [];
-        var coordinates = [];
-        var shapeIndex =  0;
-        for(var i = 0; i<response.trip.legs.length;  i++){
-          var coord = polyline.decode(response.trip.legs[i].shape, 6);
+        for(var j =0; j < response.trip.legs[i].maneuvers.length; j++){
+          var res = response.trip.legs[i].maneuvers[j];
+          res.distance = response.trip.legs[i].maneuvers[j]["length"];
+          res.index = index + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
+          res.eIndex = eIndex + response.trip.legs[i].maneuvers[j]["end_shape_index"];
+          res.maneuvernum = j+1;
+          insts.push(res);
 
-          for(var k = 0; k < coord.length; k++){
-            coordinates.push(coord[k]);
+          //lets store the important transit pieces in an array
+          if (res.transit_info) {
+            var transit=[];
+            transit.transitIndex = res.index;
+            transit.transitEIndex = res.eIndex;
+            transit.transitColor = res.transit_info.color;
+            transitStyle.push(transit);
           }
-
-          for(var j =0; j < response.trip.legs[i].maneuvers.length; j++){
-            var res = response.trip.legs[i].maneuvers[j];
-            res.distance = response.trip.legs[i].maneuvers[j]["length"];
-            res.index = shapeIndex + response.trip.legs[i].maneuvers[j]["begin_shape_index"];
-            res.maneuvernum = j+1;
-            insts.push(res);
-          }
-
-          shapeIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
         }
-        actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
+        index += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["begin_shape_index"];
+        eIndex += response.trip.legs[i].maneuvers[response.trip.legs[i].maneuvers.length-1]["end_shape_index"];
 
-
-        alts = [{
-          ////gotta change
-          name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
-          unit: response.trip.units,
-          transitmode: this._transitmode,
-          rrshape: this._rrshape,
-          graphdata: this.graphdata,
-          graphoptions: this.graphoptions,
-          coordinates: coordinates,
-          instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
-          summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
-          inputWaypoints: inputWaypoints,
-          waypoints: actualWaypoints,
-          waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
-        }];
-
-        // only versions <4.5.0 will support this flag
-          if (response.hint_data) {
-            this._saveHintData(response.hint_data, inputWaypoints);
+        //convert color decimal to hex then add color style to only transit shape points
+        for (var ts = 0; ts < transitStyle.length; ts++) {
+          for (var t = transitStyle[ts].transitIndex; t <  transitStyle[ts].transitEIndex+1; t++){
+            coordinates[t].splice(2,0,this._updateTransitStyle(transitStyle[ts].transitColor));
           }
-        callback.call(context, null, alts);
-      },
+        }
+      }
+      actualWaypoints = this._toWaypoints(inputWaypoints, response.trip.locations);
 
+      alts = [{
+        name: this._trimLocationKey(inputWaypoints[0].latLng) + " </div><div class='dest'> " + this._trimLocationKey(inputWaypoints[1].latLng) ,
+        unit: response.trip.units,
+        unit: response.trip.units,
+        transitmode: this._transitmode,
+        coordinates: coordinates,
+        instructions: insts,//response.route_instructions ? this._convertInstructions(response.route_instructions) : [],
+        summary: response.trip.summary ? this._convertSummary(response.trip.summary) : [],
+        inputWaypoints: inputWaypoints,
+        waypoints: actualWaypoints,
+        waypointIndices: this._clampIndices([0,response.trip.legs[0].maneuvers.length], coordinates)
+      }];
+
+      // only versions <4.5.0 will support this flag
+        if (response.hint_data) {
+          this._saveHintData(response.hint_data, inputWaypoints);
+        }
+      callback.call(context, null, alts);
+    },
+
+      _updateTransitStyle: function(intColor) {
+        // isolate red, green, and blue components
+        var red = (intColor >> 16) & 0xff,
+            green = (intColor >> 8) & 0xff,
+            blue = (intColor >> 0) & 0xff;
+
+        // calculate luminance in YUV colorspace based on
+        // https://en.wikipedia.org/wiki/YUV#Conversion_to.2Ffrom_RGB
+        var lum = 0.299 * red + 0.587 * green + 0.114 * blue,
+            is_light = (lum > 0xbb);
+
+        // generate a CSS color string like 'RRGGBB'
+        var paddedHex = 0x1000000 | (intColor & 0xffffff),
+            lineColor = paddedHex.toString(16).substring(1, 7);
+
+        var transitColor = new L.Routing.Control ({
+           lineOptions: {
+             styles: [
+                // Color of outline depending on luminance against background.
+                (is_light ? {color: '#000', opacity: 0.4, weight: 10}
+                          : {color: '#fff', opacity: 0.8, weight: 10}),
+
+                // Color of this transit line.
+                {color: '#'+lineColor.toUpperCase(), opacity: 1, weight: 6}
+              ]
+           }
+         })
+        return transitColor.options.lineOptions;
+     },
+          
       _saveHintData: function(hintData, waypoints) {
         var loc;
         this._hints = {

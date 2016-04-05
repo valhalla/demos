@@ -530,11 +530,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           },
           formatter : new L.Routing.Valhalla.Formatter(),
           pointMarkerStyle : {
-            radius : 6,
-            color : '#25A5FA',
-            fillColor : '#5E6472',
-            opacity : 1,
-            fillOpacity : 1
+            radius: 6,
+            color: '#20345b',
+            fillColor: '#fff',
+            opacity: 1,
+            fillOpacity: 1
           }
         };
 
@@ -632,13 +632,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         dateStr = datetimeUpdate(calInput);
         dtoptions = setDateTime(dateStr);    
       }
-      rr.route({
-        transitmode : 'multimodal',
-        date_time : dtoptions
-      });
+      if (document.getElementById('transitoptions').style.display == "block") {
+        var transitoptions = setTransitOptions();
+        rr.route({
+          transitmode : 'multimodal',
+          costing_options : transitoptions,
+          date_time : dtoptions
+        });
+      } else {
+        rr.route({
+          transitmode : 'multimodal',
+          date_time : dtoptions
+        });
+      }
       updateHashCosting(costing,null,dtoptions);
     });
     
+   
     elevationBtn.addEventListener('click', function(e) {
       if (!rr) return;
       if (environmentExists) 
@@ -674,6 +684,23 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       return bikeoptions;
     }
     
+    function setTransitOptions() {
+      var use_bus = document.getElementById("use_bus").value;
+      var use_rail = document.getElementById("use_rail").value;
+      var use_transfers = document.getElementById("use_transfers").value;
+
+      var transitoptions = {
+        "transit" : {
+          use_bus : use_bus,
+          use_rail : use_rail,
+          use_transfers : use_transfers
+        }
+      };
+      return transitoptions;
+    }
+    
+    
+
     function setDateTime(dateStr) {
       var dttype = document.getElementsByName("dttype");
       for (var i = 0; i < dttype.length; i++) {
