@@ -954,6 +954,7 @@ if (typeof module !== undefined) module.exports = polyline;
           i,
           step,
           distance,
+          walk_text,
           text,
           depart_instr,
           instr,
@@ -964,10 +965,15 @@ if (typeof module !== undefined) module.exports = polyline;
       
       for (i = 0; i < r.instructions.length; i++) {
         instr = r.instructions[i];
-        text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+        var travelmode = (typeof instr.travel_mode != "undefined" ? instr.travel_mode : "");
+        if ((instr.type === 1 || instr.type === 2 || instr.type === 3 || instr.type === 36) && travelmode == 'pedestrian') {
+          walk_text = this._formatter.formatInstruction(instr, i).replace("Head", "Walk");
+          text = instr.maneuvernum + ": " + walk_text;
+        } else
+          text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
         depart_instr = (typeof instr.depart_instruction != "undefined" ? instr.depart_instruction : "");
         arrive_instr = (typeof instr.arrive_instruction != "undefined" ? instr.arrive_instruction : "");
-        distance = this._formatter.formatDistance(instr.distance);
+        distance = (instr.travel_type != '04' || instr.travel_type != '05' || instr.travel_type != '06') ? this._formatter.formatDistance(instr.distance) : '';
         icon = this._formatter.getIconName(instr, i);
         step = this._itineraryBuilder.createStep(text, depart_instr, arrive_instr, distance, icon, steps);
         this._addRowListeners(step, r.coordinates[instr.index]);
@@ -1110,14 +1116,13 @@ if (typeof module !== undefined) module.exports = polyline;
 
 		options: {
 			styles: [
-			    {color: 'black', opacity: 0.15, weight: 8},
-			    {color: 'white', opacity: 0.9, weight: 4},
-				{color: '#25A5FA', opacity: 1, weight: 6}
+                          { color: 'white', opacity: 0.8, weight: 10 },
+                          { color: '#3455db', opacity: 1, weight: 6 }
 			],
 			missingRouteStyles: [
-				{color: 'black', opacity: 0.15, weight: 7},
-				{color: 'white', opacity: 0.6, weight: 4},
-				{color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+                          {color: 'black', opacity: 0.15, weight: 7},
+                          {color: 'white', opacity: 0.6, weight: 4},
+                          {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
 			],
 			addWaypoints: true,
 			extendToWaypoints: true,
@@ -1137,7 +1142,8 @@ if (typeof module !== undefined) module.exports = polyline;
       this._addSegment(
         route.coordinates,
         this.options.styles,
-        this.options.addWaypoints);
+        this.options.addWaypoints
+        );
     },
 
     addTo: function(map) {
@@ -1200,6 +1206,11 @@ if (typeof module !== undefined) module.exports = polyline;
         pl;
 
       for (i = 0; i < styles.length; i++) {
+        //dashed for walking mode
+        if (this._route.transitmode=='pedestrian')
+          styles[i].dashArray = '4,10';
+        else styles[i].dashArray = '0,0';
+
         pl = L.polyline(coords, styles[i]);
         this.addLayer(pl);
         if (mouselistener) {
