@@ -530,11 +530,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           },
           formatter : new L.Routing.Valhalla.Formatter(),
           pointMarkerStyle : {
-            radius : 6,
-            color : '#25A5FA',
-            fillColor : '#5E6472',
-            opacity : 1,
-            fillOpacity : 1
+            radius: 6,
+            color: '#20345b',
+            fillColor: '#fff',
+            opacity: 1,
+            fillOpacity: 1
           }
         };
 

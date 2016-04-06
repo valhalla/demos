@@ -1110,14 +1110,13 @@ if (typeof module !== undefined) module.exports = polyline;
 
 		options: {
 			styles: [
-			    {color: 'black', opacity: 0.15, weight: 8},
-			    {color: 'white', opacity: 0.9, weight: 4},
-				{color: '#25A5FA', opacity: 1, weight: 6}
+                          { color: 'white', opacity: 0.8, weight: 10 },
+                          { color: '#3455db', opacity: 1, weight: 6 }
 			],
 			missingRouteStyles: [
-				{color: 'black', opacity: 0.15, weight: 7},
-				{color: 'white', opacity: 0.6, weight: 4},
-				{color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+                          {color: 'black', opacity: 0.15, weight: 7},
+                          {color: 'white', opacity: 0.6, weight: 4},
+                          {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
 			],
 			addWaypoints: true,
 			extendToWaypoints: true,
@@ -1137,7 +1136,8 @@ if (typeof module !== undefined) module.exports = polyline;
       this._addSegment(
         route.coordinates,
         this.options.styles,
-        this.options.addWaypoints);
+        this.options.addWaypoints
+        );
     },
 
     addTo: function(map) {
@@ -1200,6 +1200,11 @@ if (typeof module !== undefined) module.exports = polyline;
         pl;
 
       for (i = 0; i < styles.length; i++) {
+        //dashed for walking mode
+        if (this._route.transitmode=='pedestrian')
+          styles[i].dashArray = '4,10';
+        else styles[i].dashArray = '0,0';
+
         pl = L.polyline(coords, styles[i]);
         this.addLayer(pl);
         if (mouselistener) {
