@@ -965,15 +965,10 @@ if (typeof module !== undefined) module.exports = polyline;
       
       for (i = 0; i < r.instructions.length; i++) {
         instr = r.instructions[i];
-        var travelmode = (typeof instr.travel_mode != "undefined" ? instr.travel_mode : "");
-        if ((instr.type === 1 || instr.type === 2 || instr.type === 3 || instr.type === 36) && travelmode == 'pedestrian') {
-          walk_text = this._formatter.formatInstruction(instr, i).replace("Head", "Walk");
-          text = instr.maneuvernum + ": " + walk_text;
-        } else
-          text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+        text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
         depart_instr = (typeof instr.depart_instruction != "undefined" ? instr.depart_instruction : "");
         arrive_instr = (typeof instr.arrive_instruction != "undefined" ? instr.arrive_instruction : "");
-        distance = (instr.travel_type != '04' || instr.travel_type != '05' || instr.travel_type != '06') ? this._formatter.formatDistance(instr.distance) : '';
+        distance = this._formatter.formatDistance(instr.distance);
         icon = this._formatter.getIconName(instr, i);
         step = this._itineraryBuilder.createStep(text, depart_instr, arrive_instr, distance, icon, steps);
         this._addRowListeners(step, r.coordinates[instr.index]);
