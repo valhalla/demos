@@ -8,7 +8,7 @@ var mode_mapping = {
 };
 var date = new Date();
 var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
-var serviceUrl;
+var serviceUrl = server.prod;
 var envToken = accessToken.prod;
 var elevToken = elevAccessToken.prod;
 var envServer = server.prod;
@@ -78,61 +78,61 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  var roadmap = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }),/*tangramCinnabar = Tangram.leafletLayer({
+  }),/*cinnabar = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/cinnabar-style-more-labels/gh-pages/cinnabar-style-more-labels.yaml',
-    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }), tangramCrossHatch = Tangram.leafletLayer({
+    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
+  }),crossHatch = Tangram.leafletLayer({
     scene: 'https://raw.githubusercontent.com/tangrams/tangram-sandbox/gh-pages/styles/crosshatch.yaml',
-    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }),*/tangramZinc = Tangram.leafletLayer({
-    scene: 'https://raw.githubusercontent.com/tangrams/zinc-style-no-labels/gh-pages/zinc-style-no-labels.yaml',
-    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
-  }), cyclemap = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
+  }),*/zinc = Tangram.leafletLayer({
+    scene: 'https://mapzen.com/carto/zinc-style/2.0/zinc-style.yaml',
+    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
+  }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), elevationmap = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
+  }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), transitmap = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
+  }), transit = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
     attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
   });
 
   var baseMaps = {
-    "RoadMap" : roadmap,
-   // "TangramCinnabar" : tangramCinnabar,
-   // "TangramCrossHatch" : tangramCrossHatch,
-    "TangramZinc" : tangramZinc,
-    "CycleMap" : cyclemap,
-    "ElevationMap" : elevationmap,
-    "TransitMap" : transitmap
+    "Road" : road,
+   // "Cinnabar" : cinnabar,
+   // "CrossHatch" : crossHatch,
+    "Zinc" : zinc,
+    "Cycle" : cycle,
+    "Elevation" : elevation,
+    "Transit" : transit
   };
 
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ roadmap ],
+    layers : [ road ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
   //mobile narrative display logic
   var mobileRouteEL = document.createElement('div');
     mobileRouteEL.className = 'mobile-route';
-    mobileRouteEL.classList.add('show-route');
+    mobileRouteEL.classList.add('list-route');
     mobileRouteEL.addEventListener('click', function (e) {
       e.stopPropagation();
       var routingContainer = document.getElementsByClassName('leaflet-routing-container')[0];
       if(routingContainer.classList.contains('left-align')){
         routingContainer.classList.remove('left-align');
-        mobileRouteEL.classList.add('show-route');
-        mobileRouteEL.classList.remove('hide-route');
+        mobileRouteEL.classList.add('list-route');
+        mobileRouteEL.classList.remove('cancel-route');
       }else{
         //if is small hack to load the narrative on the initial mobile load
         if (document.getElementsByClassName('leaflet-routing-container')[0].innerText == ""){
           window.location.reload();
         }
         routingContainer.classList.add('left-align');
-        mobileRouteEL.classList.remove('show-route');
-        mobileRouteEL.classList.add('hide-route');
+        mobileRouteEL.classList.remove('list-route');
+        mobileRouteEL.classList.add('cancel-route');
       }
     }, true);
   document.querySelector('.leaflet-top.leaflet-right').appendChild(mobileRouteEL);
@@ -163,9 +163,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var mode_icons = {
-    'car' : 'js/images/drive.png',
-    'foot' : 'js/images/walk.png',
-    'bicycle' : 'js/images/bike.png'
+    'car' : '../images/drive.png',
+    'foot' : '../images/walk.png',
+    'bicycle' : '../images/bike.png'
   };
 
   var getOriginIcon = function(icon) {
@@ -246,16 +246,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     window.location.hash = '#' + extra + parameter;
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
-  
+
   var updateHashCosting = function(costing, costingOptions, dateTime) {
     // update the permalink hash
     var pieces = parseHash();
-    if (pieces[2].indexOf('&costing=auto'))
+    if (pieces[2].indexOf('&costing='))
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
       extra = extra + '&costing_options' + JSON.stringify(costingOptions);
-    
+
     if (dateTime != null)
       extra = extra + '&date_time=' + JSON.stringify(dateTime);
 
@@ -282,14 +282,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
-    
+
     if (parameters.costingOptions !== undefined)
       var costing_options = JSON.parse(parameters.costingOptions);
-    
+
     if (parameters.dateTime !== undefined)
       var date_time = JSON.parse(parameters.dateTime);
-    
-    rr = createRouting({waypoints: locs, transitmode: costing, costing_options: costing_options, date_time: date_time}, true);
+
+    rr = createRouting({waypoints: locs, costing: costing, costing_options: costing_options, date_time: date_time}, true);
     locations = locs.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -306,6 +306,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     $scope.$emit('resetRouteInstruction');
     remove_markers();
     locations = 0;
+    document.getElementById('permalink').innerHTML = "";
   };
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
@@ -406,7 +407,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   // show something to start with but only if it was requested
   $(window).load(function(e) {
-    // rr = L.Routing.valhalla(accessToken);
+    rr = L.Routing.mapzen(accessToken);
     force = true;
     hashRoute();
   });
@@ -484,7 +485,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     var valhalla_mode = mode_mapping[mode];
 
-    rr = createRouting({waypoints: waypoints, transitmode: valhalla_mode});
+    rr = createRouting({waypoints: waypoints, costing: valhalla_mode});
     update(true, waypoints, valhalla_mode);
   });
 
@@ -494,8 +495,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
-          router : L.Routing.valhalla(envToken, options.transitmode, options.costing_options, options.date_time),
-          summaryTemplate : '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
+          router : L.Routing.mapzen(envToken, options),
+          summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
 
           createMarker : function(i, wp, n) {
             var iconV;
@@ -528,7 +529,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
                 + "&layers=Q target=_blank>Edit POI here<a/>");
           },
-          formatter : new L.Routing.Valhalla.Formatter(),
+          formatter : new L.Routing.Mapzen.Formatter(),
           pointMarkerStyle : {
             radius: 6,
             color: '#20345b',
@@ -542,7 +543,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         for (var k in options) {
             defaultOptions[k] = options[k];
         }
-
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
@@ -562,12 +562,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         dateStr = datetimeUpdate(calendarInput);
         var dtoptions = setDateTime(dateStr);
         rr.route({
-          transitmode : costing,
+          costing : costing,
           date_time : dtoptions
         });
       } else {
         rr.route({
-          transitmode : costing
+          costing : costing
         });
       }
       updateHashCosting(costing,null,dtoptions);
@@ -584,19 +584,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
           rr.route({
-            transitmode : 'bicycle',
+            costing : costing,
             costing_options : bikeoptions,
             date_time : dtoptions
           });
         } else {
           rr.route({
-            transitmode : 'bicycle',
+            costing : costing,
             costing_options : bikeoptions
           });
         }
       } else {
         rr.route({
-          transitmode : 'bicycle'
+          costing : costing,
         });
       }
       updateHashCosting(costing,bikeoptions,dtoptions);
@@ -611,12 +611,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         dateStr = datetimeUpdate(calendarInput);
         var dtoptions = setDateTime(dateStr); 
         rr.route({
-          transitmode : 'pedestrian',
+          costing : costing,
           date_time : dtoptions
         });
       } else {
         rr.route({
-          transitmode : 'pedestrian'
+          costing : costing
         });
       }
       updateHashCosting(costing,null,dtoptions);
@@ -635,17 +635,17 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       if (document.getElementById('transitoptions').style.display == "block") {
         var transitoptions = setTransitOptions();
         rr.route({
-          transitmode : 'multimodal',
+          costing : costing,
           costing_options : transitoptions,
           date_time : dtoptions
         });
       } else {
         rr.route({
-          transitmode : 'multimodal',
+          costing : costing,
           date_time : dtoptions
         });
       }
-      updateHashCosting(costing,null,dtoptions);
+      updateHashCosting(costing,transitoptions,dtoptions);
     });
     
    
@@ -655,7 +655,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         selectEnv();
       else getEnvToken();
       
-      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._routes[0].rrshape) : 0;
+      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._router._rrshape) : 0;
       elev.resetChart();
       elev.profile(elev._rrshape);
       document.getElementById('graph').style.display = "block";
@@ -784,14 +784,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
   
   $scope.clearAll = function(e) {
-    if (rr) {
-      rr.removeFrom(map);
-      rr = null;
-    }
-    $scope.$emit('resetRouteInstruction');
+
+    $('.leaflet-marker-icon').remove();
+    $('.leaflet-label').remove();
+    $('.leaflet-marker-shadow').remove();
+    $('svg').html('');
+    $('.leaflet-routing-container').remove();
     $scope.appView = 'control'
     locations = 0;
-    remove_markers();
+
     if (typeof elev != "undefined")
       elev.resetChart();
     $('#graph').empty();
