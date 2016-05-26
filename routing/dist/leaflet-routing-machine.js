@@ -1397,8 +1397,7 @@ if (typeof module !== undefined) module.exports = polyline;
       this._addSegment(
         route.coordinates,
         this.options.styles,
-        this.options.addWaypoints
-        );
+        this.options.addWaypoints);
     },
 
     addTo: function(map) {
@@ -1461,11 +1460,6 @@ if (typeof module !== undefined) module.exports = polyline;
         pl;
 
       for (i = 0; i < styles.length; i++) {
-        //dashed for walking mode
-        if (this._route.transitmode=='pedestrian')
-          styles[i].dashArray = '4,10';
-        else styles[i].dashArray = '0,0';
-
         pl = L.polyline(coords, styles[i]);
         this.addLayer(pl);
         if (mouselistener) {
