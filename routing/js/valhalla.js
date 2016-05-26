@@ -90,7 +90,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     scene: 'https://mapzen.com/carto/zinc-style/2.0/zinc-style.yaml',
     attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
   }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
+    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
     attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
   }), transit = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
@@ -148,7 +148,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $scope.route_instructions = '';
 
   var Locations = [];
-  var mode = 'car';
+  var mode = 'transit';
 
   var icon = L.icon({
     iconUrl : 'resource/via_dot.png',
@@ -254,7 +254,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
-      extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
+      extra = extra + '&costingoptions' + JSON.stringify(costingOptions);
 
     if (dateTime != null)
       extra = extra + '&datetime=' + JSON.stringify(dateTime);
@@ -322,13 +322,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon(m || 'car')
+        icon : getDestinationIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -340,13 +340,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon(m || 'car')
+        icon : getViaIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
