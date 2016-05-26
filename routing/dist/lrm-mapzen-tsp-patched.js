@@ -2364,7 +2364,9 @@ if (typeof module !== undefined) module.exports = polyline;
             data = JSON.parse(resp.responseText);
             this._rrshape = data.trip.legs[0].shape;
             this._routeDone(data, wps, routeOptions, callback, context);
-            
+            if (document.getElementById('graph') && document.getElementById('graph').style.display==="block") {
+              $("#elevation_btn").trigger("click");
+            }
             if (optimize){
               $('.leaflet-marker-icon').remove();
               $('.leaflet-label').remove();
@@ -2384,18 +2386,15 @@ if (typeof module !== undefined) module.exports = polyline;
                 markers.push(marker);
               }
             }
-          } 
-          if (document.getElementById('graph') && document.getElementById('graph').style.display==="block") {
-            $("#elevation_btn").trigger("click");
+          } else {
+            callback.call(context || callback, {
+              status: -1,
+              message: 'HTTP request failed: ' + err.response
+            });
+            alert("Travel Mode: "+ routeOptions.costing + ", status code: " + err.status + ", " + err.response);
           }
-        } else {
-          callback.call(context || callback, {
-            status: -1,
-            message: 'HTTP request failed: ' + err.response
-          });
-          alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
         }
-    }, this), true);
+     }, this), true);
     return this;
   },
 
