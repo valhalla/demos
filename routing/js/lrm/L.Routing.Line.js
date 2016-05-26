@@ -1,67 +1,68 @@
 (function() {
 	'use strict';
 
+	var L = require('leaflet');
+
 	L.Routing = L.Routing || {};
 
-	L.Routing.Line = L.Class.extend({
+	L.Routing.Line = L.LayerGroup.extend({
 		includes: L.Mixin.Events,
 
 		options: {
 			styles: [
-				{color: 'black', opacity: 0.15, weight: 7},
-				{color: 'white', opacity: 0.8, weight: 4},
-				{color: 'orange', opacity: 1, weight: 2}
+				{color: 'black', opacity: 0.15, weight: 9},
+				{color: 'white', opacity: 0.8, weight: 6},
+				{color: 'red', opacity: 1, weight: 2}
 			],
-			addWaypoints: true
+			missingRouteStyles: [
+				{color: 'black', opacity: 0.15, weight: 7},
+				{color: 'white', opacity: 0.6, weight: 4},
+				{color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+			],
+			addWaypoints: true,
+			extendToWaypoints: true,
+			missingRouteTolerance: 10
 		},
 
 		initialize: function(route, options) {
-			L.Util.setOptions(this, options);
+			L.setOptions(this, options);
+			L.LayerGroup.prototype.initialize.call(this, options);
 			this._route = route;
 
-			this._wpIndices = this._findWaypointIndices();
+			if (this.options.extendToWaypoints) {
+				this._extendToWaypoints();
+			}
+
+			if (route.subRoutes) {
+				for(var i = 0; i < route.subRoutes.length; i++) {
+					if(!route.subRoutes[i].styles) route.subRoutes[i].styles = this.options.styles;
+					this._addSegment(
+						route.subRoutes[i].coordinates,
+						route.subRoutes[i].styles,
+						this.options.addWaypoints);
+				}
+			} else {
+			 this._addSegment(
+			 	route.coordinates,
+			 	this.options.styles,
+			 	this.options.addWaypoints);
+			}
 		},
 
 		addTo: function(map) {
 			map.addLayer(this);
+			return this;
 		},
-
-		onAdd: function(map) {
-			var geom = this._route.geometry,
-			    i,
-			    pl;
-
-			this._map = map;
-			this._layers = [];
-			for (i = 0; i < this.options.styles.length; i++) {
-				pl = L.polyline(geom, this.options.styles[i])
-					.addTo(map);
-				if (this.options.addWaypoints) {
-					pl.on('mousedown', this._onLineTouched, this);
-				}
-				this._layers.push(pl);
-			}
-		},
-
-		onRemove: function(map) {
-			var i;
-			for (i = 0; i < this._layers.length; i++) {
-				map.removeLayer(this._layers[i]);
-			}
-
-			delete this._map;
-		},
-
 		getBounds: function() {
-			return L.latLngBounds(this._route.geometry);
+			return L.latLngBounds(this._route.coordinates);
 		},
 
 		_findWaypointIndices: function() {
-			var wps = this._route.waypoints,
+			var wps = this._route.inputWaypoints,
 			    indices = [],
 			    i;
 			for (i = 0; i < wps.length; i++) {
-				indices.push(this._findClosestRoutePoint(L.latLng(wps[i])));
+				indices.push(this._findClosestRoutePoint(wps[i].latLng));
 			}
 
 			return indices;
@@ -73,9 +74,9 @@
 			    i,
 			    d;
 
-			for (i = this._route.geometry.length - 1; i >= 0 ; i--) {
+			for (i = this._route.coordinates.length - 1; i >= 0 ; i--) {
 				// TODO: maybe do this in pixel space instead?
-				d = latlng.distanceTo(this._route.geometry[i]);
+				d = latlng.distanceTo(this._route.coordinates[i]);
 				if (d < minDist) {
 					minIndex = i;
 					minDist = d;
@@ -85,9 +86,40 @@
 			return minIndex;
 		},
 
+		_extendToWaypoints: function() {
+			var wps = this._route.inputWaypoints,
+				wpIndices = this._getWaypointIndices(),
+			    i,
+			    wpLatLng,
+			    routeCoord;
+
+			for (i = 0; i < wps.length; i++) {
+				wpLatLng = wps[i].latLng;
+				routeCoord = L.latLng(this._route.coordinates[wpIndices[i]]);
+				if (wpLatLng.distanceTo(routeCoord) >
+					this.options.missingRouteTolerance) {
+					this._addSegment([wpLatLng, routeCoord],
+						this.options.missingRouteStyles);
+				}
+			}
+		},
+
+		_addSegment: function(coords, styles, mouselistener) {
+			var i,
+				pl;
+			for (i = 0; i < styles.length; i++) {
+				pl = L.polyline(coords, styles[i]);
+				this.addLayer(pl);
+				if (mouselistener) {
+					pl.on('mousedown', this._onLineTouched, this);
+				}
+			}
+		},
+
 		_findNearestWpBefore: function(i) {
-			var j = this._wpIndices.length - 1;
-			while (j >= 0 && this._wpIndices[j] > i) {
+			var wpIndices = this._getWaypointIndices(),
+				j = wpIndices.length - 1;
+			while (j >= 0 && wpIndices[j] > i) {
 				j--;
 			}
 
@@ -101,9 +133,19 @@
 				latlng: e.latlng
 			});
 		},
+
+		_getWaypointIndices: function() {
+			if (!this._wpIndices) {
+				this._wpIndices = this._route.waypointIndices || this._findWaypointIndices();
+			}
+
+			return this._wpIndices;
+		}
 	});
 
 	L.Routing.line = function(route, options) {
 		return new L.Routing.Line(route, options);
 	};
+
+	module.exports = L.Routing;
 })();

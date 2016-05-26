@@ -2,9 +2,13 @@
 	'use strict';
 
 	var Waypoint = L.Class.extend({
-			initialize: function(latLng, name) {
+			initialize: function(latLng, name, street, city, state, type) {
 				this.latLng = latLng;
 				this.name = name;
+				this.street = street;
+				this.city = city;
+				this.state = state;
+				this.type = type;
 			}
 		}),
 	    GeocoderResults = L.Class.extend({

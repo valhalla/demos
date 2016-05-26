@@ -12,6 +12,9 @@
 			if (this.options.waypoints) {
 				this._plan.setWaypoints(this.options.waypoints);
 			}
+			if (this.options.date_time) {
+			  this.setDateTime(this.options.date_time);
+			}
 
 			L.Routing.Itinerary.prototype.initialize.call(this, this._router);
 
@@ -44,6 +47,10 @@
 		setWaypoints: function(waypoints) {
 			this._plan.setWaypoints(waypoints);
 		},
+
+		setDateTime: function(date_time) {
+                  this._plan.setDateTime(date_time);
+                },
 
 		spliceWaypoints: function() {
 			var removed = this._plan.spliceWaypoints.apply(this._plan, arguments);

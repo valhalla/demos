@@ -180,7 +180,7 @@
     }
     
     .leaflet-routing-alt td.measure {
-      min-width:60px;
+      min-width:10px;
     }
     
     .leaflet-routing-alt td.text {
@@ -209,18 +209,18 @@
       border-radius: 2px;
       background-color: #888;
     }
-
-    .leaflet-routing-icon {
-      -webkit-background-size: 240px 20px;
-      background-size: 240px 20px;
-      background-repeat: no-repeat;
-      margin: 0;
-        content: '';
-        display: inline-block;
-        vertical-align: top;
-        width: 20px;
-        height: 20px;
-    }
+    
+	.leaflet-routing-icon {
+	  -webkit-background-size: 240px 20px;
+	  background-size: 240px 20px;
+	  background-repeat: no-repeat;
+	  margin: 0;
+	  content: '';
+	  display: inline-block;
+	  vertical-align: top;
+	  width: 20px;
+	  height: 20px;
+	}
 
     .leaflet-routing-icon-continue         { background-position: 0 0; }
     .leaflet-routing-icon-sharp-right      { background-position: -20px 0; }
@@ -287,7 +287,19 @@
        z-index:1030;
        pointer-events: auto;
      }
-    .show-route{ background-image: url("../resource/show.png");}
-    .hide-route{ background-image: url("../resource/hide.png");}
 
-    }
+	 .list-route {
+	   background-image: url('../images/list.png');
+	   background-repeat: no-repeat;
+	   background-size: 30px;
+	   background-position: center;
+	 }
+
+	 .cancel-route {
+	   background-image: url('../images/cancel.png');
+	   left: calc(100% - 56px);
+	   background-repeat: no-repeat;
+	   background-size: 30px;
+	   background-position: center;
+	 }
+  }
