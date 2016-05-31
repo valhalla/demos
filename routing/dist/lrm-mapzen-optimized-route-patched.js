@@ -1256,17 +1256,12 @@ if (typeof module !== undefined) module.exports = polyline;
 			var container = this._itineraryBuilder.createContainer(),
 			    steps = this._itineraryBuilder.createStepsContainer(),
 			    i,
+			    instr,
+                depart_instr,
+                arrive_instr,
 			    step,
 			    distance,
 			    text,
-			    verbal_alert,
-			    depart_instr,
-			    verbal_depart,
-			    instr,
-			    verbal_pre,
-			    verbal_post,
-			    arrive_instr,
-			    verbal_arrive,
 			    icon;
 
 			container.appendChild(steps);
@@ -1275,21 +1270,15 @@ if (typeof module !== undefined) module.exports = polyline;
                         var startManeuver = 0;
 			for (i = 0; i < r.instructions.length; i++) {
 				instr = r.instructions[i];
-				//var travelmode = (typeof instr.travel_mode != "undefined" ? instr.travel_mode : "");
-			        text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
+				    text = instr.maneuvernum + ": " + this._formatter.formatInstruction(instr, i);
 			        depart_instr = (typeof instr.depart_instruction != "undefined" ? instr.depart_instruction : "");
-			        verbal_alert = (typeof instr.verbal_transition_alert_instruction != "undefined" ?  "VERBAL_ALERT: " + instr.verbal_transition_alert_instruction : "");
-			        verbal_depart = (typeof instr.verbal_depart_instruction != "undefined" ?  "VERBAL_DEPART: " + instr.verbal_depart_instruction : "");
-			        verbal_pre =  (typeof instr.verbal_pre_transition_instruction != "undefined" ? "VERBAL_PRE: " + instr.verbal_pre_transition_instruction : "");
-			        verbal_post = (typeof instr.verbal_post_transition_instruction != "undefined" ? "VERBAL_POST: " + instr.verbal_post_transition_instruction : "");
 			        arrive_instr = (typeof instr.arrive_instruction != "undefined" ? instr.arrive_instruction : "");
-			        verbal_arrive = (typeof instr.verbal_arrive_instruction != "undefined" ?  "VERBAL_ARRIVE: " + instr.verbal_arrive_instruction : "");
 			        distance = this._formatter.formatDistance(instr.distance);
 			        icon = this._formatter.getIconName(instr, i);
 			        if (icon == 'kStart' || icon == 'kStartRight' || icon == 'kStartLeft')
 			          startManeuver++;
-			        step = this._itineraryBuilder.createStep(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps, tspMarkers, startManeuver);
-                                if (optimize && (instr.type == '4' || instr.type == '5' || instr.type == '6')) {
+			        step = this._itineraryBuilder.createStep(text, depart_instr, arrive_instr, distance, icon, steps, tspMarkers, startManeuver);
+                                if (optimized_route && (instr.type == '4' || instr.type == '5' || instr.type == '6')) {
                                   //once we've hit the first destination, turn flag to true
                                   narrative_jump = true;
                                   //keep count of the multi-destinations, except for the first
@@ -1410,7 +1399,7 @@ if (typeof module !== undefined) module.exports = polyline;
 			return L.DomUtil.create('tbody', '');
 		},
 
-		createStep: function(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps, tspMarkers, startManeuver) {
+		createStep: function(text, depart_instr, arrive_instr, distance, icon, steps, tspMarkers, startManeuver) {
 		      var row = L.DomUtil.create('tr', '', steps),
 		        span,
 		        img,
@@ -1431,24 +1420,9 @@ if (typeof module !== undefined) module.exports = polyline;
 		        ul = L.DomUtil.create('ul', 'depart_instr', row);
 		        ul.appendChild(document.createTextNode(depart_instr));
 		        td.appendChild(ul);
-		        ul = L.DomUtil.create('ul', 'verbal_depart', row);
-		        ul.appendChild(document.createTextNode(verbal_depart));
-		        td.appendChild(ul);
 		      td.appendChild(document.createTextNode(text));
-		        ul = L.DomUtil.create('ul', 'verbal_alert', row);
-		        ul.appendChild(document.createTextNode(verbal_alert));
-		        td.appendChild(ul);
-		        ul = L.DomUtil.create('ul', 'verbal_pre', row);
-		        ul.appendChild(document.createTextNode(verbal_pre));
-		        td.appendChild(ul);
-		        ul = L.DomUtil.create('ul', 'verbal_post', row);
-		        ul.appendChild(document.createTextNode(verbal_post));
-		        td.appendChild(ul);
 		        ul = L.DomUtil.create('ul', 'arrive_instr', row);
 		        ul.appendChild(document.createTextNode(arrive_instr));
-		        td.appendChild(ul);
-		        ul = L.DomUtil.create('ul', 'verbal_arrive', row);
-		        ul.appendChild(document.createTextNode(verbal_arrive));
 		        td.appendChild(ul);
 		      td = L.DomUtil.create('td', '', row);
 		      td.appendChild(document.createTextNode(distance));

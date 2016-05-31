@@ -14,7 +14,7 @@
 
     <script src="conf/env.conf"></script>
     <!-- Main tangram library -->
-    <script src='https://mapzen.com/tangram/0.7/tangram.min.js'></script>
+    <script src='https://mapzen.com/tangram/0.7.0/tangram.min.js'></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
     <script language="javascript" type="text/javascript" src="js/calendar/datetimepicker.js">
@@ -59,7 +59,7 @@
           <div id="instructions">
             <img src="images/turnbyturnlogo.png" alt="logo">
             <h6><b>Point & click on the map to select a start & end point.</b></h6>
-            <h5><b>Defaults to auto.</b></h5>
+            <h5><b>Defaults to transit.</b></h5>
             <h6>Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6>
             <hr>
 		    <div>
@@ -108,9 +108,6 @@
 		      </form>
 	        <hr>
 	        </div>
-		      </form>
-	        <hr>
-	        </div>
             <div id="dtoptions" name="dtoptions" style="display:none">
 			  <form id="datetime" name="datetime" ><span style="color:black">
 				<h5><b>Date & Time Options:</b></h5><p>
@@ -128,7 +125,7 @@
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 		  </div>
-		  <div id='permalink' style='display:inline-block;'></div>
+		  <div id='permalink' style='display:inline-block;'></div><br>
 		<!--  <div id="routeResponse" style="display:inline-block;">JSON Response Link</div> -->
           <br>
            <div class = "col-md-15" >

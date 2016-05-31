@@ -110,7 +110,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ road ],
+    layers : [ zinc ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -254,7 +254,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
-      extra = extra + '&costingoptions' + JSON.stringify(costingOptions);
+      extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
 
     if (dateTime != null)
       extra = extra + '&datetime=' + JSON.stringify(dateTime);
@@ -552,120 +552,134 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn = document.getElementById("drive_btn");
-    var bikeBtn = document.getElementById("bike_btn");
-    var walkBtn = document.getElementById("walk_btn");
-    var multiBtn = document.getElementById("multi_btn");
-    var elevationBtn = document.getElementById("elevation_btn");
-    var routeresponse;
+    var driveBtn, bikeBtn, walkBtn, multiBtn, elevationBtn, routeresponse; 
 
-    driveBtn.addEventListener('click', function(e) {
-      if (!rr) return;
-      getEnvToken();
-      var costing = 'auto';
-      var calendarInput = document.getElementById("datepicker").value;
-      if (calendarInput != "") {
-        dateStr = datetimeUpdate(calendarInput);
-        var dtoptions = setDateTime(dateStr);
-        rr.route({
-          costing : costing,
-          date_time : dtoptions
-        });
-      } else {
-        rr.route({
-          costing : costing
-        });
-      }
-      updateHashCosting(costing,null,dtoptions);
-    });
-
-    bikeBtn.addEventListener('click', function(e) {
-      if (!rr) return;
-      getEnvToken();
-      var costing = 'bicycle';
-      if (document.getElementById('bikeoptions').style.display == "block") {
-        var bikeoptions = setBikeOptions();
+    if (document.getElementById('drive_btn') != undefined) {
+      driveBtn = document.getElementById("drive_btn");
+      
+      driveBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'auto';
         var calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
           rr.route({
             costing : costing,
-            costing_options : bikeoptions,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            costing : costing
+          });
+        }
+        updateHashCosting(costing,null,dtoptions);
+      });
+    }
+
+    if (document.getElementById('bike_btn') != undefined) {
+      bikeBtn = document.getElementById("bike_btn");
+      
+      bikeBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'bicycle';
+        if (document.getElementById('bikeoptions').style.display == "block") {
+          var bikeoptions = setBikeOptions();
+          var calendarInput = document.getElementById("datepicker").value;
+          if (calendarInput != "") {
+            dateStr = datetimeUpdate(calendarInput);
+            var dtoptions = setDateTime(dateStr);
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions,
+              date_time : dtoptions
+            });
+          } else {
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions
+            });
+          }
+        } else {
+          rr.route({
+            costing : costing,
+          });
+        }
+        updateHashCosting(costing,bikeoptions,dtoptions);
+      });
+    }
+    
+   if (document.getElementById('walk_btn') != undefined) {
+      walkBtn = document.getElementById("walk_btn");
+
+      walkBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'pedestrian';
+        var calendarInput = document.getElementById("datepicker").value;
+        if (calendarInput != "") {
+          dateStr = datetimeUpdate(calendarInput);
+          var dtoptions = setDateTime(dateStr); 
+          rr.route({
+            costing : costing,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            costing : costing
+          });
+        }
+        updateHashCosting(costing,null,dtoptions);
+      });
+    }
+    
+    if (document.getElementById('multi_btn') != undefined) {
+      multiBtn = document.getElementById("multi_btn");
+  
+      multiBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'multimodal';
+        var calInput = document.getElementById("datepicker").value;
+        var dtoptions = "";
+        if (calInput != "undefined") {
+          dateStr = datetimeUpdate(calInput);
+          dtoptions = setDateTime(dateStr);    
+        }
+        if (document.getElementById('transitoptions').style.display == "block") {
+          var transitoptions = setTransitOptions();
+          rr.route({
+            costing : costing,
+            costing_options : transitoptions,
             date_time : dtoptions
           });
         } else {
           rr.route({
             costing : costing,
-            costing_options : bikeoptions
+            date_time : dtoptions
           });
         }
-      } else {
-        rr.route({
-          costing : costing,
-        });
-      }
-      updateHashCosting(costing,bikeoptions,dtoptions);
-    });
-
-    walkBtn.addEventListener('click', function(e) {
-      if (!rr) return;
-      getEnvToken();
-      var costing = 'pedestrian';
-      var calendarInput = document.getElementById("datepicker").value;
-      if (calendarInput != "") {
-        dateStr = datetimeUpdate(calendarInput);
-        var dtoptions = setDateTime(dateStr); 
-        rr.route({
-          costing : costing,
-          date_time : dtoptions
-        });
-      } else {
-        rr.route({
-          costing : costing
-        });
-      }
-      updateHashCosting(costing,null,dtoptions);
-    });
-
-    multiBtn.addEventListener('click', function(e) {
-      if (!rr) return;
-      getEnvToken();
-      var costing = 'multimodal';
-      var calInput = document.getElementById("datepicker").value;
-      var dtoptions = "";
-      if (calInput != "undefined") {
-        dateStr = datetimeUpdate(calInput);
-        dtoptions = setDateTime(dateStr);    
-      }
-      if (document.getElementById('transitoptions').style.display == "block") {
-        var transitoptions = setTransitOptions();
-        rr.route({
-          costing : costing,
-          costing_options : transitoptions,
-          date_time : dtoptions
-        });
-      } else {
-        rr.route({
-          costing : costing,
-          date_time : dtoptions
-        });
-      }
-      updateHashCosting(costing,transitoptions,dtoptions);
-    });
+        updateHashCosting(costing,transitoptions,dtoptions);
+      });
+    }
     
-   
-    elevationBtn.addEventListener('click', function(e) {
-      if (!rr) return;
-      if (environmentExists) 
-        selectEnv();
-      else getEnvToken();
+    if (document.getElementById('elevation_btn') != undefined) {
+      elevationBtn = document.getElementById("elevation_btn");
       
-      var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._router._rrshape) : 0;
-      elev.resetChart();
-      elev.profile(elev._rrshape);
-      document.getElementById('graph').style.display = "block";
-    });
+      elevationBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        if (environmentExists) 
+          selectEnv();
+        else getEnvToken();
+        
+        var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._router._rrshape) : 0;
+        elev.resetChart();
+        elev.profile(elev._rrshape);
+        document.getElementById('graph').style.display = "block";
+      });
+    }
 
     function setBikeOptions() {
       var btype = document.getElementsByName("btype");
@@ -817,19 +831,29 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }
 
   $("#showbtn").on("click", function() {
-    document.getElementById('driveoptions').style.display = "block";
-    document.getElementById('bikeoptions').style.display = "block";
-    document.getElementById('walkoptions').style.display = "block";
-    document.getElementById('transitoptions').style.display = "block";
-    document.getElementById('dtoptions').style.display = "block";
+    if (document.getElementById('driveoptions') != undefined)
+      document.getElementById('driveoptions').style.display = "block";
+    if (document.getElementById('bikeoptions') != undefined)
+      document.getElementById('bikeoptions').style.display = "block";
+    if (document.getElementById('walkoptions') != undefined)
+      document.getElementById('walkoptions').style.display = "block";
+    if (document.getElementById('transitoptions') != undefined)
+      document.getElementById('transitoptions').style.display = "block";
+    if (document.getElementById('dtoptions') != undefined)
+      document.getElementById('dtoptions').style.display = "block";
   });
 
   $("#hidebtn").on("click", function() {
-    document.getElementById('driveoptions').style.display = "none";
-    document.getElementById('bikeoptions').style.display = "none";
-    document.getElementById('walkoptions').style.display = "none";
-    document.getElementById('transitoptions').style.display = "none";
-    document.getElementById('dtoptions').style.display = "none";
+    if (document.getElementById('driveoptions') != undefined)
+      document.getElementById('driveoptions').style.display = "none";
+    if (document.getElementById('bikeoptions') != undefined)
+      document.getElementById('bikeoptions').style.display = "none";
+    if (document.getElementById('walkoptions') != undefined)
+      document.getElementById('walkoptions').style.display = "none";
+    if (document.getElementById('transitoptions') != undefined)
+      document.getElementById('transitoptions').style.display = "none";
+    if (document.getElementById('dtoptions') != undefined)
+      document.getElementById('dtoptions').style.display = "none";
   });
 
   $("#hidechart").on("click", function() {
