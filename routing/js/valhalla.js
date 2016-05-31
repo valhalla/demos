@@ -148,7 +148,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   $scope.route_instructions = '';
 
   var Locations = [];
-  var mode = 'car';
+  var mode = 'transit';
 
   var icon = L.icon({
     iconUrl : 'resource/via_dot.png',
@@ -254,10 +254,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
-      extra = extra + '&costing_options' + JSON.stringify(costingOptions);
+      extra = extra + '&costingoptions' + JSON.stringify(costingOptions);
 
     if (dateTime != null)
-      extra = extra + '&date_time=' + JSON.stringify(dateTime);
+      extra = extra + '&datetime=' + JSON.stringify(dateTime);
 
     window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -283,13 +283,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.costing !== undefined)
       var costing = JSON.parse(parameters.costing);
 
-    if (parameters.costingOptions !== undefined)
-      var costing_options = JSON.parse(parameters.costingOptions);
+    if (parameters.costingoptions !== undefined)
+      var costing_options = JSON.parse(parameters.costingoptions);
 
-    if (parameters.dateTime !== undefined)
-      var date_time = JSON.parse(parameters.dateTime);
+    if (parameters.datetime !== undefined)
+      var date_time = JSON.parse(parameters.datetime);
 
-    rr = createRouting({waypoints: locs, costing: costing, costing_options: costing_options, date_time: date_time}, true);
+    rr = createRouting({
+      waypoints: locs,
+      costing : costing,
+      costing_options: costing_options,
+      date_time : date_time
+    }, true);
+    
     locations = locs.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -316,13 +322,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon(m || 'car')
+        icon : getDestinationIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -334,13 +340,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'car')
+        icon : getOriginIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon(m || 'car')
+        icon : getViaIcon(m || 'transit')
       });
       marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
           + "&layers=Q target=_blank>Edit POI here<a/>");
@@ -407,7 +413,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   // show something to start with but only if it was requested
   $(window).load(function(e) {
-    rr = L.Routing.mapzen(accessToken);
+    //rr = L.Routing.mapzen(accessToken);
     force = true;
     hashRoute();
   });

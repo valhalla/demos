@@ -209,7 +209,7 @@ return marker;
 
 var getOriginIcon = function() {
   return new L.Icon({
-    iconUrl : '../routing/resource/startmarker@2x.png',
+    iconUrl : '../matrix/resource/matrix_pin_start.png',
     iconSize : [ 40, 50 ],
     iconAnchor : [ 22, 42 ],
     shadowUrl: null
@@ -1270,7 +1270,9 @@ if (typeof module !== undefined) module.exports = polyline;
 			    icon;
 
 			container.appendChild(steps);
-
+                        var narrative_jump = false;
+                        var counter = 0;
+                        var startManeuver = 0;
 			for (i = 0; i < r.instructions.length; i++) {
 				instr = r.instructions[i];
 				//var travelmode = (typeof instr.travel_mode != "undefined" ? instr.travel_mode : "");
@@ -1284,8 +1286,19 @@ if (typeof module !== undefined) module.exports = polyline;
 			        verbal_arrive = (typeof instr.verbal_arrive_instruction != "undefined" ?  "VERBAL_ARRIVE: " + instr.verbal_arrive_instruction : "");
 			        distance = this._formatter.formatDistance(instr.distance);
 			        icon = this._formatter.getIconName(instr, i);
-			        step = this._itineraryBuilder.createStep(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps);
-			        this._addRowListeners(step, r.coordinates[instr.index]);
+			        if (icon == 'kStart' || icon == 'kStartRight' || icon == 'kStartLeft')
+			          startManeuver++;
+			        step = this._itineraryBuilder.createStep(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps, tspMarkers, startManeuver);
+                                if (optimize && (instr.type == '4' || instr.type == '5' || instr.type == '6')) {
+                                  //once we've hit the first destination, turn flag to true
+                                  narrative_jump = true;
+                                  //keep count of the multi-destinations, except for the first
+                                  counter++;
+                                }
+                                if (narrative_jump)
+                                  //this keeps the listener matched with the correct index
+                                  this._addRowListeners(step, r.coordinates[instr.index + counter]);
+			        else this._addRowListeners(step, r.coordinates[instr.index]);
 			}
 
 			return container;
@@ -1397,13 +1410,22 @@ if (typeof module !== undefined) module.exports = polyline;
 			return L.DomUtil.create('tbody', '');
 		},
 
-		createStep: function(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps) {
+		createStep: function(text, verbal_alert, depart_instr, verbal_depart, verbal_pre, verbal_post, arrive_instr, verbal_arrive, distance, icon, steps, tspMarkers, startManeuver) {
 		      var row = L.DomUtil.create('tr', '', steps),
 		        span,
+		        img,
 		        td,
 		        ul;
 		      td = L.DomUtil.create('td', '', row);
-		      span = L.DomUtil.create('span', 'leaflet-routing-icon leaflet-routing-icon-'+icon, td);
+                      if (icon == 'kDestination' || icon == 'kDestinationRight' || icon == 'kDestinationLeft'){
+		        span = L.DomUtil.create('span', 'leaflet-routing-icon leaflet-routing-icon-'+icon, td);
+		        img = document.createElement('img');
+		        img.setAttribute('src','../matrix/resource/matrix_pin_end.png');
+		        span.innerHTML = "<h2><b>"+startManeuver+"</b></h2>";
+		        span.appendChild(img);
+		      
+                      }
+                      else span = L.DomUtil.create('span', 'leaflet-routing-icon leaflet-routing-icon-'+icon, td);
 		      td.appendChild(span);
 		      td = L.DomUtil.create('td', 'text', row);
 		        ul = L.DomUtil.create('ul', 'depart_instr', row);
@@ -2329,7 +2351,7 @@ if (typeof module !== undefined) module.exports = polyline;
       if (typeof options.costing != 'undefined') 
         routeOptions = options;
 
-      if (optimize)
+      if (optimized_route)
         url = this.buildRouteUrl(waypoints, routeOptions, true);
       else url = this.buildRouteUrl(waypoints, routeOptions);
       /******************************/
@@ -2364,8 +2386,10 @@ if (typeof module !== undefined) module.exports = polyline;
             data = JSON.parse(resp.responseText);
             this._rrshape = data.trip.legs[0].shape;
             this._routeDone(data, wps, routeOptions, callback, context);
-            
-            if (optimize){
+            if (document.getElementById('graph') && document.getElementById('graph').style.display==="block") {
+              $("#elevation_btn").trigger("click");
+            }
+            if (optimized_route){
               $('.leaflet-marker-icon').remove();
               $('.leaflet-label').remove();
               var marker=0;
@@ -2384,16 +2408,13 @@ if (typeof module !== undefined) module.exports = polyline;
                 markers.push(marker);
               }
             }
-          } 
-          if (document.getElementById('graph') && document.getElementById('graph').style.display==="block") {
-            $("#elevation_btn").trigger("click");
+          } else {
+            callback.call(context || callback, {
+              status: -1,
+              message: 'HTTP request failed: ' + err.response
+            });
+            alert("Travel Mode: "+ routeOptions.costing + ", status code: " + err.status + ", " + err.response);
           }
-        } else {
-          callback.call(context || callback, {
-            status: -1,
-            message: 'HTTP request failed: ' + err.response
-          });
-          alert("Travel Mode: "+ this._transitmode + ", status code: " + err.status + ", " + err.response);
         }
     }, this), true);
     return this;
@@ -2590,7 +2611,7 @@ if (typeof module !== undefined) module.exports = polyline;
       return wps;
     },
     /***************************** Patched for demo *****************************/
-    buildRouteUrl: function(waypoints, options, optimize) {
+    buildRouteUrl: function(waypoints, options, optimized_route) {
       var locs = [],
           locationKey,
           hint;
@@ -2603,7 +2624,7 @@ if (typeof module !== undefined) module.exports = polyline;
       for (var i = 0; i < waypoints.length; i++) {
         var loc;
         locationKey = this._locationKey(waypoints[i].latLng).split(',');
-        if (!optimize) {
+        if (!optimized_route) {
           if(i === 0 || i === waypoints.length-1){
             loc = {
               lat: parseFloat(locationKey[0]),
@@ -2651,8 +2672,8 @@ if (typeof module !== undefined) module.exports = polyline;
       (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
       (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
 
-      if (optimize)
-        var action = 'optimized';
+      if (optimized_route)
+        var action = 'optimized_route';
       else action = 'route';
      
       console.log(this.options.serviceUrl + action + '?json=' +

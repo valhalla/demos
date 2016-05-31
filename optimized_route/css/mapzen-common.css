@@ -1,0 +1,35 @@
+/* button styles */
+
+.btn {
+  border-radius: 0;
+  border-width: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+
+.btn-mapzen {
+  border-color: #d4645c;;
+  background-color: #d4645c;;
+  color: #fff;
+  text-shadow: none;
+}
+
+.btn-mapzen:hover, .btn-mapzen:focus {
+  border-color: #993434;
+  background-color: #993434;
+  color: #fff;
+}
+
+.btn-transparent {
+  background: transparent;
+  border-color:  #444;;
+  color:  #444;;
+}
+
+.btn-transparent:hover, .btn-transparent:focus {
+  background-color: #e5e5e5;
+  border-color:  #444;;
+  color:  #444;;
+}
