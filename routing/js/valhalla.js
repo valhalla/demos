@@ -254,7 +254,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
-      extra = extra + '&costingoptions' + JSON.stringify(costingOptions);
+      extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
 
     if (dateTime != null)
       extra = extra + '&datetime=' + JSON.stringify(dateTime);
@@ -577,7 +577,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,null,dtoptions);
       });
     }
-    
+
     if (document.getElementById('bike_btn') != undefined) {
       bikeBtn = document.getElementById("bike_btn");
       
