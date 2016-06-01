@@ -610,39 +610,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,bikeoptions,dtoptions);
       });
     }
-      
-    if (document.getElementById('bike_btn') != undefined) {
-      bikeBtn = document.getElementById("bike_btn");
-      
-      bikeBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getEnvToken();
-        var costing = 'bicycle';
-        if (document.getElementById('bikeoptions').style.display == "block") {
-          var bikeoptions = setBikeOptions();
-          var calendarInput = document.getElementById("datepicker").value;
-          if (calendarInput != "") {
-            dateStr = datetimeUpdate(calendarInput);
-            var dtoptions = setDateTime(dateStr);
-            rr.route({
-              costing : costing,
-              costing_options : bikeoptions,
-              date_time : dtoptions
-            });
-          } else {
-            rr.route({
-              costing : costing,
-              costing_options : bikeoptions
-            });
-          }
-        } else {
-          rr.route({
-            costing : costing,
-          });
-        }
-        updateHashCosting(costing,bikeoptions,dtoptions);
-      });
-    }
    
     if (document.getElementById('walk_btn') != undefined) {
       walkBtn = document.getElementById("walk_btn");
