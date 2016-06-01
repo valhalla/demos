@@ -12,6 +12,7 @@ var envServer = "development";
 var envToken = accessToken.dev;
 var sentManyToManyEnd = false;
 var optimized_route = true;
+var tspMarkers = [];
 
 function selectEnv() {
   $("option:selected").each(function() {
