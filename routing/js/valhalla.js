@@ -254,7 +254,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       extra = '&costing=' + JSON.stringify(costing);
 
     if (costingOptions != null)
+<<<<<<< HEAD
       extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
+=======
+      extra = extra + '&costingoptions' + JSON.stringify(costingOptions);
+>>>>>>> origin/gh-pages
 
     if (dateTime != null)
       extra = extra + '&datetime=' + JSON.stringify(dateTime);
@@ -572,6 +576,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         } else {
           rr.route({
             costing : costing
+<<<<<<< HEAD
           });
         }
         updateHashCosting(costing,null,dtoptions);
@@ -612,6 +617,48 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }
     
    if (document.getElementById('walk_btn') != undefined) {
+=======
+          });
+        }
+        updateHashCosting(costing,null,dtoptions);
+      });
+    }
+    
+    if (document.getElementById('bike_btn') != undefined) {
+      bikeBtn = document.getElementById("bike_btn");
+      
+      bikeBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'bicycle';
+        if (document.getElementById('bikeoptions').style.display == "block") {
+          var bikeoptions = setBikeOptions();
+          var calendarInput = document.getElementById("datepicker").value;
+          if (calendarInput != "") {
+            dateStr = datetimeUpdate(calendarInput);
+            var dtoptions = setDateTime(dateStr);
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions,
+              date_time : dtoptions
+            });
+          } else {
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions
+            });
+          }
+        } else {
+          rr.route({
+            costing : costing,
+          });
+        }
+        updateHashCosting(costing,bikeoptions,dtoptions);
+      });
+    }
+   
+    if (document.getElementById('walk_btn') != undefined) {
+>>>>>>> origin/gh-pages
       walkBtn = document.getElementById("walk_btn");
 
       walkBtn.addEventListener('click', function(e) {
@@ -634,6 +681,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,null,dtoptions);
       });
     }
+<<<<<<< HEAD
     
     if (document.getElementById('multi_btn') != undefined) {
       multiBtn = document.getElementById("multi_btn");
@@ -665,6 +713,39 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       });
     }
     
+=======
+    
+    if (document.getElementById('multi_btn') != undefined) {
+      multiBtn = document.getElementById("multi_btn");
+  
+      multiBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'multimodal';
+        var calInput = document.getElementById("datepicker").value;
+        var dtoptions = "";
+        if (calInput != "undefined") {
+          dateStr = datetimeUpdate(calInput);
+          dtoptions = setDateTime(dateStr);    
+        }
+        if (document.getElementById('transitoptions').style.display == "block") {
+          var transitoptions = setTransitOptions();
+          rr.route({
+            costing : costing,
+            costing_options : transitoptions,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            costing : costing,
+            date_time : dtoptions
+          });
+        }
+        updateHashCosting(costing,transitoptions,dtoptions);
+      });
+    }
+    
+>>>>>>> origin/gh-pages
     if (document.getElementById('elevation_btn') != undefined) {
       elevationBtn = document.getElementById("elevation_btn");
       

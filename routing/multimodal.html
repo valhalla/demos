@@ -58,47 +58,16 @@
         <div class="col-md-2 info">
           <div id="instructions">
             <img src="images/turnbyturnlogo.png" alt="logo">
+            <br>
             <h6><b>Point & click on the map to select a start & end point.</b></h6>
-            <h5><b>Defaults to transit.</b></h5>
-            <h6>Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6>
-		    <br>
 		    <div>
-		    <span style="color:black" class="descriptions">Routing Options: </span><br>
+		    <span style="color:black" class="descriptions">Multimodal Options:</span><br>
 				<form>
 				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
 				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
 				</form>
 			</div>
-            <div id="driveoptions" name="driveoptions" style="display:none">
-			  <form id="auto" name="auto" ><span style="color:black">
-				<h5><b>Auto Options:</b></h5><p>
-				<i>Coming soon!</i>
-			  </form>
-		      <hr>
-		    </div>
-		    <div id="bikeoptions" name="bikeoptions" style="display:none">
-			  <form id="bike" name="bike" ><span style="color:black">
-				<h5><b>Bicycle Options:</b></h5><p>
-				  road: <input type="radio" name="btype" value="Road" checked/>
-				  cross: <input type="radio" name="btype" value="Cross" />
-                  hybrid: <input type="radio" name="btype" value="Hybrid" />
-                  mountain: <input type="radio" name="btype" value="Mountain"/>
-                  <br>
-                  use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
-                  cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
-                  use hills (0-1): <input type="textbox" id="use_hills" value="0.5" class="biketextbox"/>
-                  </span>
-			  </form>
-		      <hr>
-		    </div>
-	        <div id="walkoptions" name="walkoptions" style="display:none">
-		      <form id="walk" name="walk" ><span style="color:black">
-			    <h5><b>Pedestrian Options:</b></h5><p>
-			    <i>Coming soon!</i>
-		      </form>
-		      <hr>
-	        </div>
-	        <div id="transitoptions" name="transitoptions" style="display:none">
+            <div id="transitoptions" name="transitoptions" style="display:none">
 		      <form id="transit" name="transit" ><span style="color:black">
 			    <h5><b>Transit Options:</b></h5><p>
                   use_bus (0-1): <input type="textbox" id="use_bus" value="0.3" class="transittextbox"/><br>
@@ -118,29 +87,14 @@
                   <span style="color:black" class="descriptions"><b>Select a new date and/or time, then click a mode of travel.</b></span><br>
                   <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
 			  </form>
-		    </div>
-		    <br>
-	        <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
-            <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
-            <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
+		    </div>
 		  </div>
 		  <div id='permalink' style='display:inline-block;'></div><br>
 		<!--  <div id="routeResponse" style="display:inline-block;">JSON Response Link</div> -->
-          <br>
-           <div class = "col-md-15" >
-      	    <div id="graph" style= "display:none; height:200px; width: 100%; position: bottom; float:center;"></div>
-          </div><br>
-          <button id="elevation_btn" class = "transparent_btn" type="button">Get Elevation</button>
-          <button id="hidechart" name="hidebtn" type="button">Hide Chart</button>
           
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
-          <!--
-          <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
-          <h6>Point & click on map to place the origin.  Press & hold the
-          ctrl key + click on map to add additional stops along your way.  Finally, press & hold on the shift
-          key + click on your destination.  Clear your routes by clicking the red 'Clear Routes' button. </h6>
-          -->
+
         <div>
           <button  class="reset" ng-click="clearAll()"> clear all </button>
         </div>
