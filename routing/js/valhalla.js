@@ -238,7 +238,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var pieces = parseHash();
     var extra = '';
     pieces.forEach(function(e, i, a) {
-      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=')
+      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=' && e.slice(0, 'directions_options='.length) != 'directions_options=')
         extra = extra + (extra.length ? '&' : '') + e;
     });
     var hash_locs = [];
@@ -512,6 +512,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var rr;
 
     var createRouting = function(options, createMarkers) {
+        selectLocale();
+        options.directions_options = { "language" : locale };
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
