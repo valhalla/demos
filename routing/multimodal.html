@@ -61,6 +61,15 @@
             <br>
             <h6><b>Point & click on the map to select a start & end point.</b></h6>
 		    <div>
+		    <br>
+		    <span style="color:black" class="descriptions">Select a locale:</span><br>
+			<select id = "locale_dropdown" onchange="selectLocale()">
+				<option id=en-US selected="selected" value="en-US">en-US</option>
+				<option id=de-DE value="de-DE">de-DE</option>
+				<option id=it-IT  value="it-IT">it-IT</option>
+				<option id=cs-CZ  value="cs-CZ">cs-CZ</option>
+			</select>
+		    <br><br>
 		    <span style="color:black" class="descriptions">Multimodal Options:</span><br>
 				<form>
 				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
@@ -87,8 +96,9 @@
                   <span style="color:black" class="descriptions"><b>Select a new date and/or time, then click a mode of travel.</b></span><br>
                   <input type="text" id="datepicker" size="25"><a href="javascript:NewCal('datepicker','ddmmmyyyy',true,24)"><img src="resource/cal.gif" width="20" height="20" border="0" alt="Pick a date & time"></a><br>
 			  </form>
-            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 		    </div>
+		    <br>
+            <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
 		  </div>
 		  <div id='permalink' style='display:inline-block;'></div><br>
 		<!--  <div id="routeResponse" style="display:inline-block;">JSON Response Link</div> -->
