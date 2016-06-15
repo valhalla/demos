@@ -121,6 +121,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
+  // If iframed, we're going to have to disable some of the touch interaction
+  // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
+  if (window.self !== window.top) {
+    map.scrollWheelZoom.disable();
+  }
+
   //mobile narrative display logic
   var mobileRouteEL = document.createElement('div');
     mobileRouteEL.className = 'mobile-route';
