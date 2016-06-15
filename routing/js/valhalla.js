@@ -512,8 +512,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var rr;
 
     var createRouting = function(options, createMarkers) {
-        selectLocale();
-        options.directions_options = { "language" : locale };
+        if (options.directions_options == undefined) {
+          selectLocale();
+          options.directions_options = { "language" : locale };
+        }
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
