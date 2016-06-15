@@ -203,10 +203,10 @@
             });
 
             // reset service url & access token if environment has changed
-           // (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.prod;
-           // (typeof envToken != "undefined" || envToken != null) ? this._accessToken = envToken : this._accessToken = accessToken.prod;
-            this.options.serviceUrl = server.prod;
-            this._accessToken = accessToken.prod;
+            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.prod;
+            (typeof envToken != "undefined" || envToken != null) ? this._accessToken = envToken : this._accessToken = accessToken.prod;
+           // this.options.serviceUrl = server.prod;
+           // this._accessToken = accessToken.prod;
 
             console.log(this.options.serviceUrl + 'locate?json=' + params + '&api_key=' + this._accessToken);
 
