@@ -82,7 +82,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   
   var baseMaps = {
       "Road" : road,
-      "Zinc" : zinc_transit,
+      "Zinc Transit" : zinc_transit,
       "Cycle" : cycle,
       "Elevation" : elevation
   };
