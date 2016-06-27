@@ -133,6 +133,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   };
 
  //Number of locations
+  var hash = new L.Hash(map);
   var locations = 0;
   var markers = [];
 
@@ -150,6 +151,107 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     locateMarkers = [];
   };
   
+  var parseHash = function() {
+    var hash = window.location.hash;
+    if (hash.indexOf('#') === 0)
+      hash = hash.substr(1);
+    return hash.split('&');
+  };
+
+  var parseParams = function(pieces) {
+    var parameters = {};
+    pieces.forEach(function(e, i, a) {
+      var parts = e.split('=');
+      if (parts.length < 2)
+        parts.push('');
+      parameters[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+    });
+    return parameters;
+  };
+
+  var force = false;
+  var update = function(show, locs, costing) {
+    // update the permalink hash
+    var pieces = parseHash();
+    var extra = '';
+    pieces.forEach(function(e, i, a) {
+      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=' && e.slice(0, 'directions_options='.length) != 'directions_options=')
+        extra = extra + (extra.length ? '&' : '') + e;
+    });
+    var hash_locs = [];
+    locs.forEach(function(locs) {
+      hash_locs.push({
+        'lat' : locs.lat,
+        'lon' : locs.lng
+      })
+    });
+    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(hash_locs) + '&costing=' + JSON.stringify(costing);
+    force = show;
+    window.location.hash = '#' + extra + parameter;
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/optimized_route/index.html" + window.location.hash + "' target='_top'>Optimized Permalink</a>";
+  };
+
+  var updateHashCosting = function(costing, costingOptions, directionsOptions, dateTime) {
+    // update the permalink hash
+    var pieces = parseHash();
+    if (pieces[2].indexOf('&costing='))
+      extra = '&costing=' + JSON.stringify(costing);
+
+    if (costingOptions != null)
+      extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
+
+    if (directionsOptions != null)
+      extra = extra + '&directionsoptions=' + JSON.stringify(directionsOptions);
+
+    if (dateTime != null)
+      extra = extra + '&datetime=' + JSON.stringify(dateTime);
+
+    window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/optimized_route/index.html" + window.location.hash + "' target='_top'>Optimized Permalink</a>";
+  };
+
+  var hashRoute = function() {
+    // something has to have changed for us to request again
+    var parameters = parseParams(parseHash());
+    if (!force && parameters.locations == JSON.stringify(locations))
+      return;
+    force = false;
+
+    // shape
+    var waypoints = [];
+    if (parameters.locations !== undefined)
+      waypoints = JSON.parse(parameters.locations);
+
+    var locs = [];
+    waypoints.forEach(function(waypoints) {
+      locs.push(L.latLng(waypoints.lat, waypoints.lon));
+    });
+
+    if (parameters.costing !== undefined)
+      var costing = JSON.parse(parameters.costing);
+
+    if (parameters.costingoptions !== undefined)
+      var costing_options = JSON.parse(parameters.costingoptions);
+
+    if (parameters.directionsoptions !== undefined)
+      var directions_options = JSON.parse(parameters.directionsoptions);
+
+    if (parameters.datetime !== undefined)
+      var date_time = JSON.parse(parameters.datetime);
+
+    rr = createRouting({
+      waypoints: locs,
+      costing : costing,
+      costing_options: costing_options,
+      directions_options: directions_options,
+      date_time : date_time
+    }, true);
+
+    locations = locs.length;
+
+    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/optimized_route/index.html" + window.location.hash + "' target='_top'>Optimized Permalink</a>";
+  };
+
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
   });
@@ -210,6 +312,13 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     $scope.mode = mode;
   }
 
+  // show something to start with but only if it was requested
+  $(window).load(function(e) {
+    //rr = L.Routing.mapzen(accessToken);
+    force = true;
+    hashRoute();
+  });
+
   var reset_form = function() {
     $scope.startPoints = [];
     $scope.endPoints = [];
@@ -251,6 +360,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     markers = [];
     document.getElementById("end_at_start").checked = false;
     document.getElementById("optimized_routeResponse") == "";
+    window.location.hash = "";
   }
 
 
@@ -295,11 +405,11 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         }
       });
     }
-    
     $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
    
     $scope.appView = 'tspTable'
     $scope.$apply();
+    update(true, waypoints, $scope.mode);
   });
   
   var rr;
