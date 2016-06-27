@@ -28,8 +28,8 @@
       <h4><span class="descriptions"> Select an environment</span></h4>
       <select id = "env_dropdown" onchange="selectEnv()">
         <option id=localhost value="http://localhost:8002/">localhost</option>
-        <option id=development selected="selected" value="https://valhalla.dev.mapzen.com/">development</option>
-        <option id=production value="https://valhalla.mapzen.com/">production</option>
+        <option id=development value="https://valhalla.dev.mapzen.com/">development</option>
+        <option id=production selected="selected" value="https://matrix.mapzen.com/">production</option>
       </select>
       <div class = "tspWrapper">
         <div class = "{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
@@ -100,6 +100,7 @@
       <div class="routingBtns">
         <button  class="btnMatrix"s ng-click="clearAll()"> start over </button>
       </div>
+      <div id='permalink' style='display:inline-block;'></div><br>
       <div id="optimized_routeResponse" style="display:inline-block;">JSON Optimized Route Response Link</div>
     </div>
   </div>
@@ -113,7 +114,7 @@
 <script type="text/javascript" src="js/optimized_route.js"></script>
 <script src='../routing/dist/leaflet-routing-machine.js'></script>
 <script src='../routing/dist/lrm-mapzen-optimized-route-patched.js'></script>
-<script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
+<script type="text/javascript" src="js/locate/L.Locate.js"></script>
 
 <!-- Load geocoding plugin after Leaflet -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
