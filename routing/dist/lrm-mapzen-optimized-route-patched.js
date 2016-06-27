@@ -2297,7 +2297,7 @@ if (typeof module !== undefined) module.exports = polyline;
 
   L.Routing.Mapzen = L.Class.extend({
     options: {
-      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
+      serviceUrl: (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.prod,
       timeout: 30 * 1000
     },
 
@@ -2390,7 +2390,7 @@ if (typeof module !== undefined) module.exports = polyline;
             alert("Travel Mode: "+ routeOptions.costing + ", status code: " + err.status + ", " + err.response);
           }
         }
-     }, this), true);
+    }, this), true);
     return this;
   },
 
@@ -2643,8 +2643,8 @@ if (typeof module !== undefined) module.exports = polyline;
       });
       
     //reset service url & access token if environment has changed
-      (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.dev;
-      (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.dev;
+      (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.prod;
+      (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.prod;
 
       if (optimized_route)
         var action = 'optimized_route';

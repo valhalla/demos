@@ -8,15 +8,16 @@ var mode_mapping = {
 };
 
 var serviceUrl;
-var envServer = "development";
-var envToken = accessToken.dev;
+var envServer = "production";
+var envToken = accessToken.prod;
+var locToken = locateToken.prod;
 var sentManyToManyEnd = false;
 var optimized_route = true;
 var tspMarkers = [];
 
 function selectEnv() {
-  $("option:selected").each(function() {
-    var environmentExists = true;
+  $("#env_dropdown").find("option:selected").each(function() {
+    environmentExists = true; 
     envServer = $(this).text();
     serviceUrl = document.getElementById(envServer).value;
     getEnvToken();
@@ -35,12 +36,15 @@ function getEnvToken() {
   switch (envServer) {
   case "localhost":
     envToken = accessToken.local;
+    locToken = locateToken.local;
     break;
   case "development":
     envToken = accessToken.dev;
+    locToken = locateToken.dev;
     break;
   case "production":
     envToken = accessToken.prod;
+    locToken = locateToken.prod;
     break;
   }
 }
@@ -141,7 +145,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
 
   var locateMarkers = [];
   var remove_markers = function() {
-    for (i = 0; i < markers.length; i++) {
+    for (var i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
     markers = [];
@@ -150,7 +154,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     });
     locateMarkers = [];
   };
-  
+
   var parseHash = function() {
     var hash = window.location.hash;
     if (hash.indexOf('#') === 0)
@@ -540,7 +544,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         lon : e.latlng.lng
       };
       getEnvToken();
-      var locate = L.locate(envToken);
+      var locate = L.locate(locToken);
       locate.locate(ll, locateEdgeMarkers);
     });
 
