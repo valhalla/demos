@@ -71,6 +71,7 @@ app.run(function($rootScope) {
   });
 });
 
+
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $http) {
   var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -263,25 +264,28 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
 
       var marker = new L.marker(geo, {
-          icon : getOriginIcon()
-          }).bindLabel((locCount).toString(), (locCount < 10) ? {
-          position: [geo.lat,geo.lon],
-          noHide: true,
-          offset: [-9,-12]
-          } : {
-          position: [geo.lat,geo.lon],
-          noHide: true,
-          offset: [-12,-12]
-          }
-        );
-    map.addLayer(marker);
-    markers.push(marker);
+          icon : getOriginIcon(),
+          draggable:true
+      })
+      map.addLayer(marker);
+      markers.push(marker);
+      marker.on('dragend', function(event){
+        var marker = event.target;
+        var position = marker.getLatLng();
+        console.log(position);
+        marker.setLatLng(position,{draggable:'true'}).bindPopup(position);
+        var latlon = position.lat.toFixed(6) + ' , '+ position.lng.toFixed(6);
+        $scope.startPoints.splice(0,1,{lat:position.lat, lon: position.lng,latlon: latlon});
+        $scope.$apply();
+        return;
+      });
   });
 
   $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
 
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon()
+        icon : getDestinationIcon(),
+        draggable:true
       }).bindLabel((locCount).toString(), (locCount < 10) ? {
         position: [geo.lat,geo.lon],
         noHide: true,
@@ -294,6 +298,17 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
       );  
     map.addLayer(marker);
     markers.push(marker);
+    marker.on('dragend', function(event){
+      var marker = event.target;
+      var position = marker.getLatLng();
+      console.log(position);
+      marker.setLatLng(position,{draggable:'true'}).bindPopup(position);
+      var latlon = position.lat.toFixed(6) + ' , '+ position.lng.toFixed(6);
+      var latLngIndex = parseInt(marker.label._content);
+      $scope.endPoints.splice(latLngIndex-1,1,{index: (latLngIndex), lat:position.lat, lon: position.lng,latlon: latlon});
+      $scope.$apply();
+      return;
+    });
   });
   
   $scope.renderHtml = function(html_code) {
@@ -331,6 +346,34 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   //set up map events
   chooseLocations();
 
+  var rr;
+
+  var createRouting = function(options, createMarkers) {
+    tspMarkers = markers;
+
+    var defaultOptions = {
+      geocoder : null,
+      routeWhileDragging: false,
+      router : L.Routing.mapzen(envToken, options, optimized_route, tspMarkers),
+      summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
+
+      formatter : new L.Routing.Mapzen.Formatter(),
+      pointMarkerStyle : {
+        radius: 6,
+        color: '#20345b',
+        fillColor: '#fff',
+        opacity: 1,
+        fillOpacity: 1
+      }
+    };
+
+    options = options || {};
+    for (var k in options) {
+        defaultOptions[k] = options[k];
+    }
+    return L.Routing.control(defaultOptions).addTo(map);
+};
+
   var clearBtn = document.getElementById("clear_btn");
   var optimizeBtn = document.getElementById("optimize_btn");
 
@@ -347,6 +390,11 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     //$('#columns').columns('destroy');
   }
 
+  $scope.clearRouteShape = function(e) {
+    $('svg').html('');
+    $('.leaflet-routing-container').remove();
+  }
+
   $scope.clearAll = function(e) {
     $scope.matrixType = '';
     $scope.startPoints = [];
@@ -360,7 +408,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     $('svg').html('');
     $('.leaflet-routing-container').remove();
     locations = 0;
-    counterText = 0;
+    counterText = 1;
     markers = [];
     document.getElementById("end_at_start").checked = false;
     document.getElementById("optimized_routeResponse") == "";
@@ -415,33 +463,6 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     $scope.$apply();
     update(true, waypoints, $scope.mode);
   });
-  
-  var rr;
-
-  var createRouting = function(options, createMarkers) {
-    tspMarkers = markers;
-    var defaultOptions = {
-      geocoder : null,
-      routeWhileDragging : false,
-      router : L.Routing.mapzen(envToken, options, optimized_route, tspMarkers),
-      summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
-
-      formatter : new L.Routing.Mapzen.Formatter(),
-      pointMarkerStyle : {
-        radius: 6,
-        color: '#20345b',
-        fillColor: '#fff',
-        opacity: 1,
-        fillOpacity: 1
-      }
-    };
-
-    options = options || {};
-    for (var k in options) {
-        defaultOptions[k] = options[k];
-    }
-    return L.Routing.control(defaultOptions).addTo(map);
-};
 
 //locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
@@ -500,7 +521,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
 
   function chooseLocations() {
     map.on('click', function(e) {
-    
+
     var geo = {
       'lat' : e.latlng.lat.toFixed(6),
       'lon' : e.latlng.lng.toFixed(6)
@@ -513,8 +534,9 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         $scope.editingFocus = 'end_points';
         $rootScope.$emit('map.dropOriginMarker', [ geo.lat, geo.lon ], 0);
         locations++;
+
         latlon = geo.lat + ' , '+ geo.lon;
-        $scope.startPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon, latlon: latlon});
+        $scope.startPoints.push({lat:geo.lat, lon: geo.lon, latlon: latlon});
         $scope.$apply();
         return;
       } else {
@@ -529,7 +551,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         return;
       }
     }
-    });
+  });
   };
   
   $(document).on('route:time_distance', function(e, td) {
@@ -547,5 +569,4 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
       var locate = L.locate(locToken);
       locate.locate(ll, locateEdgeMarkers);
     });
-
 })
