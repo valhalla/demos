@@ -251,12 +251,6 @@ li .placeholder.geocode {
 .bike { background-position: -50px 0;}
 .pedestrian { background-position: -100px 0;}
 
-button.vehicle.multimodal { 
-    background-image: url('../../matrix/images/multimodal.svg');
-    background-size: 48px 35px;
-    background-color: lightslategray;
-}
-
 .leaflet-label-right:before,
 .leaflet-label-left:after {
   content: none;
