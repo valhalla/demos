@@ -14,6 +14,7 @@
 	<script>
 		//make a map
 		var map = L.map('map').setView([40.5, -76.5], 9);
+		var geojson = null;
 
 		//use osm tiles
 		L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -33,14 +34,19 @@
 			url += escape(JSON.stringify(json));
 			//grab the url
 			$.getJSON(url,function(isochrones){
-				//render the geojson
-				L.geoJson(isochrones, {	style: function(feature) { 
+				//clear this if its not null
+				if(geojson != null)
+					geojson.removeFrom(map);
+				//create the geojson object
+				geojson = L.geoJson(isochrones, { style: function(feature) { 
 					return { fillColor: feature.properties.fill,
 						 fillOpacity: feature.properties["fill-opacity"],
 						 weight: 1,
 						 color: '#FFFFFF'
 					       };
-				}}).addTo(map);
+				}});
+				//render the geojson
+				geojson.addTo(map);
 			})
 		}
 		
