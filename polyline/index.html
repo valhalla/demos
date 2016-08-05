@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Polyline</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+</head>
+<body>
+  <div id="map" style="width: 1440px; height: 700px"></div>
+  <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+  <script>
+    //make a map using osm tiles
+    var map = L.map('map').setView([40.5, -76.5], 9);
+    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    }).addTo(map);
+  </script>
+
+Unescape '\': <input id="unescape" type="checkbox"></br>
+Encoded Line:</br>
+  <textarea id="encoded_polyline" rows="4" cols="50"></textarea>
+
+  <script>
+    //decode an encoded string
+    function decode(encoded) {
+      //six degrees of precision in valhalla
+      var inv = 1.0 / 1e6;
+      var decoded = [];
+      var previous = [0,0];
+      var i = 0;
+      //for each byte
+      while(i < encoded.length) {
+        //for each coord (lat, lon)
+        ll = [0,0]
+        for(var j = 0; j < 2; j++) {
+          var shift = 0;
+          var byte = 0x20;
+          //keep decoding bytes until you have this coord
+          while(byte >= 0x20) {
+            byte = encoded.charCodeAt(i++) - 63;
+            ll[j] |= (byte & 0x1f) << shift;
+            shift += 5;
+          }
+          //add previous offset to get final value and remember for next one
+          ll[j] = previous[j] + (ll[j] & 1 ? ~(ll[j] >> 1) : (ll[j] >> 1));
+          previous[j] = ll[j];
+        }
+        //scale by precision and chop off long coords also flip the positions so
+        //its the far more standard lon,lat instead of lat,lon
+        decoded.push([ll[1] * inv,ll[0] * inv])
+      }
+      //hand back the list of coordinates
+      return decoded
+    };
+
+    //text change callback
+    var geojson = null;
+    function onChange() {
+      try {
+        //if they have escaped escapes
+        var encoded = $('#unescape').val() ? $(this).val().replace(/\\\\/g, '\\') : $(this).val();
+        //decode it
+        var decoded = decode(encoded);
+        //clear this if its not null
+        if(geojson != null)
+          geojson.removeFrom(map);
+        //turn this into geojson
+        var json = {
+          type:'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: decoded
+            },
+            properties: {}
+          }]
+        };
+        geojson = L.geoJson(json,{ style: function(feature) { 
+          return { fillColor: feature.properties.fill,
+            color: '#59E817',
+            opacity: 0.5,
+            weight: 5,
+          };
+        }});
+        //render the geojson
+        geojson.addTo(map);
+        //fit it in view
+        map.fitBounds(L.GeoJSON.coordsToLatLngs(decoded));
+      }
+      catch(e){
+        alert('Invalid Encoded Polyline');
+      }
+    };
+    
+    //hook up the callback
+    $("#encoded_polyline").on('keyup', onChange);
+  </script>
+</body>
+</html>
