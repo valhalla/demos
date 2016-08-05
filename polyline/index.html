@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
 </head>
 <body>
-  <div id="map" style="width: 1440px; height: 810px"></div>
+  <div id="map" style="width: 1440px; height: 700px"></div>
   <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
@@ -20,8 +20,8 @@
     }).addTo(map);
   </script>
 
-  <input id="unescape" type="checkbox">Unescape Please</br>
-  Encoded Polyline:</br>
+Unescape '\': <input id="unescape" type="checkbox"></br>
+Encoded Line:</br>
   <textarea id="encoded_polyline" rows="4" cols="50"></textarea>
 
   <script>
