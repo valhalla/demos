@@ -1,0 +1,287 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 100%;
+  height: 100%;
+  color: #383a3a;
+  min-height: 600px;
+}
+
+.container-fluid {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.control-container {
+  width: 500px;
+  height: 100%;
+  float: left;
+  background-color: #eee;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#map {
+  width: calc( 100% - 500px);
+  height: 100%;
+  float: left;
+}
+
+.tableView {
+  padding-top: 20px;
+}
+
+.instruction {
+  text-align: center;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+/* these are for blocking ui */
+div[class*="Wrapper"] {
+  background-color: #fff;
+  position: relative;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+div[class*="Blocker"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1050;
+}
+
+.block {
+  width: 100%;
+  height: 100%;
+  background-color:rgba(238,238,238,0.5);
+}
+
+
+/* optimize type button */
+.stitched {
+  padding: 8px;
+  margin-right: 7px;
+  margin-bottom: 20px;
+  background: #FFFFFF;
+  color: #A4A4A4;
+  font-size: 16px;
+  border: 2px dashed #DADADA;
+  box-shadow: 0;
+}
+
+.stitched.selected {
+  color: #68c175;
+  border: 2px solid #99cfc1;
+  cursor: default;
+}
+
+button:focus {
+  outline: 2px solid #9ed7a7;
+}
+
+.done {
+  background-color: #fff;
+  padding: 3px 8px;
+  margin: 15px auto;
+  width: auto;
+  text-align: center;
+  border: 1px solid #666;
+  cursor: pointer;
+}
+
+ol {
+  padding: 0 30px;
+}
+
+li {
+  list-style-type: none;
+  width: 100%;
+  height: 45px;
+  border-bottom: 1px solid #31783c;
+  position: relative;
+  margin: 5px 0;
+}
+li .marker {
+  width: 28px;
+  height: 36px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-repeat: no-repeat;
+  float: left;
+  color: #fff;
+  padding-top: 5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+li .start { background-image:url(../../matrix/resource/matrix_pin_start.png); }
+li .end { background-image:url(../../matrix/resource/matrix_pin_end.png);}
+
+li .geocode {
+  font-size: 14px;
+  position: absolute;
+  left: 40px;
+  bottom: 10px;
+}
+
+li .placeholder.geocode {
+  color: #ccc;
+}
+
+
+.routingBtns {
+  //float: right;
+}
+
+.btnWrapper::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.plain {
+  float: left;
+  background: transparent;
+  border: none;
+  color: #68c175;
+  padding: 10px 16px;
+  margin-top: 2px;
+}
+
+.btnOptimize {
+  background-color: #68c175;
+  float: left;
+  padding: 10px 26px;
+  border: 1px solid #68c175;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.btnOptimize:hover {
+  background-color: #31783c;
+  border-color: #31783c;
+}
+
+.leaflet-routing-alt tr {
+    min-height: 40px;
+    height: 80px;
+    border-bottom: 1px solid #eee;
+}
+
+.leaflet-routing-icon {
+  -webkit-background-size: 240px 20px;
+  background-size: 240px 20px;
+  background-repeat: no-repeat;
+  margin: 0;
+  content: '';
+  display: inline-block;
+  vertical-align: top;
+  width: 20px;
+}
+
+.leaflet-routing-icon h2 {
+  width: 20px;
+  margin-left: 11px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.leaflet-routing-icon img{
+  z-index: -1;
+  margin-top: -60px;
+  position: relative;
+  bottom: -15px;
+ }
+
+.leaflet-routing-container .start {
+  font-size: 18px;
+  min-height: 60px;
+  line-height: 60px;
+  padding-left: 50px;
+  background-image: url('../../matrix/resource/matrix_pin_start.png');
+  background-repeat: no-repeat;
+  background-position: 5px 8px;
+  background-size: 45px 55px;
+  letter-spacing: 0.5px;
+}
+
+.leaflet-routing-container .dest{
+  font-size: 18px;
+  line-height:60px;
+  min-height:40px;
+  padding-left:50px;
+  background-image: url('../../matrix/resource/matrix_pin_end.png');
+  background-repeat: no-repeat;
+  background-position: 5px 8px;
+  background-size: 45px 55px;
+  letter-spacing: 0.5px;
+}
+
+/* vehicle mode*/
+
+.vehicleBox {
+  //width: 170px;
+ // float:  left;
+}
+
+.vehicleBox .vehicle {
+  width: 50px;
+  height: 41px;
+  float: left;
+  background-color: transparent;
+ // border: 2px dashed #DADADA;
+  margin-right: 5px;
+  background-image: url('../../matrix/images/modes.svg');
+  background-size: 150px 41px;
+  background-repeat: no-repeat;
+}
+.vehicleBox .vehicle.active {
+  color: #68c175;
+  border: 2px solid #68c175;;
+}
+
+.bike { background-position: -50px 0;}
+.pedestrian { background-position: -100px 0;}
+
+.leaflet-label-right:before,
+.leaflet-label-left:after {
+  content: none;
+}
+
+html.is-iframed-demo .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 767px) {
+  html.is-iframed-demo #map {
+    height: calc( 100% - 550px );
+  }
+  .container-fluid {
+    width: 100%;
+    height: auto;
+  }
+  .control-container {
+    width: 100%;
+    height: auto;
+  }
+  #map {
+    width: 500px;
+  }
+}
+
+html.is-iframed-demo .not-map-part {
+  margin: 0 auto;
+}
+
+html.is-iframed-demo .hide-if-iframed {
+  display: none;
+}
