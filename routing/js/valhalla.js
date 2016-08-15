@@ -507,6 +507,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locations++;
 
     var valhalla_mode = mode_mapping[mode];
+    
+    selectEnv();
 
     rr = createRouting({waypoints: waypoints, costing: valhalla_mode});
     update(true, waypoints, valhalla_mode);
