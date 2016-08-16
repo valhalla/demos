@@ -1,11 +1,5 @@
 var app = angular.module('optimized_route', []);
 var hash_params = L.Hash.parseHash(location.hash);
-var mode_mapping = {
-    'foot'    : 'pedestrian',
-    'car'     : 'auto',
-    'bicycle' : 'bicycle',
-    'transit' : 'multimodal'
-};
 
 var serviceUrl;
 var envServer = "production";
@@ -87,7 +81,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ defaultMapLayer ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -368,7 +362,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   var clearBtn = document.getElementById("clear_btn");
   var optimizeBtn = document.getElementById("optimize_btn");
 
-  $scope.mode = 'auto';
+  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];

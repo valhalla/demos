@@ -1,10 +1,5 @@
 var app = angular.module('matrix', []);
 var hash_params = L.Hash.parseHash(location.hash);
-var mode_mapping = {
-  'foot' : 'pedestrian',
-  'car' : 'auto',
-  'bicycle' : 'bicycle'
-};
 
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
@@ -69,7 +64,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ defaultMapLayer ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : zinc) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -190,7 +185,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var matrixBtn = document.getElementById("matrix_btn");
 
 
-  $scope.mode = 'auto';
+  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];

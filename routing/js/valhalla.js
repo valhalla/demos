@@ -1,11 +1,6 @@
 var app = angular.module('routing', []);
 var hash_params = L.Hash.parseHash(location.hash);
-var mode_mapping = {
-  'foot'    : 'pedestrian',
-  'car'     : 'auto',
-  'bicycle' : 'bicycle',
-  'transit' : 'multimodal'
-};
+
 var date = new Date();
 var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
 var serviceUrl = server.prod;
@@ -97,7 +92,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ defaultMapLayer ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -140,8 +135,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   $scope.route_instructions = '';
 
+  $scope.setMode = function(mode){
+    $scope.mode = mode;
+  }
+
   var Locations = [];
-  var mode = 'transit';
+  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
 
   var icon = L.icon({
     iconUrl : 'resource/via_dot.png',
@@ -432,7 +431,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         });
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], $scope.mode);
         locations++;
         return;
       } else {
@@ -440,7 +439,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         });
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], mode);
+        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], $scope.mode);
         locations++;
         return;
       }
@@ -450,7 +449,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         });
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
         locations++;
         return;
       } else if (locations > 1) {
@@ -461,7 +460,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           lat : geo.lat,
           lon : geo.lon
         });
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
+        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
         locations++;
         return;
       }
@@ -486,15 +485,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     waypoints.push(L.latLng(geo.lat, geo.lon));
 
-    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], mode);
+    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
     locations++;
-
-    var valhalla_mode = mode_mapping[mode];
     
     selectEnv();
 
-    rr = createRouting({waypoints: waypoints, costing: valhalla_mode});
-    update(true, waypoints, valhalla_mode);
+    rr = createRouting({waypoints: waypoints, costing: $scope.mode});
+    update(true, waypoints, $scope.mode);
   });
 
     var rr;
@@ -801,7 +798,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }
 
     $(document).on('mode-alert', function(e, m) {
-      mode = m;
+      $scope.mode = m;
       reset();
       Locations = [];
     });

@@ -35,7 +35,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ defaultMapLayer ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : outdoors) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
 

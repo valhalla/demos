@@ -182,6 +182,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
 	<script>
+	  var defaultMode = 'auto';
+
 	  var defaultMapLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
 	  }), road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
