@@ -29,16 +29,13 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('ElevationController', function($scope, $rootScope, $sce, $http) {
-  //hiking map with terrain
-  var cycleMap = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest</a> | Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  })
-  
+
+  //map layers & default layer are defined in the index.html
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ cycleMap ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : outdoors) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
 

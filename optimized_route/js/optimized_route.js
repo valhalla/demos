@@ -1,11 +1,5 @@
 var app = angular.module('optimized_route', []);
 var hash_params = L.Hash.parseHash(location.hash);
-var mode_mapping = {
-    'foot'    : 'pedestrian',
-    'car'     : 'auto',
-    'bicycle' : 'bicycle',
-    'transit' : 'multimodal'
-};
 
 var serviceUrl;
 var envServer = "production";
@@ -74,29 +68,20 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $http) {
-  var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }), zinc = Tangram.leafletLayer({
-    scene: 'https://mapzen.com/carto/zinc-style/2.0/zinc-style.yaml',
-    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
-  }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  });
-  
+  //map layers & default layer are defined in the index.html
   var baseMaps = {
-      "Road" : road,
-      "Zinc" : zinc,
-      "Cycle" : cycle,
-      "Elevation" : elevation
+    "Road" : road,
+    "Zinc" : zinc,
+    "Cycle" : cycle,
+    "Outdoors" : outdoors,
+    "Transit" : transit
   };
 
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ zinc ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -377,7 +362,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
   var clearBtn = document.getElementById("clear_btn");
   var optimizeBtn = document.getElementById("optimize_btn");
 
-  $scope.mode = 'auto';
+  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];

@@ -1,10 +1,5 @@
 var app = angular.module('matrix', []);
 var hash_params = L.Hash.parseHash(location.hash);
-var mode_mapping = {
-  'foot' : 'pedestrian',
-  'car' : 'auto',
-  'bicycle' : 'bicycle'
-};
 
 var serviceUrl = "https://matrix.mapzen.com/";
 var envServer = "production";
@@ -57,29 +52,19 @@ app.run(function($rootScope) {
 
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
-  var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }), cinnabar = Tangram.leafletLayer({
-    scene: 'https://raw.githubusercontent.com/tangrams/cinnabar-style-more-labels/gh-pages/cinnabar-style-more-labels.yaml',
-    attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
-  }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  });
-  
+  //map layers & default layer are defined in the index.html
   var baseMaps = {
-    "Cinnabar" : cinnabar,
+    "Zinc" : zinc,
     "Road" : road,
     "Cycle" : cycle,
-    "Elevation" : elevation
+    "Outdoors" : outdoors
   };
 
   //leaflet slippy map
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ road ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : zinc) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
@@ -200,7 +185,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var matrixBtn = document.getElementById("matrix_btn");
 
 
-  $scope.mode = 'auto';
+  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
   $scope.matrixType = '';
   $scope.startPoints = [];
   $scope.endPoints = [];
