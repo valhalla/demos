@@ -433,6 +433,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     if (end_at_start)
       waypoints.push(waypoints[0]);
 
+    selectEnv();
     rr = createRouting({waypoints: waypoints, costing: $scope.mode});
     if ($scope.mode == "multimodal"){
       rr.route({

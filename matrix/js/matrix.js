@@ -251,6 +251,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
 
+    selectEnv();
     var  matrix = L.Matrix.widget(envToken, $scope.mode, $scope.matrixType);
     matrix.matrix({
       waypoints : waypoints
