@@ -23,6 +23,7 @@
 <div class="container-fluid row" ng-controller="OptimizedRouteController">
   <div id="controls" class = "control-container">
     <img src="../routing/images/turnbyturnlogo.png" alt="logo">
+
     <!---------control view ------>
     <div ng-hide="appView == 'tspTable'" class = "not-table ng-hide">
       <div class = "tspWrapper">
@@ -85,7 +86,7 @@
         <button ng-click="clearAll()" class="plain" id="clear_btn" type="button">Clear All</button>
       </div>
     </div>
-
+    <h5><b><a target="_blank" href='https://github.com/valhalla/valhalla-docs/blob/master/optimized_route/api-reference.md'>Optimized Route API reference</a></b></h5>
     <!---------table view ------>
     <div ng-hide="appView == 'control'" class = "tableView ng-hide">
       <button class = "plain" ng-click="backToControlView()"> &lt; Back</button>
