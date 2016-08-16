@@ -85,36 +85,19 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }), /* Can only load one tangram layer at a time
-    zinc = Tangram.leafletLayer({
-    scene: 'https://mapzen.com/carto/zinc-style/2.0/zinc-style.yaml',
-    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
-  }), */zinc_transit = Tangram.leafletLayer({
-    scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-transit.yaml',
-    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
-  }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png', {
-    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-  }), transit = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
-    attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-  });
-
+  //map layers & default layer are defined in the index.html
   var baseMaps = {
     "Road" : road,
-   // "Zinc" : zinc,
     "Zinc Transit" : zinc_transit,
     "Cycle" : cycle,
-    "Elevation" : elevation,
+    "Outdoors" : outdoors,
     "Transit" : transit
   };
 
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ zinc_transit ],
+    layers : [ defaultMapLayer ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   

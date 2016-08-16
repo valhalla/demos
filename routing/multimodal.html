@@ -130,6 +130,20 @@
     <!-- Load geocoding plugin after Leaflet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
+	<script>
+	  var defaultMapLayer = Tangram.leafletLayer({
+	    scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-transit.yaml',
+	    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
+	  }), road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+	  }), zinc_transit = Tangram.leafletLayer({
+	    scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-transit.yaml',
+	    attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
+	  }), transit = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
+	    attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
+	  });
+	</script>
+
     <!-- Adding a script block to post message to the parent container (think iframed demos) -->
     <script type="text/javascript">
       window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
