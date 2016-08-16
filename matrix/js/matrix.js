@@ -54,7 +54,7 @@ app.run(function($rootScope) {
 app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseMaps = {
-    "Zinc" : zinc,
+    "Zinc" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Road" : road,
     "Cycle" : cycle,
     "Outdoors" : outdoors
@@ -64,7 +64,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : zinc) ],
+    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
     center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
   });
   
