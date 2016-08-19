@@ -98,7 +98,8 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         }
         mapMatchingControl = L.mapMatching(trace, {
             externalTraceLayer: L.layerGroup(markers),
-            serviceUrlParams: {mode: $scope.mode},
+            serviceUrlParams: {mode: $scope.mode,
+                               search_radius: document.getElementById('radius').value },
             serviceUrl: serviceUrl
         }).addTo(map);
 
