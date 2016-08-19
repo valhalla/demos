@@ -1,21 +1,21 @@
 var app = angular.module('optimized_route', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
-var serviceUrl;
 var envServer = "production";
 var envToken = accessToken.prod;
 var locToken = locateToken.prod;
+var serviceUrl = server.prod;
 var sentManyToManyEnd = false;
 var optimized_route = true;
 
 function selectEnv() {
     $("#env_dropdown").find("option:selected").each(function() {
-        environmentExists = true;
         envServer = $(this).text();
-        serviceUrl = document.getElementById(envServer).value;
         getEnvToken();
     });
 }
+
+selectEnv();
 
 function handleChange(evt) {
     var sel = document.getElementById('selector');
@@ -30,14 +30,17 @@ function getEnvToken() {
     case "localhost":
         envToken = accessToken.local;
         locToken = locateToken.local;
+        serviceUrl = server.local;
         break;
     case "development":
         envToken = accessToken.dev;
         locToken = locateToken.dev;
+        serviceUrl = server.dev;
         break;
     case "production":
         envToken = accessToken.prod;
         locToken = locateToken.prod;
+        serviceUrl = server.prod;
         break;
     }
 }
@@ -95,7 +98,8 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         }
         mapMatchingControl = L.mapMatching(trace, {
             externalTraceLayer: L.layerGroup(markers),
-            serviceUrlParams: {mode: $scope.mode}
+            serviceUrlParams: {mode: $scope.mode},
+            serviceUrl: serviceUrl
         }).addTo(map);
 
         update(true, traceCoords, $scope.mode);
