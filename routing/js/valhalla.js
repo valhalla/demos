@@ -921,15 +921,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'multimodal';
         var directionsoptions = { "language" : locale };
-        var calendarInput="";
+        var calendarInput;
         if (document.getElementById("datepicker"))
-          calInput = document.getElementById("datepicker").value;
+          calendarInput = document.getElementById("datepicker").value;
         var dtoptions = "";
-        if (calInput != "undefined") {
-          dateStr = datetimeUpdate(calInput);
+        if (calendarInput != undefined) {
+          dateStr = datetimeUpdate(calendarInput);
           dtoptions = setDateTime(dateStr);    
         }
-        if (document.getElementById('transitoptions').style.display == "block") {
+        if (document.getElementById('transitoptions') && document.getElementById('transitoptions').style.display == "block") {
           var transitoptions = setTransitOptions();
           rr.route({
             costing : costing,
