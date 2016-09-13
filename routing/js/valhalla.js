@@ -68,45 +68,46 @@ var dateStr = parseIsoDateTime(isoDateTime.toString());
 if (document.getElementById("inputFile")) {
   var inputElement = document.getElementById("inputFile");
   inputElement.addEventListener("change", selectFiles, false);
-}
-function selectFiles(evt) {
-  selectEnv();
-  if (typeof evt.target != "undefined") {
-    var files = evt.target.files;
 
-    if (!files.length) {
-      alert('Please select a file!');
-      return;
-    }
-    var file = files[0];
-   // var lastUpdate = file.lastModified;
-    var reader = new FileReader();
-    var delimiter = "-j";
-    reader.onloadend = function(evt) {
-      if (evt.target.readyState == FileReader.DONE) {
-        var lines = evt.target.result.split(delimiter);
-        var index;
-        var select = document.getElementById('fileSelector').options.length = 0;
-        if (lines[0] == "") {
-          for (index = 1; index < lines.length; index++) {
-            var newOption = document.createElement('option');
-            var pattern = new RegExp("{\".*}", "g");
-            var results = pattern.exec(unescape(lines[index]));
-            lines[index] = results[0];
-            newOption.value = lines[index];
-            newOption.text = index;
-            // reset selector options
-            select = document.getElementById('fileSelector');
-            try {
-              select.add(newOption, null);
-            } catch (ex) {
-              select.add(newOption);
+  function selectFiles(evt) {
+    selectEnv();
+    if (typeof evt.target != "undefined") {
+      var files = evt.target.files;
+  
+      if (!files.length) {
+        alert('Please select a file!');
+        return;
+      }
+      var file = files[0];
+     // var lastUpdate = file.lastModified;
+      var reader = new FileReader();
+      var delimiter = "-j";
+      reader.onloadend = function(evt) {
+        if (evt.target.readyState == FileReader.DONE) {
+          var lines = evt.target.result.split(delimiter);
+          var index;
+          var select = document.getElementById('fileSelector').options.length = 0;
+          if (lines[0] == "") {
+            for (index = 1; index < lines.length; index++) {
+              var newOption = document.createElement('option');
+              var pattern = new RegExp("{\".*}", "g");
+              var results = pattern.exec(unescape(lines[index]));
+              lines[index] = results[0];
+              newOption.value = lines[index];
+              newOption.text = index;
+              // reset selector options
+              select = document.getElementById('fileSelector');
+              try {
+                select.add(newOption, null);
+              } catch (ex) {
+                select.add(newOption);
+              }
             }
           }
         }
-      }
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
+    }
   }
 }
 
@@ -533,138 +534,139 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     });
   });
 
-  document.querySelector(".select").addEventListener('click', function(evt) {
-    resetFileLoader();
-    handleChange(evt);
-    var select = document.getElementById('fileSelector');
-    var i;
-    for (i = 0; i < select.length; i++) {
-      if (select.options[i].selected) {
-        Locations = [];
-        var json = JSON.parse(select.options[i].value);
-        var via_array = new Array();
-
-        if (json.locations.length == 2) {
-          var geo = {
-            'olat' : json.locations[0].lat,
-            'olon' : json.locations[0].lon,
-            'otype' : json.locations[0].type,
-            'oname' : json.locations[0].name,
-            'ostreet' : json.locations[0].street,
-            'ocity' : json.locations[0].city,
-            'ostate' : json.locations[0].state,
-            'dlat' : json.locations[1].lat,
-            'dlon' : json.locations[1].lon,
-            'dtype' : json.locations[1].type,
-            'dname' : json.locations[1].name,
-            'dstreet' : json.locations[1].street,
-            'dcity' : json.locations[1].city,
-            'dstate' : json.locations[1].state
-          }
-          // json.locations++;
-          var waypoints = [];
-          waypoints.push({
-            latLng : L.latLng(geo.olat, geo.olon),
-            type : geo.otype,
-            name : geo.oname,
-            street : geo.ostreet,
-            city : geo.ocity,
-            state : geo.ostate
-          });
-          waypoints.push({
-            latLng : L.latLng(geo.dlat, geo.dlon),
-            type : geo.dtype,
-            name : geo.dname,
-            street : geo.dstreet,
-            city : geo.dcity,
-            state : geo.dstate
-          });
-
-        } else if (json.locations.length > 2) {
-          for (k = 1; k < json.locations.length - 2; k++) {
-            var via = {
-              'vlat' : json.locations[k].lat,
-              'vlon' : json.locations[k].lon,
-              'vtype' : json.locations[k].type,
-              'vname' : json.locations[k].name,
-              'vstreet' : json.locations[k].street,
-              'vcity' : json.locations[k].city,
-              'vstate' : json.locations[k].state
+  if (document.getElementById("inputFile")) {
+    document.querySelector(".select").addEventListener('click', function(evt) {
+      resetFileLoader();
+      handleChange(evt);
+      var select = document.getElementById('fileSelector');
+      var i;
+      for (i = 0; i < select.length; i++) {
+        if (select.options[i].selected) {
+          Locations = [];
+          var json = JSON.parse(select.options[i].value);
+          var via_array = new Array();
+  
+          if (json.locations.length == 2) {
+            var geo = {
+              'olat' : json.locations[0].lat,
+              'olon' : json.locations[0].lon,
+              'otype' : json.locations[0].type,
+              'oname' : json.locations[0].name,
+              'ostreet' : json.locations[0].street,
+              'ocity' : json.locations[0].city,
+              'ostate' : json.locations[0].state,
+              'dlat' : json.locations[1].lat,
+              'dlon' : json.locations[1].lon,
+              'dtype' : json.locations[1].type,
+              'dname' : json.locations[1].name,
+              'dstreet' : json.locations[1].street,
+              'dcity' : json.locations[1].city,
+              'dstate' : json.locations[1].state
             }
-            via_array.push(via);
+            // json.locations++;
+            var waypoints = [];
+            waypoints.push({
+              latLng : L.latLng(geo.olat, geo.olon),
+              type : geo.otype,
+              name : geo.oname,
+              street : geo.ostreet,
+              city : geo.ocity,
+              state : geo.ostate
+            });
+            waypoints.push({
+              latLng : L.latLng(geo.dlat, geo.dlon),
+              type : geo.dtype,
+              name : geo.dname,
+              street : geo.dstreet,
+              city : geo.dcity,
+              state : geo.dstate
+            });
+  
+          } else if (json.locations.length > 2) {
+            for (k = 1; k < json.locations.length - 2; k++) {
+              var via = {
+                'vlat' : json.locations[k].lat,
+                'vlon' : json.locations[k].lon,
+                'vtype' : json.locations[k].type,
+                'vname' : json.locations[k].name,
+                'vstreet' : json.locations[k].street,
+                'vcity' : json.locations[k].city,
+                'vstate' : json.locations[k].state
+              }
+              via_array.push(via);
+            }
+            var geo = {
+              'olat' : json.locations[0].lat,
+              'olon' : json.locations[0].lon,
+              'otype' : json.locations[0].type,
+              'oname' : json.locations[0].name,
+              'ostreet' : json.locations[0].street,
+              'ocity' : json.locations[0].city,
+              'ostate' : json.locations[0].state,
+              'dlat' : json.locations[json.locations.length - 1].lat,
+              'dlon' : json.locations[json.locations.length - 1].lon,
+              'dtype' : json.locations[json.locations.length - 1].type,
+              'dname' : json.locations[json.locations.length -1].name,
+              'dstreet' : json.locations[json.locations.length - 1].street,
+              'dcity' : json.locations[json.locations.length - 1].city,
+              'dstate' : json.locations[json.locations.length - 1].state
+            }
+  
+            var waypoints = [];
+            waypoints.push(L.latLng(geo.olat, geo.olon));
+            via_array.forEach(function(via_array, i) {
+              waypoints.push(L.latLng(via_array.vlat, via_array.vlon));
+            });
+            waypoints.push(L.latLng(geo.dlat, geo.dlon));
           }
-          var geo = {
-            'olat' : json.locations[0].lat,
-            'olon' : json.locations[0].lon,
-            'otype' : json.locations[0].type,
-            'oname' : json.locations[0].name,
-            'ostreet' : json.locations[0].street,
-            'ocity' : json.locations[0].city,
-            'ostate' : json.locations[0].state,
-            'dlat' : json.locations[json.locations.length - 1].lat,
-            'dlon' : json.locations[json.locations.length - 1].lon,
-            'dtype' : json.locations[json.locations.length - 1].type,
-            'dname' : json.locations[json.locations.length -1].name,
-            'dstreet' : json.locations[json.locations.length - 1].street,
-            'dcity' : json.locations[json.locations.length - 1].city,
-            'dstate' : json.locations[json.locations.length - 1].state
-          }
-
-          var waypoints = [];
-          waypoints.push(L.latLng(geo.olat, geo.olon));
-          via_array.forEach(function(via_array, i) {
-            waypoints.push(L.latLng(via_array.vlat, via_array.vlon));
-          });
-          waypoints.push(L.latLng(geo.dlat, geo.dlon));
+  
+          var rr = L.Routing.control({
+            waypoints : waypoints,
+            geocoder : null,
+            costing : json.costing,
+            routeWhileDragging : false,
+            router : L.Routing.mapzen(envToken, json),
+            summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
+  
+            createMarker : function(i, wp, n) {
+              var iconV;
+              if (i == 0) {
+                iconV = L.icon({
+                  iconUrl : 'resource/start_green_dot.gif',
+                  iconSize : [ 24, 24 ]
+                });
+              } else if (i == (n - 1)) {
+                iconV = L.icon({
+                  iconUrl : 'resource/dest_red_dot.png',
+                  iconSize : [ 24, 24 ]
+                })
+              } else {
+                iconV = L.icon({
+                  iconUrl : 'resource/dot.png',
+                  iconSize : [ 24, 24 ]
+                })
+              }
+              var options = {
+                draggable : true,
+                icon : iconV
+              }
+              var poi = L.marker(wp.latLng, options);
+              return poi.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + wp.latLng.lat + "/" + wp.latLng.lng + "&layers=Q target=_blank>Edit POI here<a/>");
+            },
+            formatter : new L.Routing.Mapzen.Formatter(),
+            pointMarkerStyle : {
+              radius: 6,
+              color: '#20345b',
+              fillColor: '#fff',
+              opacity: 1,
+              fillOpacity: 1
+            }
+          }).addTo(map);
+  
         }
-
-        var rr = L.Routing.control({
-          waypoints : waypoints,
-          geocoder : null,
-          costing : json.costing,
-          routeWhileDragging : false,
-          router : L.Routing.mapzen(envToken, json),
-          summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
-
-          createMarker : function(i, wp, n) {
-            var iconV;
-            if (i == 0) {
-              iconV = L.icon({
-                iconUrl : 'resource/start_green_dot.gif',
-                iconSize : [ 24, 24 ]
-              });
-            } else if (i == (n - 1)) {
-              iconV = L.icon({
-                iconUrl : 'resource/dest_red_dot.png',
-                iconSize : [ 24, 24 ]
-              })
-            } else {
-              iconV = L.icon({
-                iconUrl : 'resource/dot.png',
-                iconSize : [ 24, 24 ]
-              })
-            }
-            var options = {
-              draggable : true,
-              icon : iconV
-            }
-            var poi = L.marker(wp.latLng, options);
-            return poi.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + wp.latLng.lat + "/" + wp.latLng.lng + "&layers=Q target=_blank>Edit POI here<a/>");
-          },
-          formatter : new L.Routing.Mapzen.Formatter(),
-          pointMarkerStyle : {
-            radius: 6,
-            color: '#20345b',
-            fillColor: '#fff',
-            opacity: 1,
-            fillOpacity: 1
-          }
-        }).addTo(map);
-
       }
-    }
-  }, false);
-
+    }, false);
+  }
   // if the hash changes
   // L.DomEvent.addListener(window, "hashchange", hashRoute);
 
