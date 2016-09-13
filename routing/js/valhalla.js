@@ -68,46 +68,45 @@ var dateStr = parseIsoDateTime(isoDateTime.toString());
 if (document.getElementById("inputFile")) {
   var inputElement = document.getElementById("inputFile");
   inputElement.addEventListener("change", selectFiles, false);
+}
+function selectFiles(evt) {
+  selectEnv();
+  if (typeof evt.target != "undefined") {
+    var files = evt.target.files;
 
-  function selectFiles(evt) {
-    selectEnv();
-    if (typeof evt.target != "undefined") {
-      var files = evt.target.files;
-  
-      if (!files.length) {
-        alert('Please select a file!');
-        return;
-      }
-      var file = files[0];
-     // var lastUpdate = file.lastModified;
-      var reader = new FileReader();
-      var delimiter = "-j";
-      reader.onloadend = function(evt) {
-        if (evt.target.readyState == FileReader.DONE) {
-          var lines = evt.target.result.split(delimiter);
-          var index;
-          var select = document.getElementById('fileSelector').options.length = 0;
-          if (lines[0] == "") {
-            for (index = 1; index < lines.length; index++) {
-              var newOption = document.createElement('option');
-              var pattern = new RegExp("{\".*}", "g");
-              var results = pattern.exec(unescape(lines[index]));
-              lines[index] = results[0];
-              newOption.value = lines[index];
-              newOption.text = index;
-              // reset selector options
-              select = document.getElementById('fileSelector');
-              try {
-                select.add(newOption, null);
-              } catch (ex) {
-                select.add(newOption);
-              }
+    if (!files.length) {
+      alert('Please select a file!');
+      return;
+    }
+    var file = files[0];
+   // var lastUpdate = file.lastModified;
+    var reader = new FileReader();
+    var delimiter = "-j";
+    reader.onloadend = function(evt) {
+      if (evt.target.readyState == FileReader.DONE) {
+        var lines = evt.target.result.split(delimiter);
+        var index;
+        var select = document.getElementById('fileSelector').options.length = 0;
+        if (lines[0] == "") {
+          for (index = 1; index < lines.length; index++) {
+            var newOption = document.createElement('option');
+            var pattern = new RegExp("{\".*}", "g");
+            var results = pattern.exec(unescape(lines[index]));
+            lines[index] = results[0];
+            newOption.value = lines[index];
+            newOption.text = index;
+            // reset selector options
+            select = document.getElementById('fileSelector');
+            try {
+              select.add(newOption, null);
+            } catch (ex) {
+              select.add(newOption);
             }
           }
         }
-      };
-      reader.readAsText(file);
-    }
+      }
+    };
+    reader.readAsText(file);
   }
 }
 
@@ -137,7 +136,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseMaps = {
     "Road" : road,
-    "Zinc Transit" : zinc_transit,
+    "Zinc Transit" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Cycle" : cycle,
     "Outdoors" : outdoors,
     "Transit" : transit
