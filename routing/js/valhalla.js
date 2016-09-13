@@ -824,7 +824,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'auto';
         var directionsoptions = { "language" : locale };
-        var calendarInput = document.getElementById("datepicker").value;
+        var calendarInput="";
+        if (document.getElementById("datepicker"))
+          calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
@@ -851,9 +853,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'bicycle';
         var directionsoptions = { "language" : locale };
-        if (document.getElementById('bikeoptions').style.display == "block") {
+        if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
           var bikeoptions = setBikeOptions();
-          var calendarInput = document.getElementById("datepicker").value;
+          var calendarInput="";
+          if (document.getElementById("datepicker"))
+            calendarInput = document.getElementById("datepicker").value;
           if (calendarInput != "") {
             dateStr = datetimeUpdate(calendarInput);
             var dtoptions = setDateTime(dateStr);
@@ -888,7 +892,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'pedestrian';
         var directionsoptions = { "language" : locale };
-        var calendarInput = document.getElementById("datepicker").value;
+        var calendarInput="";
+        if (document.getElementById("datepicker"))
+          calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr); 
@@ -915,7 +921,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'multimodal';
         var directionsoptions = { "language" : locale };
-        var calInput = document.getElementById("datepicker").value;
+        var calendarInput="";
+        if (document.getElementById("datepicker"))
+          calInput = document.getElementById("datepicker").value;
         var dtoptions = "";
         if (calInput != "undefined") {
           dateStr = datetimeUpdate(calInput);
