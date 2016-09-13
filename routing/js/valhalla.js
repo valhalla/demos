@@ -65,9 +65,10 @@ function parseIsoDateTime(dtStr) {
 }
 var dateStr = parseIsoDateTime(isoDateTime.toString());
 
-var inputElement = document.getElementById("inputFile");
-inputElement.addEventListener("change", selectFiles, false);
-
+if (document.getElementById("inputFile")) {
+  var inputElement = document.getElementById("inputFile");
+  inputElement.addEventListener("change", selectFiles, false);
+}
 function selectFiles(evt) {
   selectEnv();
   if (typeof evt.target != "undefined") {
