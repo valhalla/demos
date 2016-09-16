@@ -396,6 +396,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
+    map.options.maxZoom = 14;
   });
   $rootScope.$on('map.dropMarker', function(ev, geo, m) {
 
