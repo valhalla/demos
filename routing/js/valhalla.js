@@ -116,7 +116,7 @@ app.run(function($rootScope) {
       'lat' : 40.7486,
       'lng' : -73.9690
     },
-    'zoom' : 13
+    'zoom' : 14
   };
   $rootScope.geobase = {
     'zoom' : hash_loc.zoom,
