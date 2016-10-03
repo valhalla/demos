@@ -13,7 +13,7 @@
 
 	<script>
 		//make a map
-		var map = L.map('map').setView([40.5, -76.5], 9);
+		var map = L.map('map').setView([40.7, -73.8], 13);
 		var geojson = null;
 
 		//use osm tiles
@@ -25,29 +25,36 @@
 		//click callback
 		function onMapClick(e) {
 			//build url
-			var url = 'https://valhalla.dev.mapzen.com/isochrone?api_key=valhalla-t_16n1c&json=';
+			var url = 'http://localhost:8002/isochrone?api_key=valhalla-t_16n1c&json=';
 			var json = {
 				locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
-				costing: "auto",
-				contours: [{"time":15},{"time":30},{"time":45},{"time":60}]
+				costing: "multimodal",
+				contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
+				rings_only: true,
+				denoise: .1
 			};
 			url += escape(JSON.stringify(json));
 			//grab the url
-			$.getJSON(url,function(isochrones){
-				//clear this if its not null
-				if(geojson != null)
-					geojson.removeFrom(map);
-				//create the geojson object
-				geojson = L.geoJson(isochrones, { style: function(feature) { 
-					return { fillColor: feature.properties.fill,
-						 fillOpacity: feature.properties["fill-opacity"],
-						 weight: 1,
-						 color: '#FFFFFF'
-					       };
-				}});
-				//render the geojson
-				geojson.addTo(map);
-			})
+			$.ajax({
+				crossDomain: true,
+				dataType: 'json',
+				url: url,
+				success: function(isochrones){
+					//clear this if its not null
+					if(geojson != null)
+						geojson.removeFrom(map);
+					//create the geojson object
+					geojson = L.geoJson(isochrones, { style: function(feature) { 
+						return { fillColor: feature.properties.fill,
+							 fillOpacity: feature.properties["fill-opacity"],
+							 weight: 1,
+							 color: '#FFFFFF'
+						       };
+					}});
+					//render the geojson
+					geojson.addTo(map);
+				}
+			});
 		}
 		
 		//hook up the callback
