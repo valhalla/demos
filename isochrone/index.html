@@ -29,7 +29,9 @@
 			var json = {
 				locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
 				costing: "auto",
-				contours: [{"time":15},{"time":30},{"time":45},{"time":60}]
+				contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
+				rings_only: true,
+				denoise: .1
 			};
 			url += escape(JSON.stringify(json));
 			//grab the url
