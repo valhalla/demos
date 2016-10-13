@@ -483,38 +483,43 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   // locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
     // clear it
-    locateMarkers.forEach(function (element, index, array) {
-      map.removeLayer(element);
+    locateMarkers.forEach(function (marker, index, array) {
+      map.removeLayer(marker);
     });
     locateMarkers = [];
-
-    //mark from node
+    
+    //get the edges and nodes grouped up
+    var results = {};
     if(locate_result.nodes != null && locate_result.nodes.length > 0) {
-      var marker = L.circle( [locate_result.nodes[0].lat,locate_result.nodes[0].lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
-      map.addLayer(marker);
-      var popup = L.popup({maxHeight : 200});
-      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();
-      locateMarkers.push(marker);
-    }//mark all the results for that spot
-    else if(locate_result.edges != null) {
-      locate_result.edges.forEach(function (element, index, array) {
-        var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+      locate_result.nodes.forEach(function (node, index, array) {
+        if(!([node.lat,node.lon] in results))
+          results[[node.lat,node.lon]] = []
+        results[[node.lat,node.lon]].push(node)
+      });
+    }
+    if(locate_result.edges != null) {
+      locate_result.edges.forEach(function (edge, index, array) {
+        if(!([edge.correlated_lat,edge.correlated_lon] in results))
+          results[[edge.correlated_lat,edge.correlated_lon]] = []
+        results[[edge.correlated_lat,edge.correlated_lon]].push(edge)
+      });
+    }
+    if(Object.keys(results).length == 0) {
+      results[[locate_result.input_lat,locate_result.input_lon]] = [locate_result]
+    }
+
+    //show some stuff
+    for (var coord in results) {
+      if (results.hasOwnProperty(coord)) {
+        var marker = L.circle( coord.split(','), 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
         map.addLayer(marker);
         var popup = L.popup({maxHeight : 200});
-        popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>");
+        popup.setContent("<pre id='json'>" + JSON.stringify(results[coord], null, 2) + "</pre>");
         marker.bindPopup(popup).openPopup();
         locateMarkers.push(marker);
-      });
-    }//no data probably
-    else {
-      var marker = L.circle( [locate_result.input_lat,locate_result.input_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
-      map.addLayer(marker);
-      var popup = L.popup({maxHeight : 200});
-      popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-      marker.bindPopup(popup).openPopup();
-      locateMarkers.push(marker);
+      }
     }
+
   };
 
   $scope.renderHtml = function(html_code) {
