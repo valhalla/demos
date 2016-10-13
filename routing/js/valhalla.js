@@ -489,8 +489,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locateMarkers = [];
 
     //mark from node
-    if(locate_result.node != null) {
-      var marker = L.circle( [locate_result.node.lat,locate_result.node.lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+    if(locate_result.nodes != null && locate_result.nodes.length > 0) {
+      var marker = L.circle( [locate_result.nodes[0].lat,locate_result.nodes[0].lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
       map.addLayer(marker);
       var popup = L.popup({maxHeight : 200});
       popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
