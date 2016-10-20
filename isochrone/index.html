@@ -1,59 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Isochrones</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+  <title>Isochrones</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
 </head>
 <body>
-	<div id="map" style="width: 1440px; height: 810px"></div>
-	<script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
-	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <div id="map" style="width: 1440px; height: 810px"></div>
+  <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"></script>
 
-	<script>
-		//make a map
-		var map = L.map('map').setView([40.5, -76.5], 9);
-		var geojson = null;
+  <script>
+    //make a map
+    var map = L.map('map').setView([37.8, -122.4], 13);
+    var geojson = null;
 
-		//use osm tiles
-		L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-		}).addTo(map);
-		
-		//click callback
-		function onMapClick(e) {
-			//build url
-			var url = 'https://valhalla.dev.mapzen.com/isochrone?api_key=valhalla-t_16n1c&json=';
-			var json = {
-				locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
-				costing: "auto",
-				contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
-				rings_only: true,
-				denoise: .1
-			};
-			url += escape(JSON.stringify(json));
-			//grab the url
-			$.getJSON(url,function(isochrones){
-				//clear this if its not null
-				if(geojson != null)
-					geojson.removeFrom(map);
-				//create the geojson object
-				geojson = L.geoJson(isochrones, { style: function(feature) { 
-					return { fillColor: feature.properties.fill,
-						 fillOpacity: feature.properties["fill-opacity"],
-						 weight: 1,
-						 color: '#FFFFFF'
-					       };
-				}});
-				//render the geojson
-				geojson.addTo(map);
-			})
-		}
-		
-		//hook up the callback
-		map.on('click', onMapClick);
-	</script>
+    //use osm tiles
+    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    }).addTo(map);
+    
+    //click callback
+    function onMapClick(e) {
+      //build url
+      var url = 'https://valhalla.dev.mapzen.com/isochrone?api_key=valhalla-t_16n1c&json=';
+      var json = {
+        locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
+        costing: "multimodal",
+        contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
+        rings_only: true,
+        denoise: .1
+      };
+      url += escape(JSON.stringify(json));
+      //grab the url
+      $.getJSON(url,function(isochrones){
+        //clear this if its not null
+        if(geojson != null)
+          geojson.removeFrom(map);
+
+        //for each feature compute an axis aligned bounding box
+        var features = isochrones.features;
+        for(var k = 0; k < features.length; k++) {
+          //find the next set of contours
+          var i = k + 1;
+          while(i < features.length && features[i].properties.contour == features[k].properties.contour)
+            i++;
+          if(i >= features.length)
+            break;
+
+          //cut this one by all of these smaller contours
+          var outer = turf.polygon(features[k].geometry.coordinates);
+          var contour = features[i].properties.contour;
+          while(i < features.length && contour == features[i].properties.contour) {
+            var inner = turf.polygon(features[i].geometry.coordinates);
+            outer = turf.difference(outer, inner);
+            i++;
+          }
+          //keep it
+          features[k].geometry = outer.geometry;
+        }
+
+        //create the geojson object
+        geojson = L.geoJson(isochrones, { style: function(feature) { 
+          return { fillColor: feature.properties.fill,
+                   fillOpacity: feature.properties["fill-opacity"],
+                   weight: 1,
+                   color: '#FFFFFF'
+                 };
+        }});
+        //render the geojson
+        geojson.addTo(map);
+      })
+    }
+    
+    //hook up the callback
+    map.on('click', onMapClick);
+  </script>
 </body>
 </html>
