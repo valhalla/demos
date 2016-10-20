@@ -10,6 +10,7 @@
   <div id="map" style="width: 1440px; height: 810px"></div>
   <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"></script>
 
   <script>
     //make a map
@@ -42,60 +43,25 @@
 
         //for each feature compute an axis aligned bounding box
         var features = isochrones.features;
-        var bboxes = [];
-        features.forEach(function(feature) {
-          var box = [feature.geometry.coordinates[0][0].slice(), feature.geometry.coordinates[0][0].slice()];
-          feature.geometry.coordinates.forEach(function(ring) {
-            ring.forEach(function(point) {
-              //min
-              if(point[0] < box[0][0])
-                box[0][0] = point[0];
-              if(point[1] < box[0][1])
-                box[0][1] = point[1];
-              //max
-              if(point[0] > box[1][0])
-                box[1][0] = point[0];
-              if(point[1] > box[1][1])
-                box[1][1] = point[1];
-            });
-          });
-          bboxes.push(box);
-        });
-
-        //test whether the inner bbox lies within the outer
-        var inside = function(outer, inner) {
-          return inner[0][0] >= outer[0][0] && inner[1][0] <= outer[1][0] &&
-                 inner[0][1] >= outer[0][1] && inner[1][1] <= outer[1][1];
-        };
-
-        //for each feature in reverse
-        for(var i = features.length - 1; i > 0; i--) {
-          //make sure we are on the next contour
-          var j = i - 1;
-          while(j >= 0 && features[i].properties.contour == features[j].properties.contour)
-            j--;
-          if(j < 0)
+        for(var k = 0; k < features.length; k++) {
+          //find the next set of contours
+          var i = k + 1;
+          while(i < features.length && features[i].properties.contour == features[k].properties.contour)
+            i++;
+          if(i >= features.length)
             break;
-          //find the first one that fits in this contour
-          var contour = features[j].properties.contour;
-          while(j >= 0 && features[j].properties.contour == contour) {
-            //does it fit as an inner ring this will make a cut out
-            //reversing the winding of this inner is more proper
-            //but it seems this renderer doesnt care at all
-            if(inside(bboxes[j], bboxes[i])) {
-              features[i].geometry.coordinates.forEach(function (p) { features[j].geometry.coordinates.push(p); });
-              break;
-            }
-            j--;
+
+          //cut this one by all of these smaller contours
+          var outer = turf.polygon(features[k].geometry.coordinates);
+          var contour = features[i].properties.contour;
+          while(i < features.length && contour == features[i].properties.contour) {
+            var inner = turf.polygon(features[i].geometry.coordinates);
+            outer = turf.difference(outer, inner);
+            i++;
           }
+          //keep it
+          features[k].geometry = outer.geometry;
         }
-
-
-for(var i = 0; i < features.length; i++){
-if(features[i].properties.contour != 30) {
-features.splice(i, 1);
-}
-}  
 
         //create the geojson object
         geojson = L.geoJson(isochrones, { style: function(feature) { 
