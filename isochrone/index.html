@@ -4,18 +4,20 @@
   <title>Isochrones</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+
 </head>
 <body>
-  <div id="map" style="width: 1440px; height: 810px"></div>
-  <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
+  <div id="map" style="width: 1440px; height: 960px"></div>
+  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-  <script src="https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"></script>
 
   <script>
     //make a map
-    var map = L.map('map').setView([37.8, -122.4], 13);
+    var map = L.map('map').setView([40.4, -76.0], 13);
+    L.polyline([[41.21, 9.36], [41.24, 9.35], [41.23, 9.34]]).addTo(map).bindTooltip('Top tooltip following mouse', {sticky: true, direction: 'top'});
     var geojson = null;
+    var tooltips = [];
 
     //use osm tiles
     L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,13 +28,14 @@
     //click callback
     function onMapClick(e) {
       //build url
-      var url = 'https://valhalla.dev.mapzen.com/isochrone?api_key=valhalla-t_16n1c&json=';
+      var url = 'http://localhost:8002/isochrone?api_key=valhalla-t_16n1c&json=';
       var json = {
         locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
-        costing: "multimodal",
+        costing: "auto",
         contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
-        rings_only: true,
-        denoise: .1
+        polygons: false,
+        denoise: .2,
+        generalize: 150
       };
       url += escape(JSON.stringify(json));
       //grab the url
@@ -40,37 +43,27 @@
         //clear this if its not null
         if(geojson != null)
           geojson.removeFrom(map);
-
-        //for each feature compute an axis aligned bounding box
-        var features = isochrones.features;
-        for(var k = 0; k < features.length; k++) {
-          //find the next set of contours
-          var i = k + 1;
-          while(i < features.length && features[i].properties.contour == features[k].properties.contour)
-            i++;
-          if(i >= features.length)
-            break;
-
-          //cut this one by all of these smaller contours
-          var outer = turf.polygon(features[k].geometry.coordinates);
-          var contour = features[i].properties.contour;
-          while(i < features.length && contour == features[i].properties.contour) {
-            var inner = turf.polygon(features[i].geometry.coordinates);
-            outer = turf.difference(outer, inner);
-            i++;
-          }
-          //keep it
-          features[k].geometry = outer.geometry;
-        }
+        //clear the tooltips
+        tooltips.forEach(function (tooltip) {
+          tooltip.removeFrom(map);
+        });
+        tooltips = [];
 
         //create the geojson object
-        geojson = L.geoJson(isochrones, { style: function(feature) { 
-          return { fillColor: feature.properties.fill,
-                   fillOpacity: feature.properties["fill-opacity"],
-                   weight: 1,
-                   color: '#FFFFFF'
-                 };
-        }});
+        geojson = L.geoJson(isochrones, {
+          style: function(feature) { 
+            return { opacity: feature.properties.opacity * 2,
+                     weight: 10,
+                     color: feature.properties.color
+                   };
+          },
+          onEachFeature: function(feature, layer) {
+            var tooltip = layer.bindTooltip(feature.properties.contour + ' min', { sticky: true });
+            tooltips.push(tooltip);
+            tooltip.addTo(map);
+          }
+        });
+
         //render the geojson
         geojson.addTo(map);
       })
