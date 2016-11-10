@@ -21,8 +21,9 @@
   </script>
 
 Unescape '\': <input id="unescape" type="checkbox"></br>
+Number of Points: <a id="cardinality"></a></br>
 Encoded Line:</br>
-  <textarea id="encoded_polyline" rows="4" cols="50"></textarea>
+  <textarea id="encoded_polyline" rows="4" cols="50"></textarea></br>
 
   <script>
     //decode an encoded string
@@ -65,6 +66,7 @@ Encoded Line:</br>
         var encoded = $('#unescape').val() ? $(this).val().replace(/\\\\/g, '\\') : $(this).val();
         //decode it
         var decoded = decode(encoded);
+        document.getElementById("cardinality").textContent = decoded.length;
         //clear this if its not null
         if(geojson != null)
           geojson.removeFrom(map);
