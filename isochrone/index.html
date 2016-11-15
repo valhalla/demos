@@ -28,7 +28,7 @@
     //click callback
     function onMapClick(e) {
       //build url
-      var url = 'https://valhalla.dev.mapzen.com/isochrone?json=';
+      var url = 'https://valhalla.mapzen.com/isochrone?json=';
       var json = {
         locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
         costing: "auto",
