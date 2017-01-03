@@ -116,7 +116,7 @@ app.run(function($rootScope) {
       'lat' : 40.7486,
       'lng' : -73.9690
     },
-    'zoom' : 14
+    'zoom' : 16
   };
   $rootScope.geobase = {
     'zoom' : hash_loc.zoom,
@@ -135,11 +135,12 @@ app.run(function($rootScope) {
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseMaps = {
+    "Default" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Road" : road,
-    "Zinc Transit" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Cycle" : cycle,
     "Outdoors" : outdoors,
-    "Transit" : transit
+    "Transit" : transit,
+    "Zinc" : zinc
   };
 
   var map = L.map('map', {
@@ -396,6 +397,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
+    map.options.maxZoom = 16;
   });
   $rootScope.$on('map.dropMarker', function(ev, geo, m) {
 
