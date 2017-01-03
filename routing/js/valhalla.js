@@ -135,11 +135,12 @@ app.run(function($rootScope) {
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseMaps = {
+    "Default" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Road" : road,
-    "Zinc Transit" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Cycle" : cycle,
     "Outdoors" : outdoors,
-    "Transit" : transit
+    "Transit" : transit,
+    "Zinc" : zinc
   };
 
   var map = L.map('map', {
