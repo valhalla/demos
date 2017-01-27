@@ -3,7 +3,7 @@ var markers = [];
 
 function makePoints(event) {
     var text = document.getElementById("inputtext").value;
-    var re = /PointLL\((-?[0-9]+\.[0-9]+), (-?[0-9]+\.[0-9]+)\)/g;
+    var re = /[^0-9,] *(-?[0-9]+\.[0-9]+), *(-?[0-9]+\.[0-9]+) *[^0-9,]/g;
     var array;
 
     if (markers.length > 0) {
@@ -13,6 +13,8 @@ function makePoints(event) {
         markers = [];
     }
 
+    var last_idx = 0;
+    var new_text = "";
     while ((array = re.exec(text)) !== null) {
         var lat = parseFloat(array[1]);
         var lng = parseFloat(array[2]);
@@ -21,7 +23,8 @@ function makePoints(event) {
 
         var match_id = markers.length;
 
-        text = text.substr(0, idx) + '<span class="rematch" id="match_' + match_id + '">' + text.substr(idx, len) + '</span>' + text.substr(idx + len, text.length - idx - len);
+        new_text += text.substr(last_idx, idx - last_idx) + '<span class="rematch" id="match_' + match_id + '">' + array[0] + '</span>';
+        last_idx = idx + array[0].length;
 
         var marker = L.marker([lat, lng]);
         marker.match_id = match_id;
@@ -35,7 +38,8 @@ function makePoints(event) {
         });
         markers.push(marker.addTo(map));
     }
-    document.getElementById("output").innerHTML = text;
+    new_text += text.substr(last_idx, text.length - last_idx);
+    document.getElementById("output").innerHTML = new_text;
 
     if (markers.length == 1) {
         map.setView(marker[0].getLatLng(), 18);
