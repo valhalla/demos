@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>A utility to show points from a bunch of text</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="points.css" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="points.js"></script>
+  </head>
+  <body>
+    <div>
+      <p>Paste some text in the box below and click "Submit". Any text submitted which contains "PointLL(lat, lng)" will have a marker on the map below. Hovering over a marker will highlight the coordinates in the text.</p>
+    </div>
+    <div>
+      <form id="inputform" action="#">
+        <textarea id="inputtext" rows="10" cols="100"></textarea>
+        <br/>
+        <input type="submit" value="Submit"/>
+      </form>
+    </div>
+    <div>
+      <p id="output"></p>
+    </div>
+    <div id="map"></div>
+  </body>
+</html>

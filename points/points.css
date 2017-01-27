@@ -1,0 +1,11 @@
+#map {
+    height: 650px;
+}
+
+span.rematch {
+    background-color: #ddd;
+}
+
+span.active {
+    background-color: #f00;
+}
