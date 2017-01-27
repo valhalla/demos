@@ -3,7 +3,7 @@ var markers = [];
 
 function makePoints(event) {
     var text = document.getElementById("inputtext").value;
-    var re = /PointLL\((-?[0-9]+\.[0-9]+), (-?[0-9]+\.[0-9]+)\)/g;
+    var re = /[^0-9,] *(-?[0-9]+\.[0-9]+), *(-?[0-9]+\.[0-9]+) *[^0-9,]/g;
     var array;
 
     if (markers.length > 0) {
