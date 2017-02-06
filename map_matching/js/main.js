@@ -106,6 +106,26 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         update(true, traceCoords, $scope.mode);
     };
 
+    var mapMatchingGeoJSONControl;
+
+    var mapMatchGeoJSON = function (traceGeoJSON) {
+        let markers = {
+            'type': 'MultiPoint',
+            'coordinates': traceGeoJSON.coordinates || (traceGeoJSON.geometry && traceGeoJSON.geometry.coordinates)
+        };
+
+        if (mapMatchingGeoJSONControl) {
+            mapMatchingGeoJSONControl.removeFrom(map);
+        }
+        mapMatchingGeoJSONControl = L.mapMatching(traceGeoJSON, {
+            serviceUrlParams: {mode: $scope.mode,
+                               search_radius: document.getElementById('radius').value },
+            serviceUrl: serviceUrl
+        }).addTo(map);
+
+        update(true, traceGeoJSON, $scope.mode);
+    };
+
     var baseMaps = {
         "Road" : road,
         "Zinc" : zinc,
@@ -287,11 +307,32 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
 
         $rootScope.$emit('map.dropDestMarker', [ geo.lat, geo.lon ], counterText);
         var latlon = geo.lat + ' , '+ geo.lon;
-        $scope.endPoints.push({index: (counterText), lat:geo.lat, lon: geo.lon,latlon: latlon});
+        $scope.endPoints.push({
+            index: (counterText),
+            lat: geo.lat,
+            lon: geo.lon,
+            latlon: latlon
+        });
         $scope.$apply();
         counterText++;
 
         mapMatch();
+    });
+
+    var traceLayer;
+    $('#geojson_match').click(function () {
+        $scope.clearAll();
+        let geojson = JSON.parse($('#geojson').val());
+        if (traceLayer) {
+            map.removeLayer(traceLayer);
+        }
+        traceLayer = L.geoJson(geojson, {
+            style: {
+                color: '#ff7800'
+            }
+        }).addTo(map);
+        map.fitBounds(traceLayer.getBounds());
+        mapMatchGeoJSON(geojson);
     });
 
     var clearBtn = document.getElementById("clear_btn");
