@@ -343,9 +343,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.locations !== undefined)
       waypoints = JSON.parse(parameters.locations);
 
-    var locs = [];
-    waypoints.forEach(function(waypoints) {
-      locs.push(L.latLng(waypoints.lat, waypoints.lon));
+    waypoints.forEach(function(waypoint) {
+      waypoint['latLng'] = L.latLng(waypoint.lat, waypoint.lon);
     });
 
     if (parameters.costing !== undefined)
@@ -361,14 +360,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       var date_time = JSON.parse(parameters.datetime);
 
     rr = createRouting({
-      waypoints: locs,
-      costing : costing,
+      waypoints: waypoints,
+      costing: costing,
       costing_options: costing_options,
       directions_options: directions_options,
-      date_time : date_time
+      date_time: date_time
     }, true);
     
-    locations = locs.length;
+    locations = waypoints.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
   };
@@ -550,84 +549,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         if (select.options[i].selected) {
           Locations = [];
           var json = JSON.parse(select.options[i].value);
-          var via_array = new Array();
-  
-          if (json.locations.length == 2) {
-            var geo = {
-              'olat' : json.locations[0].lat,
-              'olon' : json.locations[0].lon,
-              'otype' : json.locations[0].type,
-              'oname' : json.locations[0].name,
-              'ostreet' : json.locations[0].street,
-              'ocity' : json.locations[0].city,
-              'ostate' : json.locations[0].state,
-              'dlat' : json.locations[1].lat,
-              'dlon' : json.locations[1].lon,
-              'dtype' : json.locations[1].type,
-              'dname' : json.locations[1].name,
-              'dstreet' : json.locations[1].street,
-              'dcity' : json.locations[1].city,
-              'dstate' : json.locations[1].state
-            }
-            // json.locations++;
-            var waypoints = [];
-            waypoints.push({
-              latLng : L.latLng(geo.olat, geo.olon),
-              type : geo.otype,
-              name : geo.oname,
-              street : geo.ostreet,
-              city : geo.ocity,
-              state : geo.ostate
-            });
-            waypoints.push({
-              latLng : L.latLng(geo.dlat, geo.dlon),
-              type : geo.dtype,
-              name : geo.dname,
-              street : geo.dstreet,
-              city : geo.dcity,
-              state : geo.dstate
-            });
-  
-          } else if (json.locations.length > 2) {
-            for (k = 1; k < json.locations.length - 2; k++) {
-              var via = {
-                'vlat' : json.locations[k].lat,
-                'vlon' : json.locations[k].lon,
-                'vtype' : json.locations[k].type,
-                'vname' : json.locations[k].name,
-                'vstreet' : json.locations[k].street,
-                'vcity' : json.locations[k].city,
-                'vstate' : json.locations[k].state
-              }
-              via_array.push(via);
-            }
-            var geo = {
-              'olat' : json.locations[0].lat,
-              'olon' : json.locations[0].lon,
-              'otype' : json.locations[0].type,
-              'oname' : json.locations[0].name,
-              'ostreet' : json.locations[0].street,
-              'ocity' : json.locations[0].city,
-              'ostate' : json.locations[0].state,
-              'dlat' : json.locations[json.locations.length - 1].lat,
-              'dlon' : json.locations[json.locations.length - 1].lon,
-              'dtype' : json.locations[json.locations.length - 1].type,
-              'dname' : json.locations[json.locations.length -1].name,
-              'dstreet' : json.locations[json.locations.length - 1].street,
-              'dcity' : json.locations[json.locations.length - 1].city,
-              'dstate' : json.locations[json.locations.length - 1].state
-            }
-  
-            var waypoints = [];
-            waypoints.push(L.latLng(geo.olat, geo.olon));
-            via_array.forEach(function(via_array, i) {
-              waypoints.push(L.latLng(via_array.vlat, via_array.vlon));
-            });
-            waypoints.push(L.latLng(geo.dlat, geo.dlon));
-          }
+          json.locations.forEach(function (location) {
+            location.latLng = L.latLng(location.lat, location.lon);
+          });
   
           var rr = L.Routing.control({
-            waypoints : waypoints,
+            waypoints : json.locations,
             geocoder : null,
             costing : json.costing,
             routeWhileDragging : false,
