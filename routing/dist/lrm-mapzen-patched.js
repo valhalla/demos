@@ -2510,36 +2510,8 @@ if (typeof module !== undefined) module.exports = polyline;
       var costingOptions = options.costing_options;
       var directionsOptions = options.directions_options;
       var dateTime = options.date_time;
-
-      for (var i = 0; i < waypoints.length; i++) {
-        var loc;
-        locationKey = this._locationKey(waypoints[i].latLng).split(',');
-        if(i === 0 || i === waypoints.length-1){
-          loc = {
-            lat: parseFloat(locationKey[0]),
-            lon: parseFloat(locationKey[1]),
-            type: "break",
-            name: waypoints[i].name,
-            street: waypoints[i].street,
-            city: waypoints[i].city,
-            state: waypoints[i].state
-          }
-        }else{
-          loc = {
-            lat: parseFloat(locationKey[0]),
-            lon: parseFloat(locationKey[1]),
-            type: "through",
-            name: waypoints[i].name,
-            street: waypoints[i].street,
-            city: waypoints[i].city,
-            state: waypoints[i].state
-          }
-        }
-        locs.push(loc);
-      }
-
       var params = JSON.stringify({
-        locations: locs,
+        locations: waypoints,
         costing: costing,
         costing_options: costingOptions,
         directions_options: directionsOptions,
