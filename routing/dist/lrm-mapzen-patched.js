@@ -2279,8 +2279,6 @@ if (typeof module !== undefined) module.exports = polyline;
       for (i = 0; i < waypoints.length; i++) {
         wp = waypoints[i];
         wps.push({
-          lat: wp.latLng.lat,
-          lon: wp.latLng.lng,
           latLng: wp.latLng,
           name: wp.name || "",
           options: wp.options || {}
@@ -2660,6 +2658,8 @@ if (typeof module !== undefined) module.exports = polyline;
 
 			for (i = 0; i < this._waypoints.length; i++) {
 				wps.push(this._waypoints[i]);
+				wps[i].lat = wps[i].latLng.lat;
+				wps[i].lon = wps[i].latLng.lng;
 			}
 
 			return wps;
