@@ -322,7 +322,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     var traceLayer;
     $('#geojson_match').click(function () {
         $scope.clearAll();
-        let geojson = JSON.parse($('#geojson').val());
+        var geojson = JSON.parse($('#geojson').val());
         if (traceLayer) {
             map.removeLayer(traceLayer);
         }
