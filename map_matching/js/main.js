@@ -109,7 +109,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     var mapMatchingGeoJSONControl;
 
     var mapMatchGeoJSON = function (traceGeoJSON) {
-        let markers = {
+        var markers = {
             'type': 'MultiPoint',
             'coordinates': traceGeoJSON.coordinates || (traceGeoJSON.geometry && traceGeoJSON.geometry.coordinates)
         };
