@@ -97,11 +97,11 @@ button:focus {
   cursor: pointer;
 }
 
-ol {
+.control-container ol {
   padding: 0 30px;
 }
 
-li {
+.control-container li {
   list-style-type: none;
   width: 100%;
   height: 45px;
@@ -109,7 +109,7 @@ li {
   position: relative;
   margin: 5px 0;
 }
-li .marker {
+.control-container li .marker {
   width: 28px;
   height: 36px;
   margin-left: 5px;
@@ -122,17 +122,17 @@ li .marker {
   text-align: center;
 }
 
-li .start { background-image:url(../resource/matrix_pin_start.png); }
+.control-container li .start { background-image:url(../resource/matrix_pin_start.png); }
 li .end { background-image:url(../resource/matrix_pin_end.png);}
 
-li .geocode {
+.control-container li .geocode {
   font-size: 14px;
   position: absolute;
   left: 40px;
   bottom: 10px;
 }
 
-li .placeholder.geocode {
+.control-container li .placeholder.geocode {
   color: #ccc;
 }
 
