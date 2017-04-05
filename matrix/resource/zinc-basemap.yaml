@@ -1,0 +1,4 @@
+import: https://mapzen.com/carto/zinc-style/zinc-style.yaml
+
+global:
+    sdk_mapzen_api_key: vector-tiles-HqUVidw
