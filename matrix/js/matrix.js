@@ -34,7 +34,7 @@ app.run(function($rootScope) {
       'lat' : 40.7486,
       'lng' : -73.9690
     },
-    'zoom' : 13
+    'zoom' : 14
   };
   $rootScope.geobase = {
     'zoom' : hash_loc.zoom,
@@ -124,6 +124,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
 
   $rootScope.$on('map.setView', function(ev, geo, zoom) {
     map.setView(geo, zoom || 8);
+    map.options.maxZoom = 14;
   });
 
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
