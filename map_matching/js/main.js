@@ -73,7 +73,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
     }), zinc = Tangram.leafletLayer({
-        scene: 'https://mapzen.com/carto/zinc-style/2.0/zinc-style.yaml',
+        scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-basemap.yaml',
         attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
     }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
         attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
