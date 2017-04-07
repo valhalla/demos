@@ -1,0 +1,5 @@
+import: https://mapzen.com/carto/walkabout-style/walkabout-style.yaml
+
+global:
+    sdk_mapzen_api_key: vector-tiles-HqUVidw,
+	sdk_transit_overlay: true
