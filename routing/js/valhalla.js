@@ -137,10 +137,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var baseMaps = {
     "Default" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
     "Road" : road,
-    "Cycle" : cycle,
-    "Outdoors" : outdoors,
-    "Transit" : transit,
-    "Zinc" : zinc
+    "Cycle" : (typeof cycle != undefined ? cycle : road),
+    "Outdoors" : (typeof outdoors != undefined ? outdoors : road),
+    "Transit" : (typeof transit != undefined ? transit : road),
+    "Zinc" : (typeof zinc != undefined ? zinc : road)
   };
 
   var map = L.map('map', {
