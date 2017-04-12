@@ -53,21 +53,21 @@ app.run(function($rootScope) {
 //hooks up to the div whose data-ng-controller attribute matches this name
 app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
-  var baseMaps = {
-    "Zinc" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
+  var baseLayers = {
     "Road" : road,
     "Cycle" : cycle,
-    "Outdoors" : outdoors
+    "Outdoors" : outdoors,
+    "Zinc (Mapzen)" : zinc
   };
 
-  //leaflet slippy map
-  var map = L.map('map', {
+  var manhattan = [40.7510, -73.9783];
+  L.Mapzen.apiKey = 'valhalla-UdVXVeg';
+  var map = L.Mapzen.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
-    center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
-  });
-  
+    tangramOptions: defaultlayer,
+    fallbackTile: road
+  }).setView(manhattan, 13);
 
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
@@ -81,7 +81,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   };
 
   L.control.geocoder('search-8LtGSDw', options).addTo(map);
-  L.control.layers(baseMaps, null).addTo(map);
+  L.control.layers(baseLayers, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps

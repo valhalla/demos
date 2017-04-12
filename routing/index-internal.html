@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    //Not updating leaflet version because of depricated functionality
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/valhalla.css" />
     <link rel="stylesheet" href="css/elevation.css" />
+    <link rel="stylesheet" href="https://mapzen.com/js/mapzen.standalone.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css"  >
 
     <script src="conf/env.conf"></script>
     <!-- Main tangram library -->
-    <script src='https://mapzen.com/tangram/0.10/tangram.min.js'></script>
+    <script src="https://mapzen.com/tangram/tangram.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
     <script language="javascript" type="text/javascript" src="js/calendar/datetimepicker.js">
@@ -191,27 +191,32 @@
     <script src='dist/lrm-mapzen-patched.js'></script>
     <script src="js/elevation/L.Elevation.js"></script>
     <script src="js/locate/L.Locate.js"></script>
-    
+    <script src="https://mapzen.com/js/mapzen.standalone.js"></script>
+        
     <!-- Load geocoding plugin after Leaflet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
 	<script>
-	  var defaultMode = 'auto';
-
-	  var defaultMapLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      var defaultMode = 'auto';
+      
+      var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-	  }), road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-	  }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
+	  });
+	  var cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
 	    attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-	  }), outdoors = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
-		attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest</a> | Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-	  }), transit = L.tileLayer(' http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
-        attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'
-	  }), zinc = Tangram.leafletLayer({
-        scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-basemap.yaml',
-        attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
-      });
+	  });
+	  var outdoors = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
+        attribution : 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest</a> | Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+	  });
+	  var transit =  {
+	    scene: {
+	      import: L.Mapzen.BasemapStyles.Refill,
+	      global: {
+	      	sdk_transit_overlay: true
+	      }
+	    }
+	  };
+	  var defaultlayer = transit;
 	</script>
 
     <!-- Adding a script block to post message to the parent container (think iframed demos) -->

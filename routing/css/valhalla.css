@@ -118,7 +118,7 @@ div#route_inst table td.distance{
     -webkit-border-radius: 9px 9px 9px 9px;
     border-radius: 8px 8px 9px 9px;
     box-shadow: 1px 1px 11px #330033;
-    background: url("arrow.gif") no-repeat scroll 319px 5px #A4A4A4;
+    /*background: url("arrow.gif") no-repeat scroll 319px 5px #A4A4A4;*/
 }
 
 #flot-tooltip {
