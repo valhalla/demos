@@ -134,21 +134,23 @@ app.run(function($rootScope) {
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
-  var baseMaps = {
-    "Default" : (typeof defaultMapLayer != undefined ? defaultMapLayer : road),
+  var baseLayers = {
     "Road" : road,
-    "Cycle" : (typeof cycle != undefined ? cycle : road),
-    "Outdoors" : (typeof outdoors != undefined ? outdoors : road),
-    "Transit" : (typeof transit != undefined ? transit : road),
-    "Zinc" : (typeof zinc != undefined ? zinc : road)
+    "Cycle" : cycle,
+    "Outdoors" : outdoors,
+    "Refill Transit (Mapzen)" : transit
   };
 
-  var map = L.map('map', {
+  var manhattan = [40.7510, -73.9783];
+  L.Mapzen.apiKey = 'valhalla-UdVXVeg';
+  var map = L.Mapzen.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    layers : [ (typeof defaultMapLayer != undefined ? defaultMapLayer : road) ],
-    center : [ $rootScope.geobase.lat, $rootScope.geobase.lon ]
-  });
+    tangramOptions: defaultlayer,
+    fallbackTile: road
+  }).setView(manhattan, 13);
+
+  L.control.layers(baseLayers, null).addTo(map);
   
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
@@ -185,7 +187,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   };
 
   L.control.geocoder('search-8LtGSDw', options).addTo(map);
-  L.control.layers(baseMaps, null).addTo(map);
 
   $scope.route_instructions = '';
 
