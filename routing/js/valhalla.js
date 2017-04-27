@@ -135,10 +135,8 @@ app.run(function($rootScope) {
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseLayers = {
-    "Road" : road,
-    "Cycle" : cycle,
-    "Outdoors" : outdoors,
-    "Refill Transit (Mapzen)" : transit
+    "OSM Road" : road,
+    "Walkabout (Mapzen)" : walkabout
   };
 
   var manhattan = [40.7510, -73.9783];
@@ -146,12 +144,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.Mapzen.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    tangramOptions: defaultlayer,
-    fallbackTile: road
+    tangramOptions: walkabout,
   }).setView(manhattan, 13);
-
-  L.control.layers(baseLayers, null).addTo(map);
   
+  L.control.layers(baseLayers, null).addTo(map);
+
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
   if (window.self !== window.top) {
