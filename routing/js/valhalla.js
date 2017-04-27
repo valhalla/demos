@@ -136,7 +136,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   //map layers & default layer are defined in the index.html
   var baseLayers = {
     "OSM Road" : road,
-    "Walkabout (Mapzen)" : walkabout
+    "Mapzen" : mapzen
   };
 
   var manhattan = [40.7510, -73.9783];
@@ -144,7 +144,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var map = L.Mapzen.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    tangramOptions: walkabout,
+    tangramOptions: mapzen,
   }).setView(manhattan, 13);
   
   L.control.layers(baseLayers, null).addTo(map);
