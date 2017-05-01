@@ -75,6 +75,7 @@ Costing: <select id="costing">
     }
 
     //form the request url
+    var input;
     function build_url(ll) {
       //build url
       var url = 'http://localhost:8002/locate?json=';
@@ -91,6 +92,17 @@ Costing: <select id="costing">
       var costing = document.getElementById('costing').value 
       if(costing != 'none')
         json['costing'] = costing;
+      //mark where they clicked
+      if(input != null)
+        input.removeFrom(map);
+      input = new L.CircleMarker(ll, { color: '#99dd99', radius: 10, fillOpacity: 0.75 });
+      input.on('click', function (event) {
+        var printed = pretty.print(json);
+        $('#properties').html(printed);
+        L.DomEvent.stopPropagation(event);
+      });
+      input.addTo(map);
+      //give back the string
       url += escape(JSON.stringify(json));
       return url;
     }
