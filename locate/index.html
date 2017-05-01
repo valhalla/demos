@@ -60,7 +60,7 @@ Costing: <select id="costing">
         return r + (pEnd || '');
       },
       print: function(obj) {
-        var line = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{]|\[\]|{})?$/mg;
+        var line = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{]|\[\],?|{},?)?$/mg;
         var html = JSON.stringify(obj, null, 2)
           .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
           .replace(/</g, '&lt;').replace(/>/g, '&gt;');
