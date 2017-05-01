@@ -71,8 +71,7 @@ Costing: <select id="costing">
     function clickGroup(event) {
       var printed = pretty.print(event.target.feature.properties.edges);
       $('#properties').html(printed);
-      if(event.stopPropagation())
-        event.stopPropagation();
+      L.DomEvent.stopPropagation(event);
     }
 
     //form the request url
@@ -120,10 +119,12 @@ Costing: <select id="costing">
             properties: { 'edges': grouped_edges[cll] }
           });
         });
-        document.getElementById('properties').innerHTML = Object.keys(grouped_edges).length + ' results';
+        //update the properties panel with summary info
+        $('#properties').html(pretty.print({ result_count: Object.keys(grouped_edges).length }));
       }//something went wrong likely the result was borked
       catch(e) {
-        document.getElementById('properties').innerHTML = result;
+        //show something in the properties panel
+        $('#properties').html(pretty.print(result));
         fc.features = [ {
           type: 'Feature',
           geometry: {
@@ -160,9 +161,9 @@ Costing: <select id="costing">
         located = build_geojson(result, event.latlng)
         //make a leaflet geojson object with style and click events per result
         geojson = L.geoJson(located, {
-          style: function(feature) { return { color: '#aaccff' }; },
-          pointToLayer: function(feature, ll) { return new L.CircleMarker(ll, { radius: 5, fillOpacity: 0.66 }); },
-          onEachFeature: function(feature, layer) { layer.on({ click: clickGroup }) }
+          style: function(feature) { return { color: '#dd99dd' }; },
+          pointToLayer: function(feature, ll) { return new L.CircleMarker(ll, { radius: 5, fillOpacity: 0.75 }); },
+          onEachFeature: function(feature, layer) { layer.on('click', clickGroup) }
         });
         //render the geojson
         geojson.addTo(map);
