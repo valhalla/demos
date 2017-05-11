@@ -1,0 +1,18 @@
+pre {
+  background-color: ghostwhite;
+  border: 1px solid silver;
+  padding: 5px 5px;
+  margin: 5px; 
+}
+.json-key {
+  color: brown;
+}
+.json-number {
+  color: darkgreen;
+}
+.json-string {
+  color: brown;
+}
+.json-constant {
+  color: navy;
+}
