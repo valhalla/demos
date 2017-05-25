@@ -1013,7 +1013,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       lat : e.latlng.lat,
       lon : e.latlng.lng
     };
-    getEnvToken();
+    selectEnv();
     var locate = L.locate(envToken);
     locate.locate(ll, locateEdgeMarkers);
   });
