@@ -28,6 +28,8 @@ Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" on
 <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
 Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
 <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
+Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
+<input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
 Costing: <select id="costing">
   <option selected>none</option>
   <option>auto</option>
@@ -84,12 +86,16 @@ Costing: <select id="costing">
           lat: ll.lat,
           lon: ll.lng,
           minimum_reachability: parseInt(document.getElementById('reach').value),
-          radius: parseInt(document.getElementById('radius').value)
+          radius: parseInt(document.getElementById('radius').value),
+          heading: parseInt(document.getElementById('heading').value)
         }],
         verbose: true
       };
+      //remove negative heading
+      if(json.locations[0].heading < 0)
+        delete json.locations[0].heading;
       //optional costing
-      var costing = document.getElementById('costing').value 
+      var costing = document.getElementById('costing').value;
       if(costing != 'none')
         json['costing'] = costing;
       //mark where they clicked
@@ -156,7 +162,7 @@ Costing: <select id="costing">
       features.forEach(function (feature) {
         coords.push(feature.geometry.coordinates);
       });
-      map.fitBounds(L.GeoJSON.coordsToLatLngs(coords), { maxZoom: 16 });
+      map.fitBounds(L.GeoJSON.coordsToLatLngs(coords), { maxZoom: 19 });
     }
 
     //map click callback
