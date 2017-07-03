@@ -24,6 +24,8 @@ Unescape '\': <input id="unescape" type="checkbox"></br>
 Number of Points: <a id="cardinality"></a></br>
 Encoded Line:</br>
   <textarea id="encoded_polyline" rows="4" cols="50"></textarea></br>
+Decoded Line:</br>
+  <textarea id="decoded_polyline" rows="4" cols="50"></textarea></br>
 
   <script>
     //decode an encoded string
@@ -52,10 +54,12 @@ Encoded Line:</br>
         }
         //scale by precision and chop off long coords also flip the positions so
         //its the far more standard lon,lat instead of lat,lon
-        decoded.push([ll[1] * inv,ll[0] * inv])
+        decoded.push([ll[1] * inv,ll[0] * inv]);
       }
+      //update the display
+      document.getElementById("decoded_polyline").textContent = JSON.stringify(decoded);
       //hand back the list of coordinates
-      return decoded
+      return decoded;
     };
 
     //text change callback
