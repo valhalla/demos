@@ -746,7 +746,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn, bikeBtn, walkBtn, multiBtn, elevationBtn, routeresponse; 
+    var driveBtn, bikeBtn, lowstressbikeBtn, walkBtn, multiBtn, elevationBtn, routeresponse; 
 
     if (document.getElementById('drive_btn') != undefined) {
       driveBtn = document.getElementById("drive_btn");
@@ -784,6 +784,45 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         if (!rr) return;
         getEnvToken();
         var costing = 'bicycle';
+        var directionsoptions = { "language" : locale };
+        if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
+          var bikeoptions = setBikeOptions();
+          var calendarInput="";
+          if (document.getElementById("datepicker"))
+            calendarInput = document.getElementById("datepicker").value;
+          if (calendarInput != "") {
+            dateStr = datetimeUpdate(calendarInput);
+            var dtoptions = setDateTime(dateStr);
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions,
+              directions_options : directionsoptions,
+              date_time : dtoptions
+            });
+          } else {
+            rr.route({
+              costing : costing,
+              costing_options : bikeoptions,
+              directions_options : directionsoptions
+            });
+          }
+        } else {
+          rr.route({
+            costing : costing,
+            directions_options : directionsoptions
+          });
+        }
+        updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
+      });
+    }
+  
+  if (document.getElementById('low_stress_bike_btn') != undefined) {
+      lowstressbikeBtn = document.getElementById("low_stress_bike_btn");
+      
+      lowstressbikeBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'low_stress_bicycle';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
           var bikeoptions = setBikeOptions();
