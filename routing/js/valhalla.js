@@ -786,7 +786,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var costing = 'bicycle';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
-          var bikeoptions = setBikeOptions();
+          var bikeoptions = setBikeOptions(costing);
           var calendarInput="";
           if (document.getElementById("datepicker"))
             calendarInput = document.getElementById("datepicker").value;
@@ -825,7 +825,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var costing = 'low_stress_bicycle';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
-          var bikeoptions = setBikeOptions();
+          var bikeoptions = setBikeOptions(costing);
           var calendarInput="";
           if (document.getElementById("datepicker"))
             calendarInput = document.getElementById("datepicker").value;
@@ -935,7 +935,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       });
     }
 
-    function setBikeOptions() {
+    function setBikeOptions(costing) {
       var btype = document.getElementsByName("btype");
       var bicycle_type = "Road";
       for (var i = 0; i < btype.length; i++) {
@@ -947,13 +947,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       var cycling_speed = document.getElementById("cycle_speed").value;
       var use_hills = document.getElementById("use_hills").value;
 
-      var bikeoptions = {
-        "bicycle" : {
-          bicycle_type : bicycle_type,
-          use_roads : use_roads,
-          cycling_speed : cycling_speed,
-          use_hills : use_hills
-        }
+      var bikeoptions = {};
+      bikeoptions[costing.toString()] = {
+        bicycle_type : bicycle_type,
+        use_roads : use_roads,
+        cycling_speed : cycling_speed,
+        use_hills : use_hills
       };
       return bikeoptions;
     }
