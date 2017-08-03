@@ -3,7 +3,6 @@ var hash_params = L.Hash.parseHash(location.hash);
 
 var envServer = "production";
 var envToken = accessToken.prod;
-var locToken = locateToken.prod;
 var serviceUrl = server.prod;
 var sentManyToManyEnd = false;
 var optimized_route = true;
@@ -29,17 +28,14 @@ function getEnvToken() {
     switch (envServer) {
     case "localhost":
         envToken = accessToken.local;
-        locToken = locateToken.local;
         serviceUrl = server.local;
         break;
     case "development":
         envToken = accessToken.dev;
-        locToken = locateToken.dev;
         serviceUrl = server.dev;
         break;
     case "production":
         envToken = accessToken.prod;
-        locToken = locateToken.prod;
         serviceUrl = server.prod;
         break;
     }
@@ -182,20 +178,13 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     //Number of locations
     var hash = new L.Hash(map);
     var markers = [];
-
-    $scope.route_instructions = '';
-
-    var locateMarkers = [];
     var remove_markers = function() {
         for (var i = 0; i < markers.length; i++) {
             map.removeLayer(markers[i]);
         }
         markers = [];
-        locateMarkers.forEach(function (element, index, array) {
-            map.removeLayer(element);
-        });
-        locateMarkers = [];
     };
+
 
     var parseHash = function() {
         var hash = window.location.hash;
@@ -268,18 +257,6 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         return $sce.trustAsHtml(html_code);
     };
 
-    $scope.$on('setRouteInstruction', function(ev, instructions) {
-        $scope.$apply(function() {
-            $scope.route_instructions = instructions;
-        });
-    });
-
-    $scope.$on('resetRouteInstruction', function(ev) {
-        $scope.$apply(function() {
-            $scope.route_instructions = '';
-        });
-    });
-
     $scope.setMode = function(mode) {
         $scope.mode = mode;
         mapMatch();
@@ -295,6 +272,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
     };
 
     //set up map events
+    var counterText = 1;
     map.on('click', function(e) {
         if (!markers.length) {
             $scope.manyToManyClick(e);
@@ -337,7 +315,7 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
 
     var clearBtn = document.getElementById("clear_btn");
 
-    $scope.mode = 'multimodal';
+    $scope.mode = 'auto';
     $scope.endPoints = [];
     $scope.editingFocus = 'start_points';
     $scope.appView = 'control';
@@ -382,74 +360,4 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         getEnvToken();
     };
 
-    //locate edge snap markers
-    var locateEdgeMarkers = function (locate_result) {
-        // clear it
-        locateMarkers.forEach(function (element, index, array) {
-            map.removeLayer(element);
-        });
-        locateMarkers = [];
-
-        //mark from node
-        if(locate_result.node != null) {
-            var marker = L.circle( [locate_result.node.lat,locate_result.node.lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
-            map.addLayer(marker);
-            var popup = L.popup({maxHeight : 200});
-            popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-            marker.bindPopup(popup).openPopup();
-            locateMarkers.push(marker);
-        }//mark all the results for that spot
-        else if(locate_result.edges != null) {
-            locate_result.edges.forEach(function (element, index, array) {
-                var marker = L.circle( [element.correlated_lat, element.correlated_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
-                map.addLayer(marker);
-                var popup = L.popup({maxHeight : 200});
-                popup.setContent("<pre id='json'>" + JSON.stringify(element, null, 2) + "</pre>");
-                marker.bindPopup(popup).openPopup();
-                locateMarkers.push(marker);
-            });
-        }//no data probably
-        else {
-            var marker = L.circle( [locate_result.input_lat,locate_result.input_lon], 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
-            map.addLayer(marker);
-            var popup = L.popup({maxHeight : 200});
-            popup.setContent("<pre id='json'>" + JSON.stringify(locate_result, null, 2) + "</pre>");
-            marker.bindPopup(popup).openPopup();
-            locateMarkers.push(marker);
-        }
-    };
-
-    /**
-     * Returns a string of next Tuesday's date based
-     * on the current day of the week.  If today is Tuesday,
-     * then we use the following Tuesday's date.
-     *
-     * @returns {string} in format of 'YYYY-MM-DD'
-     */
-    function getNextTuesday () {
-        var today = new Date(), day, tuesday;
-        day = today.getDay();
-        tuesday = today.getDate() - day + (day === 0 ? -6 : 2);
-        tuesday += 7;
-        today.setDate(tuesday);
-        return today.toISOString().split('T')[0];
-    }
-
-    var counterText = 1;
-
-    $(document).on('route:time_distance', function(e, td) {
-        var instructions = $('.leaflet-routing-container.leaflet-control').html();
-        $scope.$emit('setRouteInstruction', instructions);
-    });
-
-    // ask the service for information about this location
-    map.on("contextmenu", function(e) {
-        var ll = {
-            lat : e.latlng.lat,
-            lon : e.latlng.lng
-        };
-        getEnvToken();
-        var locate = L.locate(locToken);
-        locate.locate(ll, locateEdgeMarkers);
-    });
 });
