@@ -138,7 +138,11 @@
         var trace = {
             'costing': options.serviceUrlParams.mode,
             'search_radius': parseFloat(options.serviceUrlParams.search_radius),
-            'shape_match': 'map_snap'
+            'shape_match': 'map_snap',
+            'filters':{
+                'attributes':['edge.way_id','edge.begin_shape_index','edge.end_shape_index','matched.point','matched.edge_index','matched.begin_route_discontinuity','matched.end_route_discontinuity','shape'],
+                'action':'include'
+            }
         };
         //dont bother with non numbers
         if(!isFinite(trace.search_radius))
@@ -163,14 +167,14 @@
             matched.push([p.lon, p.lat]);
             //starts a discontinuity so make a linestring up to and including this point
             if(p.begin_route_discontinuity)
-                multilines.push(shape.slice(start, attributes.edges[p.edge_index].begin_shape_index));
+                multilines.push(shape.slice(start, attributes.edges[p.edge_index].end_shape_index + 1));
             //ends a discontinuity so make a linestring start here
             else if(p.end_route_discontinuity)
                 start = attributes.edges[p.edge_index].begin_shape_index;
         }
         //get the last bit
         if(start < shape.length)
-          multilines.push(shape.slice(start, shape.length))
+          multilines.push(shape.slice(start, shape.length));
         //hand it back as geojson
         return {
             "type": "Feature",
