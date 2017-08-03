@@ -38,7 +38,7 @@ Decoded Line:</br>
       //for each byte
       while(i < encoded.length) {
         //for each coord (lat, lon)
-        ll = [0,0]
+        var ll = [0,0]
         for(var j = 0; j < 2; j++) {
           var shift = 0;
           var byte = 0x20;
