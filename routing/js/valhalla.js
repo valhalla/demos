@@ -8,12 +8,12 @@ var envToken = accessToken.prod;
 var elevToken = elevAccessToken.prod;
 var envServer = server.prod;
 var elevServiceUrl = elevationServer.prod;
-var environmentExists = false; 
+var environmentExists = false;
 var locale = "en-US";
 
 function selectEnv() {
   $("#env_dropdown").find("option:selected").each(function() {
-    environmentExists = true; 
+    environmentExists = true;
     envServer = $(this).text();
     serviceUrl = document.getElementById(envServer).value;
     getEnvToken();
@@ -146,7 +146,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     zoomControl : true,
     tangramOptions: mapzen,
   }).setView(manhattan, 13);
-  
+
   L.control.layers(baseLayers, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
@@ -177,7 +177,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       }
     }, true);
   document.querySelector('.leaflet-top.leaflet-right').appendChild(mobileRouteEL);
-  
+
   // Add geocoding plugin
   var options = {
     layers: 'coarse'
@@ -318,7 +318,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (costingOptions != null)
       extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
-    
+
     if (directionsOptions != null)
       extra = extra + '&directionsoptions=' + JSON.stringify(directionsOptions);
 
@@ -350,7 +350,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (parameters.costingoptions !== undefined)
       var costing_options = JSON.parse(parameters.costingoptions);
-    
+
     if (parameters.directionsoptions !== undefined)
       var directions_options = JSON.parse(parameters.directionsoptions);
 
@@ -364,7 +364,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       directions_options: directions_options,
       date_time: date_time
     }, true);
-    
+
     locations = waypoints.length;
 
     document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
@@ -486,7 +486,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       map.removeLayer(marker);
     });
     locateMarkers = [];
-    
+
     //get the edges and nodes grouped up
     var results = {};
     if(locate_result.nodes != null && locate_result.nodes.length > 0) {
@@ -550,7 +550,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           json.locations.forEach(function (location) {
             location.latLng = L.latLng(location.lat, location.lon);
           });
-  
+
           var rr = L.Routing.control({
             waypoints : json.locations,
             geocoder : null,
@@ -558,7 +558,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             routeWhileDragging : false,
             router : L.Routing.mapzen(envToken, json),
             summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
-  
+
             createMarker : function(i, wp, n) {
               var iconV;
               if (i == 0) {
@@ -593,7 +593,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
               fillOpacity: 1
             }
           }).addTo(map);
-  
+
         }
       }
     }, false);
@@ -678,7 +678,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
     locations++;
-    
+
     selectEnv();
 
     rr = createRouting({waypoints: waypoints, costing: $scope.mode});
@@ -746,11 +746,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn, bikeBtn, lowstressbikeBtn, walkBtn, multiBtn, elevationBtn, routeresponse; 
+    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, elevationBtn, routeresponse;
 
     if (document.getElementById('drive_btn') != undefined) {
       driveBtn = document.getElementById("drive_btn");
-      
+
       driveBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
@@ -779,7 +779,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     if (document.getElementById('bike_btn') != undefined) {
       bikeBtn = document.getElementById("bike_btn");
-      
+
       bikeBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
@@ -815,14 +815,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
       });
     }
-  
-  if (document.getElementById('low_stress_bike_btn') != undefined) {
-      lowstressbikeBtn = document.getElementById("low_stress_bike_btn");
-      
-      lowstressbikeBtn.addEventListener('click', function(e) {
+
+  if (document.getElementById('motor_scooter_btn') != undefined) {
+      scooterBtn = document.getElementById("motor_scooter_btn");
+
+      scooterBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
-        var costing = 'low_stress_bicycle';
+        var costing = 'motor_scooter_btn';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
           var bikeoptions = setBikeOptions(costing);
@@ -854,7 +854,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
       });
     }
-    
+
    if (document.getElementById('walk_btn') != undefined) {
       walkBtn = document.getElementById("walk_btn");
 
@@ -868,7 +868,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
           calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
-          var dtoptions = setDateTime(dateStr); 
+          var dtoptions = setDateTime(dateStr);
           rr.route({
             costing : costing,
             directions_options : directionsoptions,
@@ -883,10 +883,10 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,null,directionsoptions,dtoptions);
       });
     }
-    
+
     if (document.getElementById('multi_btn') != undefined) {
       multiBtn = document.getElementById("multi_btn");
-  
+
       multiBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
@@ -898,7 +898,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var dtoptions = "";
         if (calendarInput != undefined) {
           dateStr = datetimeUpdate(calendarInput);
-          dtoptions = setDateTime(dateStr);    
+          dtoptions = setDateTime(dateStr);
         }
         if (document.getElementById('transitoptions') && document.getElementById('transitoptions').style.display == "block") {
           var transitoptions = setTransitOptions();
@@ -918,16 +918,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,transitoptions,directionsoptions,dtoptions);
       });
     }
-    
+
     if (document.getElementById('elevation_btn') != undefined) {
       elevationBtn = document.getElementById("elevation_btn");
-      
+
       elevationBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        if (environmentExists) 
+        if (environmentExists)
           selectEnv();
         else getEnvToken();
-        
+
         var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._router._rrshape) : 0;
         elev.resetChart();
         elev.profile(elev._rrshape);
@@ -956,7 +956,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       };
       return bikeoptions;
     }
-    
+
     function setTransitOptions() {
       var use_bus = document.getElementById("use_bus").value;
       var use_rail = document.getElementById("use_rail").value;
@@ -971,8 +971,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       };
       return transitoptions;
     }
-    
-    
+
+
 
     function setDateTime(dateStr) {
       var dttype = document.getElementsByName("dttype");
@@ -1055,7 +1055,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var locate = L.locate(envToken);
     locate.locate(ll, locateEdgeMarkers);
   });
-  
+
   $scope.clearAll = function(e) {
 
     $('.leaflet-marker-icon').remove();

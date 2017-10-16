@@ -29,7 +29,7 @@
     <script type="text/javascript" src="../flot/jquery.colorhelpers.js"></script>
     <script type="text/javascript" src="../flot/jquery.flot.canvas.js"></script>
     <script type="text/javascript" src="../flot/jquery.flot.stack.js"></script>
-  
+
     <style>
         body{
             width: 100%;
@@ -51,12 +51,12 @@
           overflow-x: hidden;
           overflow-y: auto;
         }*/
-        var serviceUrl = server.local;	    
+        var serviceUrl = server.local;
     </style>
 </head>
 <body>
 	<div class="container-fluid" data-ng-controller="RouteController">
-	
+
         <div class="col-md-2 info">
           <div id="instructions">
             <img src="images/turnbyturnlogo.png" alt="logo">
@@ -148,7 +148,7 @@
 		    <br>
 	        <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
             <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
-	    <button id="low_stress_bike_btn" class = "transparent_btn" type="button">Low Stress Bike</button>
+	          <button id="motor_scooter_btn" class = "transparent_btn" type="button">Motor Scooter</button>
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
             <br>
@@ -167,7 +167,7 @@
           <b>Note:</b>You cannot run Test File Routes and then click above to run Point & Click Route Test options.  You must CLEAR ALL between testing sections.</span>
           <br>
         <!--  <div id="routeResponse" style="display:inline-block;">JSON Route Response Link</div>-->
-          
+
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
           <!--
           <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
@@ -178,14 +178,14 @@
         <div><br>
           <button  class="reset" ng-click="clearAll()"> clear all </button>
         </div>
-       
+
         </div>
 
         <div id="mapwrapper" class="col-md-10">
           <div id="map"></div>
         </div>
     </div>
-    
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
 
@@ -195,13 +195,13 @@
     <script src="js/elevation/L.Elevation.js"></script>
     <script src="js/locate/L.Locate.js"></script>
     <script src="https://mapzen.com/js/mapzen.standalone.js"></script>
-        
+
     <!-- Load geocoding plugin after Leaflet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
 	<script>
       var defaultMode = 'auto';
-      
+
       var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
 	  });
@@ -223,4 +223,3 @@
     </script>
 </body>
 </html>
-
