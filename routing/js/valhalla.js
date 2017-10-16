@@ -822,7 +822,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       scooterBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
-        var costing = 'motor_scooter_btn';
+        var costing = 'motor_scooter';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
           var bikeoptions = setBikeOptions(costing);
