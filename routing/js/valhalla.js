@@ -824,8 +824,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         getEnvToken();
         var costing = 'motor_scooter';
         var directionsoptions = { "language" : locale };
-        if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
-          var bikeoptions = setBikeOptions(costing);
+        if (document.getElementById('scooteroptions') && document.getElementById('scooteroptions').style.display == "block") {
+          var scooteroptions = setScooterOptions(costing);
           var calendarInput="";
           if (document.getElementById("datepicker"))
             calendarInput = document.getElementById("datepicker").value;
@@ -834,14 +834,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             var dtoptions = setDateTime(dateStr);
             rr.route({
               costing : costing,
-              costing_options : bikeoptions,
+              costing_options : scooteroptions,
               directions_options : directionsoptions,
               date_time : dtoptions
             });
           } else {
             rr.route({
               costing : costing,
-              costing_options : bikeoptions,
+              costing_options : scooteroptions,
               directions_options : directionsoptions
             });
           }
@@ -851,7 +851,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             directions_options : directionsoptions
           });
         }
-        updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
+        updateHashCosting(costing,scooteroptions,directionsoptions,dtoptions);
       });
     }
 
@@ -955,6 +955,21 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         use_hills : use_hills
       };
       return bikeoptions;
+    }
+
+    function setScooterOptions(costing) {
+      var stype = document.getElementsByName("stype");
+      var use_hills = document.getElementById("use_hills").value;
+      var use_primary = document.getElementById("use_primary").value;
+      var top_speed = document.getElementById("top_speed").value;
+
+      var scooteroptions = {};
+      scooteroptions[costing.toString()] = {
+        use_hills : use_hills,
+        use_primary : use_primary,
+        top_speed : (160 >= top_speed >= 0) ? top_speed : "",
+      };
+      return scooteroptions;
     }
 
     function setTransitOptions() {
@@ -1088,6 +1103,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('driveoptions').style.display = "block";
     if (document.getElementById('bikeoptions') != undefined)
       document.getElementById('bikeoptions').style.display = "block";
+    if (document.getElementById('scooteroptions') != undefined)
+      document.getElementById('scooteroptions').style.display = "block";
     if (document.getElementById('walkoptions') != undefined)
       document.getElementById('walkoptions').style.display = "block";
     if (document.getElementById('transitoptions') != undefined)
@@ -1101,6 +1118,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('driveoptions').style.display = "none";
     if (document.getElementById('bikeoptions') != undefined)
       document.getElementById('bikeoptions').style.display = "none";
+    if (document.getElementById('scooteroptions') != undefined)
+      document.getElementById('scooteroptions').style.display = "none";
     if (document.getElementById('walkoptions') != undefined)
       document.getElementById('walkoptions').style.display = "none";
     if (document.getElementById('transitoptions') != undefined)
