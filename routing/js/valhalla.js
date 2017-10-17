@@ -945,7 +945,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       }
       var use_roads = document.getElementById("use_roads").value;
       var cycling_speed = document.getElementById("cycle_speed").value;
-      var use_hills = document.getElementById("use_hills").value;
+      var use_hills = document.getElementById("bike_use_hills").value;
 
       var bikeoptions = {};
       bikeoptions[costing.toString()] = {
@@ -959,7 +959,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     function setScooterOptions(costing) {
       var stype = document.getElementsByName("stype");
-      var use_hills = document.getElementById("use_hills").value;
+      var use_hills = document.getElementById("scooter_use_hills").value;
       var use_primary = document.getElementById("use_primary").value;
       var top_speed = document.getElementById("top_speed").value;
 
