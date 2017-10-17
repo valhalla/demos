@@ -57,7 +57,7 @@ div#route_inst table td.distance{
     white-space: -moz-pre-wrap;
 }
 
-.biketextbox, .transittextbox {
+.biketextbox, .scootertextbox, .transittextbox {
   width: 18%;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
