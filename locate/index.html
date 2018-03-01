@@ -30,6 +30,8 @@ Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="
 <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
 Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
 <input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
+Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1" onchange="document.getElementById('node_text').value=this.value;" />
+<input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
 Costing: <select id="costing">
   <option selected>none</option>
   <option>auto</option>
@@ -87,7 +89,8 @@ Costing: <select id="costing">
           lon: ll.lng,
           minimum_reachability: parseInt(document.getElementById('reach').value),
           radius: parseInt(document.getElementById('radius').value),
-          heading: parseInt(document.getElementById('heading').value)
+          heading: parseInt(document.getElementById('heading').value),
+          node_snap_tolerance: parseInt(document.getElementById('node').value)
         }],
         verbose: true
       };
