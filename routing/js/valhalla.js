@@ -133,21 +133,15 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  //map layers & default layer are defined in the index.html
-  var baseLayers = {
-    "OSM Road" : road,
-    "Mapzen" : mapzen
-  };
-
   var manhattan = [40.7510, -73.9783];
-  L.Mapzen.apiKey = 'valhalla-UdVXVeg';
-  var map = L.Mapzen.map('map', {
+  var map = L.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
-    tangramOptions: mapzen,
   }).setView(manhattan, 13);
-
-  L.control.layers(baseLayers, null).addTo(map);
+  L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+  }).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps

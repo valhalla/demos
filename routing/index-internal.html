@@ -215,16 +215,6 @@
       var road = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution : '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributers'
 	  });
-	  var mapzen =  {
-	    scene: {
-	      import: L.Mapzen.BasemapStyles.WalkaboutMoreLabels,
-	      global: {
-	      	sdk_transit_overlay: false,
-		sdk_path_overlay: false,
-                sdk_bike_overlay: true
-	      }
-	    }
-	  };
 	</script>
 
     <!-- Adding a script block to post message to the parent container (think iframed demos) -->
