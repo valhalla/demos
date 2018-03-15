@@ -14,29 +14,30 @@
 
   <script>
     //make a map
-    var map = L.map('map').setView([40.4, -76.0], 13);
-    L.polyline([[41.21, 9.36], [41.24, 9.35], [41.23, 9.34]]).addTo(map).bindTooltip('Top tooltip following mouse', {sticky: true, direction: 'top'});
-    var geojson = null;
-    var tooltips = [];
+    var map = L.map('map');//.setView([40.4, -76.0], 13);
 
     //use osm tiles
     L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
+      maxZoom: 19,
       attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
     }).addTo(map);
+
+    var geojson = null;
+    var tooltips = [];
+
+    //fit the results in the map
+    var fit_results = function(features) {
+      var coords = [];
+      features.forEach(function (feature) {
+        coords = coords.concat(feature.geometry.coordinates);
+      });
+      var lls = L.GeoJSON.coordsToLatLngs(coords);
+      map.fitBounds(lls, { maxZoom: 19 });
+    };
     
-    //click callback
-    function onMapClick(e) {
+    var get_isochrones = function(json) {
       //build url
       var url = 'http://localhost:8002/isochrone?json=';
-      var json = {
-        locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
-        costing: "auto",
-        contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
-        polygons: false,
-        denoise: .2,
-        generalize: 150
-      };
       url += escape(JSON.stringify(json));
       //grab the url
       $.getJSON(url,function(isochrones){
@@ -58,7 +59,7 @@
                    };
           },
           onEachFeature: function(feature, layer) {
-            var tooltip = layer.bindTooltip(feature.properties.contour + ' min', { sticky: true });
+            var tooltip = layer.bindTooltip(feature.properties.contour + (json['use_cost'] ? ' joules' : ' min'), { sticky: true });
             tooltips.push(tooltip);
             tooltip.addTo(map);
           }
@@ -66,11 +67,39 @@
 
         //render the geojson
         geojson.addTo(map);
-      })
-    }
+        //fit it in view
+        fit_results(isochrones.features);
+      });
+    };
+
+    //parse the hash
+    var parse_hash = function() {
+      var hash = window.location.hash;
+      if(hash.indexOf('#') === 0)
+        hash = hash.substr(1);
+      try {
+        return JSON.parse(decodeURIComponent(hash));
+      }
+      catch(e) {
+        alert('Bad json in location.hash');
+      }
+    };
+
+    //click callback
+    function onMapClick(e) {
+      var json = parse_hash();
+      json['locations'] = [{'lat':e.latlng.lat, 'lon':e.latlng.lng}];
+      get_isochrones(json);
+    };
     
-    //hook up the callback
+    //hook up the callback for clicks
     map.on('click', onMapClick);
+
+    //start by loading something
+    window.onload = function() {
+      var json = parse_hash();
+      get_isochrones(json);
+    };
   </script>
 </body>
 </html>

@@ -777,7 +777,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       bikeBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
-        var costing = 'bicycle';
+        var costing = 'auto_electric';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
           var bikeoptions = setBikeOptions(costing);
