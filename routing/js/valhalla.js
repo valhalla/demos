@@ -3,11 +3,11 @@ var hash_params = L.Hash.parseHash(location.hash);
 
 var date = new Date();
 var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
-var serviceUrl = server.prod;
-var envToken = accessToken.prod;
-var elevToken = elevAccessToken.prod;
-var envServer = server.prod;
-var elevServiceUrl = elevationServer.prod;
+var serviceUrl = server.local;
+var envToken = accessToken.local;
+var elevToken = elevAccessToken.local;
+var envServer = server.local;
+var elevServiceUrl = elevationServer.local;
 var environmentExists = false;
 var locale = "en-US";
 
@@ -598,6 +598,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   // show something to start with but only if it was requested
   $(window).load(function(e) {
     //rr = L.Routing.mapzen(accessToken);
+    selectEnv();
     force = true;
     hashRoute();
   });
