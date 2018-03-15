@@ -89,6 +89,7 @@
     function onMapClick(e) {
       var json = parse_hash();
       json['locations'] = [{'lat':e.latlng.lat, 'lon':e.latlng.lng}];
+      window.location.hash = '#' + encodeURIComponent(JSON.stringify(json));
       get_isochrones(json);
     };
     
