@@ -68,10 +68,8 @@ app.run(function($rootScope) {
 app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $http) {
     var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution : '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-    }), zinc = Tangram.leafletLayer({
-        scene: 'https://raw.githubusercontent.com/valhalla/demos/gh-pages/routing/map_style/zinc-basemap.yaml',
-        attribution: '<a href="https://mapzen.com/tangram">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/">Mapzen</a>'
-    }), cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
+    }),
+    cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
         attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }), elevation = L.tileLayer('http://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
         attribution : 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -124,7 +122,6 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
 
     var baseMaps = {
         "Road" : road,
-        "Zinc" : zinc,
         "Cycle" : cycle,
         "Elevation" : elevation
     };
@@ -145,12 +142,6 @@ app.controller('OptimizedRouteController', function($scope, $rootScope, $sce, $h
         map.scrollWheelZoom.disable();
     }
 
-    // Add geocoding plugin
-    var options = {
-        layers: 'coarse'
-    };
-
-    L.control.geocoder('search-8LtGSDw', options).addTo(map);
     L.control.layers(baseMaps, null).addTo(map);
 
     // If iframed, we're going to have to disable some of the touch interaction

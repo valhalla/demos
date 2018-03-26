@@ -172,13 +172,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }, true);
   document.querySelector('.leaflet-top.leaflet-right').appendChild(mobileRouteEL);
 
-  // Add geocoding plugin
-  var options = {
-    layers: 'coarse'
-  };
-
-  L.control.geocoder('search-8LtGSDw', options).addTo(map);
-
   $scope.route_instructions = '';
 
   $scope.setMode = function(mode){
