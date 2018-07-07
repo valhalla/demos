@@ -111,7 +111,7 @@ Decoded Line:</br>
     
     //Check if we should initialize from anchor
     window.onload = function () {
-      var idx = window.location.href.indexOf("#")
+      var idx = window.location.href.indexOf("#");
       var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
       var polyline = decodeURIComponent(url_encoded);
       document.getElementById("encoded_polyline").textContent = polyline;
