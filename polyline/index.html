@@ -21,6 +21,7 @@
   </script>
 
 Unescape '\': <input id="unescape" type="checkbox"></br>
+Polyline6: <input id="polyline6" type="checkbox"></br>
 Number of Points: <a id="cardinality"></a></br>
 Encoded Line:</br>
   <textarea id="encoded_polyline" rows="4" cols="50"></textarea></br>
@@ -29,9 +30,9 @@ Decoded Line:</br>
 
   <script>
     //decode an encoded string
-    function decode(encoded) {
-      //six degrees of precision in valhalla
-      var inv = 1.0 / 1e6;
+    function decode(encoded, mul) {
+      //precision
+      var inv = 1.0 / mul;
       var decoded = [];
       var previous = [0,0];
       var i = 0;
@@ -68,8 +69,10 @@ Decoded Line:</br>
       try {
         //if they have escaped escapes
         var encoded = $('#unescape').val() ? $(this).val().replace(/\\\\/g, '\\') : $(this).val();
+        //if they want 6 digits of precision
+        var mul = $('#polyline6').val() ? 1e6 : 1e5;
         //decode it
-        var decoded = decode(encoded);
+        var decoded = decode(encoded, mul);
         document.getElementById("cardinality").textContent = decoded.length;
         //clear this if its not null
         if(geojson != null)
