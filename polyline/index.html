@@ -57,8 +57,6 @@ Decoded Line:</br>
         //its the far more standard lon,lat instead of lat,lon
         decoded.push([ll[1] * inv,ll[0] * inv]);
       }
-      //update the display
-      document.getElementById("decoded_polyline").textContent = JSON.stringify(decoded);
       //hand back the list of coordinates
       return decoded;
     };
@@ -73,6 +71,8 @@ Decoded Line:</br>
         var mul = $('#polyline6').val() ? 1e6 : 1e5;
         //decode it
         var decoded = decode(encoded, mul);
+        //update the display
+        document.getElementById("decoded_polyline").textContent = JSON.stringify(decoded);
         document.getElementById("cardinality").textContent = decoded.length;
         //clear this if its not null
         if(geojson != null)
@@ -108,6 +108,16 @@ Decoded Line:</br>
     
     //hook up the callback
     $("#encoded_polyline").on('keyup', onChange);
+    
+    //Check if we should initialize from anchor
+    window.onload = function () {
+      var idx = window.location.href.indexOf("#")
+      var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
+      var polyline = decodeURIComponent(url_encoded);
+      document.getElementById("encoded_polyline").textContent = polyline;
+      $('encoded_polyline').keyup();
+    };
+    
   </script>
 </body>
 </html>
