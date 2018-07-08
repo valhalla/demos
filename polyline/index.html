@@ -74,6 +74,8 @@ Decoded Line:</br>
         var encoded = $('#unescape').is(":checked") ?
             $("#encoded_polyline").val().replace(/\\\\/g, '\\') :
             $("#encoded_polyline").val();
+        if(encoded.length == 0)
+          return;
         //if they want 6 digits of precision
         var mul = $('#polyline6').is(":checked") ? 1e6 : 1e5;
         //decode it
@@ -120,6 +122,7 @@ Decoded Line:</br>
     
     //Check if we should initialize from anchor
     window.onload = function () {
+      //parse query params
       var query = window.location.search.substring(1);
       var vars = query.split('&');
       for(var i = 0; i < vars.length; i++) {
@@ -131,11 +134,14 @@ Decoded Line:</br>
         else if(decodeURIComponent(pair[0]) == 'polyline6')
           $("#polyline6").prop("checked", decodeURIComponent(pair[1]) == 'true');
       }
+      //parse the anchor
       var idx = window.location.href.indexOf("#");
       var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
       var polyline = decodeURIComponent(url_encoded);
       $("#encoded_polyline").val(polyline);
-      render();
+      //show it if there is something to show
+      if(polyline.length > 0)
+        render();
     };
     
   </script>
