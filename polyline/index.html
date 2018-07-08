@@ -65,6 +65,11 @@ Decoded Line:</br>
     var geojson = null;
     function render() {
       try {
+        //update the window location so that we have a proper permalink
+        window.history.pushState(null, null, window.location.pathname +
+          '?unescape=' + ($('#unescape').is(":checked") ? 'true' : 'false') +
+          '&polyline6=' + ($('#polyline6').is(":checked") ? 'true' : 'false') +
+          '#' + encodeURIComponent($("#encoded_polyline").val()));
         //if they have escaped escapes
         var encoded = $('#unescape').is(":checked") ?
             $("#encoded_polyline").val().replace(/\\\\/g, '\\') :
