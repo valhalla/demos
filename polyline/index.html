@@ -115,6 +115,8 @@ Decoded Line:</br>
     
     //hook up the callback
     $("#encoded_polyline").on('keyup', render);
+    $('#unescape').change(render);
+    $('#polyline6').change(render);
     
     //Check if we should initialize from anchor
     window.onload = function () {
