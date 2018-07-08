@@ -21,6 +21,7 @@
   </script>
 
 Unescape '\': <input id="unescape" type="checkbox"></br>
+Polyline6: <input id="polyline6" type="checkbox"></br>
 Number of Points: <a id="cardinality"></a></br>
 Encoded Line:</br>
   <textarea id="encoded_polyline" rows="4" cols="50"></textarea></br>
@@ -29,9 +30,9 @@ Decoded Line:</br>
 
   <script>
     //decode an encoded string
-    function decode(encoded) {
-      //six degrees of precision in valhalla
-      var inv = 1.0 / 1e6;
+    function decode(encoded, mul) {
+      //precision
+      var inv = 1.0 / mul;
       var decoded = [];
       var previous = [0,0];
       var i = 0;
@@ -56,21 +57,30 @@ Decoded Line:</br>
         //its the far more standard lon,lat instead of lat,lon
         decoded.push([ll[1] * inv,ll[0] * inv]);
       }
-      //update the display
-      document.getElementById("decoded_polyline").textContent = JSON.stringify(decoded);
       //hand back the list of coordinates
       return decoded;
     };
 
     //text change callback
     var geojson = null;
-    function onChange() {
+    function render() {
       try {
+        //update the window location so that we have a proper permalink
+        window.history.pushState(null, null, window.location.pathname +
+          '?unescape=' + ($('#unescape').is(":checked") ? 'true' : 'false') +
+          '&polyline6=' + ($('#polyline6').is(":checked") ? 'true' : 'false') +
+          '#' + encodeURIComponent($("#encoded_polyline").val()));
         //if they have escaped escapes
-        var encoded = $('#unescape').val() ? $(this).val().replace(/\\\\/g, '\\') : $(this).val();
+        var encoded = $('#unescape').is(":checked") ?
+            $("#encoded_polyline").val().replace(/\\\\/g, '\\') :
+            $("#encoded_polyline").val();
+        //if they want 6 digits of precision
+        var mul = $('#polyline6').is(":checked") ? 1e6 : 1e5;
         //decode it
-        var decoded = decode(encoded);
-        document.getElementById("cardinality").textContent = decoded.length;
+        var decoded = decode(encoded, mul);
+        //update the display
+        $('#decoded_polyline').val(JSON.stringify(decoded));
+        $('#cardinality').val(decoded.length);
         //clear this if its not null
         if(geojson != null)
           geojson.removeFrom(map);
@@ -104,7 +114,28 @@ Decoded Line:</br>
     };
     
     //hook up the callback
-    $("#encoded_polyline").on('keyup', onChange);
+    $("#encoded_polyline").on('keyup', render);
+    
+    //Check if we should initialize from anchor
+    window.onload = function () {
+      var query = window.location.search.substring(1);
+      var vars = query.split('&');
+      for(var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        //assume you want to escape some polyline that was from json
+        if(decodeURIComponent(pair[0]) == 'unescape')
+          $("#unescape").prop("checked", decodeURIComponent(pair[1]) != 'false');
+        //assume you dont want polyline6
+        else if(decodeURIComponent(pair[0]) == 'polyline6')
+          $("#polyline6").prop("checked", decodeURIComponent(pair[1]) == 'true');
+      }
+      var idx = window.location.href.indexOf("#");
+      var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
+      var polyline = decodeURIComponent(url_encoded);
+      $("#encoded_polyline").val(polyline);
+      render();
+    };
+    
   </script>
 </body>
 </html>
