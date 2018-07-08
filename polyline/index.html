@@ -63,17 +63,19 @@ Decoded Line:</br>
 
     //text change callback
     var geojson = null;
-    function onChange() {
+    function render() {
       try {
         //if they have escaped escapes
-        var encoded = $('#unescape').val() ? $(this).val().replace(/\\\\/g, '\\') : $(this).val();
+        var encoded = $('#unescape').is(":checked") ?
+            $("#encoded_polyline").val().replace(/\\\\/g, '\\') :
+            $("#encoded_polyline").val();
         //if they want 6 digits of precision
-        var mul = $('#polyline6').val() ? 1e6 : 1e5;
+        var mul = $('#polyline6').is(":checked") ? 1e6 : 1e5;
         //decode it
         var decoded = decode(encoded, mul);
         //update the display
-        document.getElementById("decoded_polyline").textContent = JSON.stringify(decoded);
-        document.getElementById("cardinality").textContent = decoded.length;
+        $('#decoded_polyline').val(JSON.stringify(decoded));
+        $('#cardinality').val(decoded.length);
         //clear this if its not null
         if(geojson != null)
           geojson.removeFrom(map);
@@ -107,15 +109,26 @@ Decoded Line:</br>
     };
     
     //hook up the callback
-    $("#encoded_polyline").on('keyup', onChange);
+    $("#encoded_polyline").on('keyup', render);
     
     //Check if we should initialize from anchor
     window.onload = function () {
+      var query = window.location.search.substring(1);
+      var vars = query.split('&');
+      for(var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        //assume you want to escape some polyline that was from json
+        if(decodeURIComponent(pair[0]) == 'unescape')
+          $("#unescape").prop("checked", decodeURIComponent(pair[1]) != 'false');
+        //assume you dont want polyline6
+        else if(decodeURIComponent(pair[0]) == 'polyline6')
+          $("#polyline6").prop("checked", decodeURIComponent(pair[1]) == 'true');
+      }
       var idx = window.location.href.indexOf("#");
       var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
       var polyline = decodeURIComponent(url_encoded);
-      document.getElementById("encoded_polyline").textContent = polyline;
-      $('encoded_polyline').keyup();
+      $("#encoded_polyline").val(polyline);
+      render();
     };
     
   </script>
