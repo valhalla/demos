@@ -1001,11 +1001,13 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     function setMotorcycleOptions(costing) {
       var stype = document.getElementsByName("stype");
       var use_highways = document.getElementById("use_highways").value;
+      var use_tolls = document.getElementById("use_tolls").value;
       var use_trails = document.getElementById("use_trails").value;
 
       var motorcycleoptions = {};
       motorcycleoptions[costing.toString()] = {
         use_highways : use_highways,
+        use_tolls : use_tolls,
         use_trails : use_trails
       };
       return motorcycleoptions;
