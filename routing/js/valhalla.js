@@ -733,7 +733,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, elevationBtn, routeresponse;
+    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, elevationBtn, routeresponse;
 
     if (document.getElementById('drive_btn') != undefined) {
       driveBtn = document.getElementById("drive_btn");
@@ -802,8 +802,37 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
       });
     }
+    
+   if (document.getElementById('walk_btn') != undefined) {
+      walkBtn = document.getElementById("walk_btn");
 
-  if (document.getElementById('motor_scooter_btn') != undefined) {
+      walkBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getEnvToken();
+        var costing = 'pedestrian';
+        var directionsoptions = { "language" : locale };
+        var calendarInput="";
+        if (document.getElementById("datepicker"))
+          calendarInput = document.getElementById("datepicker").value;
+        if (calendarInput != "") {
+          dateStr = datetimeUpdate(calendarInput);
+          var dtoptions = setDateTime(dateStr);
+          rr.route({
+            costing : costing,
+            directions_options : directionsoptions,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            costing : costing,
+            directions_options : directionsoptions
+          });
+        }
+        updateHashCosting(costing,null,directionsoptions,dtoptions);
+    });
+   }
+   
+   if (document.getElementById('motor_scooter_btn') != undefined) {
       scooterBtn = document.getElementById("motor_scooter_btn");
 
       scooterBtn.addEventListener('click', function(e) {
@@ -841,40 +870,50 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,scooteroptions,directionsoptions,dtoptions);
       });
     }
+    
+    if (document.getElementById('motorcycle_btn') != undefined) {
+        motorcycleBtn = document.getElementById("motorcycle_btn");
 
-   if (document.getElementById('walk_btn') != undefined) {
-      walkBtn = document.getElementById("walk_btn");
-
-      walkBtn.addEventListener('click', function(e) {
+        motorcycleBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
-        var costing = 'pedestrian';
+        var costing = 'motorcycle';
         var directionsoptions = { "language" : locale };
-        var calendarInput="";
-        if (document.getElementById("datepicker"))
-          calendarInput = document.getElementById("datepicker").value;
-        if (calendarInput != "") {
-          dateStr = datetimeUpdate(calendarInput);
-          var dtoptions = setDateTime(dateStr);
-          rr.route({
-            costing : costing,
-            directions_options : directionsoptions,
-            date_time : dtoptions
-          });
+        if (document.getElementById('motorcycleoptions') && document.getElementById('motorcycleoptions').style.display == "block") {
+          var motorcycleoptions = setMotorcycleOptions(costing);
+          var calendarInput="";
+          if (document.getElementById("datepicker"))
+            calendarInput = document.getElementById("datepicker").value;
+          if (calendarInput != "") {
+            dateStr = datetimeUpdate(calendarInput);
+            var dtoptions = setDateTime(dateStr);
+            rr.route({
+              costing : costing,
+              costing_options : motorcycleoptions,
+              directions_options : directionsoptions,
+              date_time : dtoptions
+            });
+          } else {
+            rr.route({
+              costing : costing,
+              costing_options : motorcycleoptions,
+              directions_options : directionsoptions
+            });
+          }
         } else {
           rr.route({
             costing : costing,
             directions_options : directionsoptions
           });
         }
-        updateHashCosting(costing,null,directionsoptions,dtoptions);
-      });
-    }
+        updateHashCosting(costing,motorcycleoptions,directionsoptions,dtoptions);
+     });
+   }   
 
-    if (document.getElementById('multi_btn') != undefined) {
-      multiBtn = document.getElementById("multi_btn");
+   if (document.getElementById('multi_btn') != undefined) {
+        multiBtn = document.getElementById("multi_btn");
 
-      multiBtn.addEventListener('click', function(e) {
+        multiBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getEnvToken();
         var costing = 'multimodal';
@@ -907,7 +946,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     }
 
     if (document.getElementById('elevation_btn') != undefined) {
-      elevationBtn = document.getElementById("elevation_btn");
+        elevationBtn = document.getElementById("elevation_btn");
 
       elevationBtn.addEventListener('click', function(e) {
         if (!rr) return;
@@ -957,6 +996,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         top_speed : (160 >= top_speed >= 0) ? top_speed : "",
       };
       return scooteroptions;
+    }
+    
+    function setMotorcycleOptions(costing) {
+      var stype = document.getElementsByName("stype");
+      var use_highways = document.getElementById("use_highways").value;
+      var use_trails = document.getElementById("use_trails").value;
+
+      var motorcycleoptions = {};
+      motorcycleoptions[costing.toString()] = {
+        use_highways : use_highways,
+        use_trails : use_trails
+      };
+      return motorcycleoptions;
     }
 
     function setTransitOptions() {
@@ -1092,6 +1144,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('bikeoptions').style.display = "block";
     if (document.getElementById('scooteroptions') != undefined)
       document.getElementById('scooteroptions').style.display = "block";
+    if (document.getElementById('motorcycleoptions') != undefined)
+      document.getElementById('motorcycleoptions').style.display = "block";
     if (document.getElementById('walkoptions') != undefined)
       document.getElementById('walkoptions').style.display = "block";
     if (document.getElementById('transitoptions') != undefined)
@@ -1107,6 +1161,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('bikeoptions').style.display = "none";
     if (document.getElementById('scooteroptions') != undefined)
       document.getElementById('scooteroptions').style.display = "none";
+    if (document.getElementById('motorcycleoptions') != undefined)
+      document.getElementById('motorcycleoptions').style.display = "none";
     if (document.getElementById('walkoptions') != undefined)
       document.getElementById('walkoptions').style.display = "none";
     if (document.getElementById('transitoptions') != undefined)
