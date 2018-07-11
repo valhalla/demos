@@ -96,20 +96,39 @@
 		    </div>
 		    <div id="bikeoptions" name="bikeoptions" style="display:none">
 			  <form id="bike" name="bike" ><span style="color:black">
-				<h5><b>Bicycle Options:</b></h5><p>
-				  road: <input type="radio" name="btype" value="Road" checked/>
-				  cross: <input type="radio" name="btype" value="Cross" />
-                  hybrid: <input type="radio" name="btype" value="Hybrid" />
-                  mountain: <input type="radio" name="btype" value="Mountain"/>
-                  <br>
-                  use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
-                  cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
-                  use hills (0-1): <input type="textbox" id="use_hills" value="0.5" class="biketextbox"/>
-                  </span>
+			     <h5><b>Bicycle Options:</b></h5><p>
+			        road: <input type="radio" name="btype" value="Road" checked/>
+		                cross: <input type="radio" name="btype" value="Cross" />
+                                hybrid: <input type="radio" name="btype" value="Hybrid" />
+                                mountain: <input type="radio" name="btype" value="Mountain"/>
+                                <br>
+                                use roads (0-1): <input type="textbox" id="use_roads" value="0.5" class="biketextbox"/><br>
+                                cycling speed (between 5 and 60kph): <input type="textbox" id="cycle_speed" value="25.0" class="biketextbox"/><br>
+                                use hills (0-1): <input type="textbox" id="bike_use_hills" value="0.5" class="biketextbox"/>
+                                </span>
 			  </form>
 		      <hr>
 		    </div>
-	        <div id="walkoptions" name="walkoptions" style="display:none">
+                    <div id="scooteroptions" name="scooteroptions" style="display:none">
+		        <form id="scooter" name="scooter" ><span style="color:black">
+			     <h5><b>Motor Scooter Options:</b></h5><p>
+                                use hills (0-1): <input type="textbox" id="scooter_use_hills" value="0.5" class="scootertextbox"/><br>
+                                use primary (0-1): <input type="textbox" id="use_primary" value="0.5" class="scootertextbox"/><br>
+                                top speed (max speed 160kph): <input type="textbox" id="top_speed" value="" class="scootertextbox"/>
+                        </span>
+			</form>
+		      <hr>
+		    </div>
+		    <div id="motorcycleoptions" name="motorcycleoptions" style="display:none">
+                    <form id="motorcycle" name="motorcycle" ><span style="color:black">
+                             <h5><b>Motorcycle Options:</b></h5><p>
+                                use highways (0-1): <input type="textbox" id="use_highways" value="0.5" class="motorcycletextbox"/><br>
+                                use trails (0-1): <input type="textbox" id="use_trails" value="0.0" class="motorcycletextbox"/>
+                    </span>
+                    </form>
+                <hr>
+                </div>
+	            <div id="walkoptions" name="walkoptions" style="display:none">
 		      <form id="walk" name="walk" ><span style="color:black">
 			    <h5><b>Pedestrian Options:</b></h5><p>
 			    <i>Coming soon!</i>
@@ -140,6 +159,8 @@
 		    <br>
 	        <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
             <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
+	    <button id="motor_scooter_btn" class = "transparent_btn" type="button">Motor Scooter</button>
+	    <button id="motorcycle_btn" class = "transparent_btn" type="button">Motorcycle</button>
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
             <br>
