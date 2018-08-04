@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://mapzen.com/js/mapzen.standalone.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css"  >
 
-    <script src="conf/env.conf"></script>
+    <script src="conf/environment.conf"></script>
     <!-- Main tangram library -->
     <script src="https://mapzen.com/tangram/0.13.0/tangram.debug.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -25,10 +25,10 @@
 	</script>
     <script type = "text/javascript" src="../flot/jquery.flot.min.js"></script>
     <script type = "text/javascript" src="../flot/jquery.flot.symbol.min.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="../flot/jquery.colorhelpers.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.canvas.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.stack.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.colorhelpers.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.canvas.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.stack.js"></script>
 
     <style>
         body{
@@ -55,16 +55,18 @@
 </head>
 <body>
 	<div class="container-fluid" data-ng-controller="RouteController">
-	
+
         <div class="col-md-2 info">
           <div id="instructions">
             <p><h6><b>Point & click on the map to select a start & end point.</b><br>
             <b>Defaults to auto.</b><br>
             Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6></p>
-		    <h5><b><a target="_blank" href='https://github.com/valhalla/valhalla-docs/blob/master/api-reference.md'>Turn-by-Turn API reference</a></b></h5>
+            <h5><b><a target="_blank" href='https://github.com/valhalla/valhalla-docs/blob/master/api-reference.md'>Turn-by-Turn API reference</a></b></h5>
             <hr>
             <h4>Point & Click Route Testing</h4>
-		    <span style="color:black" class="descriptions">Select a locale:</span><br>
+             <br>Token:</br>
+                 <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" onclick="selectEnv()" placeholder = "Enter stage or prod token."></textarea></br>             
+                    <span style="color:black" class="descriptions">Select a locale:</span><br>
 			<select id = "locale_dropdown" onchange="selectLocale()">
 				<option id=en-US selected="selected" value="en-US">en-US</option>
 				<option id=de-DE value="de-DE">de-DE</option>
@@ -85,8 +87,8 @@
 				   <input type="button" id="showbtn" name="showbtn"  value="Show"/>
 				   <input type="button" id="hidebtn" name="hidebtn"  value="Hide"/>
 				</form>
-			</div>
-            <div id="driveoptions" name="driveoptions" style="display:none">
+		    </div>
+                    <div id="driveoptions" name="driveoptions" style="display:none">
 			  <form id="auto" name="auto" ><span style="color:black">
 				<h5><b>Auto Options:</b></h5><p>
 				<i>Coming soon!</i>
@@ -145,6 +147,19 @@
 		      </form>
 	        <hr>
 	        </div>
+	        <div id="truckoptions" name="truckoptions" style="display:none">
+                      <form id="truck" name="truck" ><span style="color:black">
+                            <h5><b>Truck Options:</b></h5><p>
+                    height (m): <input type="textbox" id="height" value="4.11" class="trucktextbox"/><br>
+                    width (m): <input type="textbox" id="width" value="2.6" class="trucktextbox"/><br>
+                    length (m): <input type="textbox" id="length" value="21.64" class="trucktextbox"/><br>
+                    weight (metric ton): <input type="textbox" id="weight" value="21.77" class="trucktextbox"/><br>
+                    axle_load (metric ton): <input type="textbox" id="axle_load" value="9.07" class="trucktextbox"/><br>
+                    hazmat: <input type="checkbox" id="isHazmat"/>
+                    </span>
+                      </form>
+                <hr>
+                </div>
 	        <div id="dtoptions" name="dtoptions" style="display:none">
 			  <form id="datetime" name="datetime" ><span style="color:black">
 				<h5><b>Date & Time Options:</b></h5><p>
@@ -157,12 +172,13 @@
 			  </form>
 		    </div>
 		    <br>
-	        <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
+	    <button id="drive_btn" class = "transparent_btn" type="button">Drive</button>
             <button id="bike_btn" class = "transparent_btn" type="button">Bike</button>
 	    <button id="motor_scooter_btn" class = "transparent_btn" type="button">Motor Scooter</button>
 	    <button id="motorcycle_btn" class = "transparent_btn" type="button">Motorcycle</button>
             <button id="walk_btn" class = "transparent_btn" type="button">Walk</button>
             <button id="multi_btn" class = "transparent_btn" type="button">Transit</button>
+            <button id="truck_btn" class = "transparent_btn" type="button">Truck</button>
             <br>
             <div id='permalink' style='display:inline-block;'></div>
 		  </div>
@@ -179,7 +195,7 @@
           <b>Note:</b>You cannot run Test File Routes and then click above to run Point & Click Route Test options.  You must CLEAR ALL between testing sections.</span>
           <br>
         <!--  <div id="routeResponse" style="display:inline-block;">JSON Route Response Link</div>-->
-          
+
           <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
           <!--
           <h5><b>What's New?  </b><h5><h6><b>Perform multi-location routes</b></h6>
@@ -190,14 +206,14 @@
         <div><br>
           <button  class="reset" ng-click="clearAll()"> clear all </button>
         </div>
-       
+
         </div>
 
         <div id="mapwrapper" class="col-md-10">
           <div id="map"></div>
         </div>
     </div>
-    
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
     <script type="text/javascript" src="js/leaflet-hash.js"></script>
 
@@ -213,7 +229,7 @@
 
 	<script>
       var defaultMode = 'auto';
-      
+
       var road = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution : '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributers'
 	  });
@@ -225,4 +241,3 @@
     </script>
 </body>
 </html>
-

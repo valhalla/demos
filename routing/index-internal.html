@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://mapzen.com/js/mapzen.standalone.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css"  >
 
-    <script src="conf/env.conf"></script>
+    <script src="conf/environment.conf"></script>
     <!-- Main tangram library -->
     <script src="https://mapzen.com/tangram/0.13.0/tangram.debug.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -25,10 +25,10 @@
 	</script>
     <script type = "text/javascript" src="../flot/jquery.flot.min.js"></script>
     <script type = "text/javascript" src="../flot/jquery.flot.symbol.min.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="../flot/jquery.colorhelpers.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.canvas.js"></script>
-    <script type="text/javascript" src="../flot/jquery.flot.stack.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.colorhelpers.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.canvas.js"></script>
+    <script type = "text/javascript" src="../flot/jquery.flot.stack.js"></script>
 
     <style>
         body{
@@ -68,10 +68,11 @@
             <span style="color:black" class="descriptions">Select an environment:</span><br>
 			<select id="env_dropdown" onchange="selectEnv()">
 				<option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
-				<option id=development value="https://valhalla.dev.mapzen.com/">development</option>
-				<option id=production value="https://valhalla.mapzen.com/">production</option>
+				<option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
+				<option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
 			</select>
-		    <br><br>
+		    <br>Token:</br>
+                        <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter stage or prod token."></textarea></br>
 		    <span style="color:black" class="descriptions">Select a locale:</span><br>
 			<select id = "locale_dropdown" onchange="selectLocale()">
 				<option id=en-US selected="selected" value="en-US">en-US</option>
@@ -153,6 +154,19 @@
 		      </form>
 	        <hr>
 	        </div>
+	        <div id="truckoptions" name="truckoptions" style="display:none">
+                      <form id="truck" name="truck" ><span style="color:black">
+                            <h5><b>Truck Options:</b></h5><p>
+                    height (m): <input type="textbox" id="height" value="4.11" class="trucktextbox"/><br>
+                    width (m): <input type="textbox" id="width" value="2.6" class="trucktextbox"/><br>
+                    length (m): <input type="textbox" id="length" value="21.64" class="trucktextbox"/><br>
+                    weight (metric ton): <input type="textbox" id="weight" value="21.77" class="trucktextbox"/><br>
+                    axle_load (metric ton): <input type="textbox" id="axle_load" value="9.07" class="trucktextbox"/><br>
+                    hazmat: <input type="checkbox" id="isHazmat"/>
+                    </span>
+                      </form>
+                <hr>
+                </div>
 	        <div id="dtoptions" name="dtoptions" style="display:none">
 			  <form id="datetime" name="datetime" ><span style="color:black">
 				<h5><b>Date & Time Options:</b></h5><p>
@@ -171,6 +185,7 @@
 	    <button id="multi_btn" class = "transparent_btn" type="button">Transit</button><br>
             <button id="motor_scooter_btn" class = "transparent_btn" type="button">Motor Scooter</button>
             <button id="motorcycle_btn" class = "transparent_btn" type="button">Motorcycle</button>
+            <button id="truck_btn" class = "transparent_btn" type="button">Truck</button>
             <br>
             <div id='permalink' style='display:inline-block;'></div>
 		  </div>

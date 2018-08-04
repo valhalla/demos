@@ -141,13 +141,13 @@
 
         L.Elevation.Widget = L.Class.extend({
           options : {
-            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.dev,
+            serviceUrl : (typeof serviceUrl != "undefined" || serviceUrl != null) ? serviceUrl : server.staging,
             timeout : 30 * 1000
           },
 
-          initialize : function(accessToken, options) {
+          initialize : function(token, options) {
             L.Util.setOptions(this, options);
-            this._accessToken = accessToken;
+            this._token = token;
             this._graphdata = [];
             this._graphoptions = {
                     axislabels : {
@@ -273,12 +273,12 @@
             });
 
             // reset service url & access token if environment has changed
-            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.dev;
-            (typeof token != "undefined" || token != null) ? this._accessToken = token : this._accessToken = accessToken.dev;
+            (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.staging;
+            (typeof token != "undefined" || token != null) ? this._token = token : this._token = stageToken;
 
-            console.log(this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken);
+            console.log(this.options.serviceUrl + 'height?json=' + params + '&access_token=' + this._token);
 
-            return this.options.serviceUrl + 'height?json=' + params + '&api_key=' + this._accessToken;
+            return this.options.serviceUrl + 'height?json=' + params + '&access_token=' + this._token;
           },
 
           getDataPoints : function(elevresult) {
@@ -330,8 +330,8 @@
           }
         });
 
-        L.Elevation.widget = function(accessToken, options) {
-          return new L.Elevation.Widget(accessToken, options);
+        L.Elevation.widget = function(token, options) {
+          return new L.Elevation.Widget(token, options);
         };
 
         module.exports = L.Elevation;

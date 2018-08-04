@@ -148,9 +148,9 @@
             timeout : 10 * 1000
           },
 
-          initialize : function(accessToken, options) {
+          initialize : function(token, options) {
             L.Util.setOptions(this, options);
-            this._accessToken = accessToken;
+            this._token = token;
           },
 
           locate : function(ll, result_callback, callback, context) {
@@ -204,18 +204,18 @@
 
             // reset service url & access token if environment has changed
             (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl = serviceUrl : this.options.serviceUrl = server.prod;
-            (typeof envToken != "undefined" || envToken != null) ? this._accessToken = envToken : this._accessToken = accessToken.prod;
+            (typeof token != "undefined" || token != null) ? this._token = token : this._token = prodToken;
            // this.options.serviceUrl = server.prod;
-           // this._accessToken = accessToken.prod;
+           // this._token = token.prod;
 
-            console.log(this.options.serviceUrl + 'locate?json=' + params + '&api_key=' + this._accessToken);
+            console.log(this.options.serviceUrl + 'locate?json=' + params + '&access_token=' + this._token);
 
-            return this.options.serviceUrl + 'locate?json=' + params + '&api_key=' + this._accessToken;
+            return this.options.serviceUrl + 'locate?json=' + params + '&access_token=' + this._token;
           }
         });
 
-        L.locate = function(accessToken, ll, options) {
-          return new L.Locate(accessToken, ll, options);
+        L.locate = function(token, ll, options) {
+          return new L.Locate(token, ll, options);
         };
 
         module.exports = L.Locate;

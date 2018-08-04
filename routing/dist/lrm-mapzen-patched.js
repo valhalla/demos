@@ -2237,9 +2237,9 @@ if (typeof module !== undefined) module.exports = polyline;
       timeout: 30 * 1000
     },
 
-    initialize: function(accessToken, options) {
+    initialize: function(token, options) {
       L.Util.setOptions(this, options);
-      this._accessToken = accessToken;
+      this._token = token;
       this._hints = {
         locations: {}
       };
@@ -2520,18 +2520,18 @@ if (typeof module !== undefined) module.exports = polyline;
       
     //reset service url & access token if environment has changed
       (typeof serviceUrl != 'undefined' || serviceUrl != null) ? this.options.serviceUrl=serviceUrl : this.options.serviceUrl=server.prod;
-      (typeof envToken != "undefined" || envToken != null) ? this._accessToken=envToken : this._accessToken=accessToken.prod;
+      (typeof token != "undefined" || token != null) ? this._token=token : this._token=prodToken;
 
       var action = 'route';
      
       console.log(this.options.serviceUrl + action + '?json=' +
-             params + '&api_key=' + this._accessToken);
+             params + '&access_token=' + this._token);
       
      // document.getElementById(action+'Response').innerHTML =
-     //   "<a href='" + this.options.serviceUrl + action + '?json=' + params + '&api_key=' + this._accessToken + "' target='_blank'>JSON Response Link</a>";
+     //   "<a href='" + this.options.serviceUrl + action + '?json=' + params + '&access_token=' + this._token + "' target='_blank'>JSON Response Link</a>";
       
      return this.options.serviceUrl + action + '?json=' +
-             params + '&api_key=' + this._accessToken;
+             params + '&access_token=' + this._token;
     },
     /*************************************************************************/
     _locationKey: function(location) {
@@ -2591,8 +2591,8 @@ if (typeof module !== undefined) module.exports = polyline;
     }
   });
 
-  L.Routing.mapzen = function(accessToken, options) {
-    return new L.Routing.Mapzen(accessToken, options);
+  L.Routing.mapzen = function(token, options) {
+    return new L.Routing.Mapzen(token, options);
   };
 
   module.exports = L.Routing.Mapzen;
