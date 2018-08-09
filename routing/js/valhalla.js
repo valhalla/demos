@@ -4,10 +4,10 @@ var hash_params = L.Hash.parseHash(location.hash);
 var date = new Date();
 var isoDateTime = date.toISOString(); // "2015-06-12T15:28:46.493Z"
 var serviceUrl = server.prod;
-var envToken = accessToken.prod;
-var elevToken = elevAccessToken.prod;
+var server = server.prod;
 var envServer = server.prod;
-var elevServiceUrl = elevationServer.prod;
+var token = prodToken;
+var heightUrl = heightServer.prod;
 var environmentExists = false;
 var locale = "en-US";
 
@@ -16,7 +16,7 @@ function selectEnv() {
     environmentExists = true;
     envServer = $(this).text();
     serviceUrl = document.getElementById(envServer).value;
-    getEnvToken();
+    getToken();
   });
 }
 
@@ -28,22 +28,23 @@ function handleChange(evt) {
   }
 }
 
-function getEnvToken() {
+function getToken() {
   switch (envServer) {
   case "localhost":
-    envToken = accessToken.local;
-    elevServiceUrl = elevationServer.local;
-    elevToken = elevAccessToken.local;
+    token = "";
+    heightUrl = heightServer.local;
     break;
-  case "development":
-    envToken = accessToken.dev;
-    elevServiceUrl = elevationServer.dev;
-    elevToken = elevAccessToken.dev;
+  case "staging":
+    token = $("#token").val() != "" ? $("#token").val() : stageToken;
+    heightUrl = heightServer.staging;
     break;
   case "production":
-    envToken = accessToken.prod;
-    elevServiceUrl = elevationServer.prod;
-    elevToken = elevAccessToken.prod;
+    token = $("#token").val() != "" ? $("#token").val() : prodToken;
+    heightUrl = heightServer.prod;
+    break;
+  default:
+    token = $("#token").val() != "" ? $("#token").val() : prodToken;
+    heightUrl = heightServer.prod;
     break;
   }
 }
@@ -543,7 +544,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             geocoder : null,
             costing : json.costing,
             routeWhileDragging : false,
-            router : L.Routing.mapzen(envToken, json),
+            router : L.Routing.mapzen(token, json),
             summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
 
             createMarker : function(i, wp, n) {
@@ -590,7 +591,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   // show something to start with but only if it was requested
   $(window).load(function(e) {
-    //rr = L.Routing.mapzen(accessToken);
+    //rr = L.Routing.mapzen(token);
     force = true;
     hashRoute();
   });
@@ -682,7 +683,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         var defaultOptions = {
           geocoder : null,
           routeWhileDragging : false,
-          router : L.Routing.mapzen(envToken, options),
+          router : L.Routing.mapzen(token, options),
           summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
 
           createMarker : function(i, wp, n) {
@@ -733,14 +734,14 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, elevationBtn, routeresponse;
+    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, truckBtn, elevationBtn, routeresponse;
 
     if (document.getElementById('drive_btn') != undefined) {
       driveBtn = document.getElementById("drive_btn");
 
       driveBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'auto';
         var directionsoptions = { "language" : locale };
         var calendarInput="";
@@ -769,7 +770,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
       bikeBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'bicycle';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
@@ -808,7 +809,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
       walkBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'pedestrian';
         var directionsoptions = { "language" : locale };
         var calendarInput="";
@@ -837,7 +838,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
       scooterBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'motor_scooter';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('scooteroptions') && document.getElementById('scooteroptions').style.display == "block") {
@@ -876,7 +877,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
         motorcycleBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'motorcycle';
         var directionsoptions = { "language" : locale };
         if (document.getElementById('motorcycleoptions') && document.getElementById('motorcycleoptions').style.display == "block") {
@@ -915,7 +916,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
         multiBtn.addEventListener('click', function(e) {
         if (!rr) return;
-        getEnvToken();
+        getToken();
         var costing = 'multimodal';
         var directionsoptions = { "language" : locale };
         var calendarInput;
@@ -945,6 +946,38 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       });
     }
 
+    if (document.getElementById('truck_btn') != undefined) {
+      truckBtn = document.getElementById("truck_btn");
+
+      truckBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getToken();
+        if (document.getElementById('truckoptions').style.display == "block") {
+          var truckoptions = setTruckOptions();
+          var calendarInput = document.getElementById("datepicker").value;
+          if (calendarInput != "") {
+            dateStr = datetimeUpdate(calendarInput);
+            var dtoptions = setDateTime(dateStr);
+            rr.route({
+              costing : 'truck',
+              costing_options : truckoptions,
+              date_time : dtoptions
+            });
+          } else {
+            rr.route({
+              costing : 'truck',
+              costing_options : truckoptions,
+            });
+          }
+        } else {
+          rr.route({
+            costing : 'truck'
+          });
+        }
+        updateHashCosting(costing,truckoptions,dtoptions);
+      });
+    }
+
     if (document.getElementById('elevation_btn') != undefined) {
         elevationBtn = document.getElementById("elevation_btn");
 
@@ -952,9 +985,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         if (!rr) return;
         if (environmentExists)
           selectEnv();
-        else getEnvToken();
+        else getToken();
 
-        var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(elevToken, rr._router._rrshape) : 0;
+        var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(token, rr._router._rrshape) : 0;
         elev.resetChart();
         elev.profile(elev._rrshape);
         document.getElementById('graph').style.display = "block";
@@ -1028,7 +1061,30 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       return transitoptions;
     }
 
+    function setTruckOptions() {
+      var height = document.getElementById("height").value;
+      var width = document.getElementById("width").value;
+      var length = document.getElementById("length").value;
+      var weight = document.getElementById("weight").value;
+      var axle_load = document.getElementById("axle_load").value;
+      var isHazmat = false;
 
+      if(document.getElementById("isHazmat").checked == true)
+        isHazmat = true;
+       else isHazmat = false;
+
+      var truckoptions = {
+        "truck" : {
+          height : height,
+          width : width,
+          length : length,
+          weight : weight,
+          axle_load : axle_load,
+          hazmat : isHazmat
+        }
+      };
+      return truckoptions;
+    }
 
     function setDateTime(dateStr) {
       var dttype = document.getElementsByName("dttype");
@@ -1108,7 +1164,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       lon : e.latlng.lng
     };
     selectEnv();
-    var locate = L.locate(envToken);
+    var locate = L.locate(token);
     locate.locate(ll, locateEdgeMarkers);
   });
 
@@ -1152,6 +1208,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('walkoptions').style.display = "block";
     if (document.getElementById('transitoptions') != undefined)
       document.getElementById('transitoptions').style.display = "block";
+    if (document.getElementById('truckoptions') != undefined)
+      document.getElementById('truckoptions').style.display = "block";
     if (document.getElementById('dtoptions') != undefined)
       document.getElementById('dtoptions').style.display = "block";
   });
@@ -1169,6 +1227,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       document.getElementById('walkoptions').style.display = "none";
     if (document.getElementById('transitoptions') != undefined)
       document.getElementById('transitoptions').style.display = "none";
+    if (document.getElementById('truckoptions') != undefined)
+      document.getElementById('truckoptions').style.display = "none";
     if (document.getElementById('dtoptions') != undefined)
       document.getElementById('dtoptions').style.display = "none";
   });

@@ -55,8 +55,8 @@
       }
 
       // reset service url & access token if environment has changed
-      (typeof this.elevServiceUrl != 'undefined' || this.elevServiceUrl != null) ? this.elevServiceUrl = this.elevServiceUrl : this.elevServiceUrl = this.elevationServer.prod;
-      (typeof this.elevToken != "undefined" || this.elevToken != null) ? this._accessToken = this.elevToken : this._accessToken = this.elevAccessToken.prod;
+      (typeof this.heightUrl != 'undefined' || this.heightUrl != null) ? this.heightUrl = this.heightUrl : this.heightUrl = this.heightServer.prod;
+      (typeof this.token != "undefined" || this.token != null) ? this._token = this.token : this._token = this.prodToken;
 
       var params = JSON.stringify({
         encoded_polyline : rrshape,
@@ -66,7 +66,7 @@
       var resp = $.ajax({
         crossDomain : true,
         type : "POST",
-        url : this.elevServiceUrl + 'height?api_key=' + this.elevToken,
+        url : this.heightUrl + 'height?access_token=' + this.token,
         data : params,
         success : "success",
         dataType : 'json'
@@ -82,7 +82,7 @@
           }
         }
       });
-      console.log("Elevation POST Request :: " + this.elevServiceUrl + 'height?api_key=' + this.elevToken + " ,POST DATA :: " + params);
+      console.log("Elevation POST Request :: " + this.heightUrl + 'height?access_token=' + this.token + " ,POST DATA :: " + params);
       return resp;
     }
     ;
@@ -105,13 +105,13 @@
 
         L.Elevation = L.Class.extend({
           options : {
-            elevServiceUrl : (typeof elevServiceUrl != "undefined" || elevServiceUrl != null) ? elevServiceUrl : elevationServer.prod,
+            heightUrl : (typeof heightUrl != "undefined" || heightUrl != null) ? heightUrl : heightServer.prod,
             timeout : 30 * 1000
           },
 
-          initialize : function(accessToken, rrshape, options) {
+          initialize : function(token, rrshape, options) {
             L.Util.setOptions(this, options);
-            this._accessToken = accessToken;
+            this._token = token;
             this._rrshape = rrshape;
             this._graphdata = [];
             this._graphoptions = {
@@ -275,8 +275,8 @@
           }
         });
 
-        L.elevation = function(accessToken, shape, options) {
-          return new L.Elevation(accessToken, shape, options);
+        L.elevation = function(token, shape, options) {
+          return new L.Elevation(token, shape, options);
         };
 
         module.exports = L.Elevation;
