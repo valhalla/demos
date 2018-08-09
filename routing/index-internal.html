@@ -59,20 +59,20 @@
 
         <div class="col-md-2 info">
           <div id="instructions">
+            <img src="images/Valhalla.png" height="175" width="175" alt="logo"><br>
             <p><h6><b>Point & click on the map to select a start & end point.</b><br>
             <b>Defaults to auto.</b><br>
             Change route to use other methods of travel (auto, bicycle, pedestrian, or transit) from one of the mode buttons below.</h6></p>
-            <h5><b><a target="_blank" href='https://github.com/valhalla/valhalla-docs/blob/master/api-reference.md'>Turn-by-Turn API reference</a></b></h5>
+            <h5><b><a target="_blank" href='https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md'>Turn-by-Turn API reference</a></b></h5>
             <hr>
             <h4>Point & Click Route Testing</h4>
-            <span style="color:black" class="descriptions">Select an environment:</span><br>
+            <span style="color:black" class="descriptions">Select an endpoint:</span><br>
 			<select id="env_dropdown" onchange="selectEnv()">
 				<option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
-				<option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
 				<option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
 			</select>
 		    <br>Token:</br>
-                        <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter stage or prod token."></textarea></br>
+                        <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter token."></textarea></br>
 		    <span style="color:black" class="descriptions">Select a locale:</span><br>
 			<select id = "locale_dropdown" onchange="selectLocale()">
 				<option id=en-US selected="selected" value="en-US">en-US</option>
