@@ -72,6 +72,7 @@ if (document.getElementById("inputFile")) {
 }
 function selectFiles(evt) {
   selectEnv();
+  getToken();
   if (typeof evt.target != "undefined") {
     var files = evt.target.files;
 
@@ -603,6 +604,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     };
 
   var eventObj = window.event ? event : e.originalEvent;
+    getToken();
     //way to test multi-locations
     if(eventObj.ctrlKey) {
       if (locations == 0) {
