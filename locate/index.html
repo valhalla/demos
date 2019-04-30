@@ -38,6 +38,12 @@ Costing: <select id="costing">
   <option>pedestrian</option>
   <option>bicycle</option>
 </select></br>
+Prefered Side: <select id="pref">
+  <option selected>either</option>
+  <option>same</option>
+  <option>opposite</option>
+</select></br>
+
 
     </div>
     <div id="sidebar" style="float:right; width:25%">
@@ -90,7 +96,8 @@ Costing: <select id="costing">
           minimum_reachability: parseInt(document.getElementById('reach').value),
           radius: parseInt(document.getElementById('radius').value),
           heading: parseInt(document.getElementById('heading').value),
-          node_snap_tolerance: parseInt(document.getElementById('node').value)
+          node_snap_tolerance: parseInt(document.getElementById('node').value),
+          preferred_side: document.getElementById('pref').value
         }],
         verbose: true
       };
