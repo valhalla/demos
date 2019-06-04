@@ -1,7 +1,7 @@
 var app = angular.module('elevation', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
-serviceUrl       = server.prod;
+serviceUrl = server.prod;
 token = prodToken;
 
 //??
