@@ -140,10 +140,29 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
   }).setView(manhattan, 13);
-  L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  var osmlayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-  }).addTo(map);
+    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  });
+  osmlayer.addTo(map);
+
+  var mapboxlayer = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  });
+
+  var baseMaps = {
+    "OSM": osmlayer,
+    "Mapbox": mapboxlayer
+  };
+
+  L.control.layers(baseMaps).addTo(map);
+
+
+  document.getElementById('maptoken').addEventListener('change', function(ev) {
+    var maptoken = event.target.value;
+    mapboxlayer.setUrl('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png?access_token=' + maptoken);
+  });
 
   // If iframed, we're going to have to disable some of the touch interaction
   // to not hijack page scroll. See Stamen's Checklist for Maps: http://content.stamen.com/stamens-checklist-for-maps
@@ -805,7 +824,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
       });
     }
-    
+
    if (document.getElementById('walk_btn') != undefined) {
       walkBtn = document.getElementById("walk_btn");
 
@@ -834,7 +853,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,null,directionsoptions,dtoptions);
     });
    }
-   
+
    if (document.getElementById('motor_scooter_btn') != undefined) {
       scooterBtn = document.getElementById("motor_scooter_btn");
 
@@ -873,7 +892,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,scooteroptions,directionsoptions,dtoptions);
       });
     }
-    
+
     if (document.getElementById('motorcycle_btn') != undefined) {
         motorcycleBtn = document.getElementById("motorcycle_btn");
 
@@ -911,7 +930,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         }
         updateHashCosting(costing,motorcycleoptions,directionsoptions,dtoptions);
      });
-   }   
+   }
 
    if (document.getElementById('multi_btn') != undefined) {
         multiBtn = document.getElementById("multi_btn");
@@ -1032,7 +1051,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       };
       return scooteroptions;
     }
-    
+
     function setMotorcycleOptions(costing) {
       var stype = document.getElementsByName("stype");
       var use_highways = document.getElementById("use_highways").value;

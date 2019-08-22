@@ -73,7 +73,9 @@
 				<option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
 			</select>
 		    <br>Token:</br>
-                        <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter token."></textarea></br>
+                        <textarea id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter token."></textarea>
+        <br>Map Token:</br>
+                        <textarea id="maptoken" rows="1" cols="30" maxlength="100" wrap="hard" placeholder = "Enter token."></textarea></br>
 		    <span style="color:black" class="descriptions">Select a locale:</span><br>
 			<select id = "locale_dropdown" onchange="selectLocale()">
 				<option id=en-US selected="selected" value="en-US">en-US</option>
@@ -231,16 +233,12 @@
     <script type="text/javascript" src="js/elevation/L.Elevation.js"></script>
     <script type="text/javascript" src="js/locate/L.Locate.js"></script>
     <script type="text/javascript" src="https://mapzen.com/js/mapzen.standalone.js"></script>
-        
+
     <!-- Load geocoding plugin after Leaflet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
 
 	<script>
-      var defaultMode = 'auto';
-
-      var road = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	    attribution : '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributers'
-	  });
+    var defaultMode = 'auto';
 	</script>
 
     <!-- Adding a script block to post message to the parent container (think iframed demos) -->
