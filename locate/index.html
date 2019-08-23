@@ -24,13 +24,16 @@ crossorigin=""></script>
     <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
     <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
   </select></br>
-  Map Token: <input id="maptoken" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
+  Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
 
-  Base URL: <select id="baseurl">
+  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
+
+<!--   <select id="baseurl">
     <option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
     <option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
     <option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
   </select></br>
+ -->
   Valhalla Token: <input id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
   Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
   <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
@@ -118,6 +121,8 @@ crossorigin=""></script>
         delete json.locations[0].heading;
       //selectable base url
       var baseurl = document.getElementById('baseurl').value;
+      if (!baseurl)
+        baseurl = 'http://localhost:8002/';
       //access token
       var token = document.getElementById('token').value;
       //optional costing
