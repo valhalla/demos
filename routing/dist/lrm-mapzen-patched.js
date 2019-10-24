@@ -1429,52 +1429,52 @@ if (typeof module !== undefined) module.exports = polyline;
 					route.subRoutes[i].styles,
 					this.options.addWaypoints);
 				}
-	            for (var m=0; m < all_markers.length; m++)
-	              this.addLayer(all_markers[m]);
+	                        for (var m=0; m < all_markers.length; m++)
+	                          this.addLayer(all_markers[m]);
 			} else {
 				if (route.costing != "bikeshare"){
-			   		if (is_walk) {
-			      for (var s = 0; s < this.options.styles.length; s++)
-			        this.options.styles[s].dashArray = '4,10';
+					if (is_walk) {
+						for (var s = 0; s < this.options.styles.length; s++)
+							this.options.styles[s].dashArray = '4,10';
 			    } else {
-			      for (var s = 0; s < this.options.styles.length; s++)
-			        this.options.styles[s].dashArray = '0,0'
-			      }
-			    this._addSegment(
-			 	route.coordinates,
-	 		 	this.options.styles,
-				this.options.addWaypoints);
-			  }
-			  if (route.costing == "bikeshare"){
-				var current_mode = "pedestrian";
-				var start_index = 0;
-				for(var i = 0; i < route.instructions.length; i++) {
-            		if (current_mode != route.instructions[i].travel_mode) {
-						if (current_mode == "pedestrian") {
-							for (var s = 0; s < this.options.styles.length; s++){
-								this.options.styles[s].dashArray = '4,10';
-								this.options.styles[s].opacity = 1.0;
-					  		}
-					}else {
-						for (var s = 0; s < this.options.styles.length; s++) {
-							this.options.styles[s].dashArray = '0,0'
-							this.options.styles[s].opacity = 0.4;
-					  	}
-					}
-					this._addSegment(route.coordinates.slice(start_index, route.instructions[i-1].end_shape_index+1), this.options.styles);	
-					start_index = route.instructions[i-1].end_shape_index;
-					current_mode = route.instructions[i].travel_mode;	
-					}
+					for (var s = 0; s < this.options.styles.length; s++)
+						this.options.styles[s].dashArray = '0,0';
 				}
-				if (current_mode == "pedestrian") {
-					for (var s = 0; s < this.options.styles.length; s++){
-						this.options.styles[s].dashArray = '4,10';
-						this.options.styles[s].opacity = 1.0;
-				  	}
+				this._addSegment(
+					route.coordinates,
+					this.options.styles,
+					this.options.addWaypoints);
 				}
-				this._addSegment(route.coordinates.slice(start_index, route.instructions.slice(-1).end_shape_index), this.options.styles);	
+				if (route.costing == "bikeshare"){
+					var current_mode = "pedestrian";
+					var start_index = 0;
+					for(var i = 0; i < route.instructions.length; i++) {
+						if (current_mode != route.instructions[i].travel_mode) {
+							if (current_mode == "pedestrian") {
+								for (var s = 0; s < this.options.styles.length; s++){
+									this.options.styles[s].dashArray = '4,10';
+									this.options.styles[s].opacity = 1.0;
+								}
+							} else {
+								for (var s = 0; s < this.options.styles.length; s++) {
+									this.options.styles[s].dashArray = '0,0';
+									this.options.styles[s].opacity = 0.4;
+								}
+							}
+							this._addSegment(route.coordinates.slice(start_index, route.instructions[i-1].end_shape_index+1), this.options.styles);
+							start_index = route.instructions[i-1].end_shape_index;
+							current_mode = route.instructions[i].travel_mode;
+						}
+					}
+					if (current_mode == "pedestrian") {
+						for (var s = 0; s < this.options.styles.length; s++){
+							this.options.styles[s].dashArray = '4,10';
+							this.options.styles[s].opacity = 1.0;
+						}
+					}
+					this._addSegment(route.coordinates.slice(start_index, route.instructions.slice(-1).end_shape_index), this.options.styles);
+				}
 			}
-		}
 		},
 
 		addTo: function(map) {
