@@ -757,7 +757,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         return L.Routing.control(defaultOptions).addTo(map);
     };
 
-    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, truckBtn, elevationBtn, routeresponse;
+    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, truckBtn, elevationBtn, bikeshareBtn, routeresponse;
 
     if (document.getElementById('drive_btn') != undefined) {
       driveBtn = document.getElementById("drive_btn");
@@ -1000,6 +1000,34 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         updateHashCosting(costing,truckoptions,dtoptions);
       });
     }
+
+    if (document.getElementById('bikeshare_btn') != undefined) {
+      bieshareBtn = document.getElementById("bikeshare_btn");
+      bieshareBtn.addEventListener('click', function(e) {
+        if (!rr) return;
+        getToken();
+        var costing = 'bikeshare';
+        var directionsoptions = { "language" : locale };
+        var calendarInput="";
+        if (document.getElementById("datepicker"))
+          calendarInput = document.getElementById("datepicker").value;
+        if (calendarInput != "") {
+          dateStr = datetimeUpdate(calendarInput);
+          var dtoptions = setDateTime(dateStr);
+          rr.route({
+            costing : costing,
+            directions_options : directionsoptions,
+            date_time : dtoptions
+          });
+        } else {
+          rr.route({
+            costing : costing,
+            directions_options : directionsoptions
+          });
+        }
+        updateHashCosting(costing,null,directionsoptions,dtoptions);
+    });
+   }
 
     if (document.getElementById('elevation_btn') != undefined) {
         elevationBtn = document.getElementById("elevation_btn");
