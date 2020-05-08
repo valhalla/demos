@@ -14,7 +14,7 @@
       <div id="map" style="height: 800px"></div>
       <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
       <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.0/polyline.min.js"></script>
       <script>
         //make a map using osm tiles
         var map = L.map('map').setView([16.73, -169.52], 14);
@@ -80,9 +80,28 @@ Prefered Side: <select id="pref">
         return y;
       }
     };
+
+    var shapes = [];
     function clickGroup(event) {
-      var printed = pretty.print(event.target.feature.properties.edges);
+      var edges = event.target.feature.properties.edges;
+      // print properties
+      var printed = pretty.print(edges);
       $('#properties').html(printed);
+
+      // remove before add shape
+      if (shapes.length > 0) {
+        shapes.map(s=>{
+          s.removeFrom(map);
+        });
+        shapes = [];
+      }
+      // print shape
+      edges.map(edge=>{
+        var shape = L.geoJson(polyline.toGeoJSON(edge.edge_info.shape, 6));
+        shape.addTo(map);
+        shapes.push(shape);
+      });
+
       L.DomEvent.stopPropagation(event);
     }
 
