@@ -18,7 +18,7 @@
       <script>
         //make a map using osm tiles
         var map = L.map('map').setView([16.73, -169.52], 14);
-        L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
         }).addTo(map);
@@ -47,6 +47,8 @@ Prefered Side: <select id="pref">
 
     </div>
     <div id="sidebar" style="float:right; width:25%">
+      <input id="saerchquery" type="text" placeholder="lat,lon or word" style="width:60%; margin: 5px">
+      <button id="saerch">search</button>
       <pre id="properties"></pre>
     </div>
   </div>
@@ -202,6 +204,34 @@ Prefered Side: <select id="pref">
 
     //hook up the callback for the text box changing
     map.on('click', onClick);
+
+
+    // geocode and jump result point
+    $('#saerch').on('click', ()=>{
+      const query = $('#saerchquery').val();
+      if (query === '') {
+        return;
+      }
+      $.ajax({
+        type: 'GET',
+        url: 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURI(query),
+        dataType: 'jsonp',
+        jsonp: 'json_callback',
+      }).done((data) => {
+        if (data.length === 0) {
+          alert('no result search data.')
+        }
+
+        let e = {};
+        e.latlng = {
+          lat : data[0].lat,
+          lng : data[0].lon,
+        };
+        onClick(e);
+      });
+
+      // ?q=%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%B8%82&format=json
+    })
   </script>
 </body>
 </html>
