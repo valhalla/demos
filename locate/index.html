@@ -4,48 +4,59 @@
   <title>Locate</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
   <link rel="stylesheet" href="json.css" />
 </head>
 <body>
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+crossorigin=""></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.0/polyline.min.js"></script>
 
   <div style="width:100%">
-    <div style="float:left; width:75%">
-      <div id="map" style="height: 800px"></div>
-      <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
-      <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.0/polyline.min.js"></script>
-      <script>
-        //make a map using osm tiles
-        var map = L.map('map').setView([16.73, -169.52], 14);
-        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-        }).addTo(map);
-      </script>
+  <div style="float:left; width:75%">
 
-Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
-<input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
-Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
-<input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
-Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
-<input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
-Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1" onchange="document.getElementById('node_text').value=this.value;" />
-<input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
-Costing: <select id="costing">
-  <option selected>none</option>
-  <option>auto</option>
-  <option>pedestrian</option>
-  <option>bicycle</option>
-</select></br>
-Prefered Side: <select id="pref">
-  <option selected>either</option>
-  <option>same</option>
-  <option>opposite</option>
-</select></br>
+  <div id="map" style="height: 800px"></div>
 
+  Tile Layer: <select id="tileurl">
+    <option id=osm selected="selected" value='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+    <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
+  </select></br>
+  Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
 
-    </div>
+  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
+
+<!--   <select id="baseurl">
+    <option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
+    <option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
+    <option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
+  </select></br>
+ -->
+  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
+  Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
+  <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
+  Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
+  <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
+  Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
+  <input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
+  Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1" onchange="document.getElementById('node_text').value=this.value;" />
+  <input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
+  Costing: <select id="costing">
+    <option selected>none</option>
+    <option>auto</option>
+    <option>pedestrian</option>
+    <option>bicycle</option>
+  </select></br>
+  Preferred Side: <select id="pref">
+    <option selected>either</option>
+    <option>same</option>
+    <option>opposite</option>
+  </select></br>
+
+  </div>
     <div id="sidebar" style="float:right; width:25%">
       <input id="saerchquery" type="text" placeholder="lat,lon or word" style="width:60%; margin: 5px">
       <button id="saerch">search</button>
@@ -53,8 +64,15 @@ Prefered Side: <select id="pref">
     </div>
   </div>
 
-
   <script>
+    //make a map using osm tiles
+    var map = L.map('map').setView([16.73, -169.52], 14);
+    var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    })
+    baseLayer.addTo(map);
+
     //update the properties
     pretty = {
       replacer: function(match, pIndent, pKey, pVal, pEnd) {
@@ -108,8 +126,6 @@ Prefered Side: <select id="pref">
     //form the request url
     var input;
     function build_url(ll) {
-      //build url
-      var url = 'http://localhost:8002/locate?json=';
       var json = {
         locations: [{
           lat: ll.lat,
@@ -125,6 +141,12 @@ Prefered Side: <select id="pref">
       //remove negative heading
       if(json.locations[0].heading < 0)
         delete json.locations[0].heading;
+      //selectable base url
+      var baseurl = document.getElementById('baseurl').value;
+      if (!baseurl)
+        baseurl = 'http://localhost:8002/';
+      //access token
+      var token = document.getElementById('token').value;
       //optional costing
       var costing = document.getElementById('costing').value;
       if(costing != 'none')
@@ -140,7 +162,9 @@ Prefered Side: <select id="pref">
       });
       input.addTo(map);
       //give back the string
-      url += escape(JSON.stringify(json));
+      var url = baseurl + 'locate?json=' + escape(JSON.stringify(json));
+      if (token)
+        url += '&access_token=' + token;
       return url;
     }
 
@@ -198,7 +222,7 @@ Prefered Side: <select id="pref">
 
     //map click callback
     var geojson = null;
-    function onClick(event) {
+    function onMapClick(event) {
       //update the map with the results
       var url = build_url(event.latlng);
       //grab the url
@@ -220,6 +244,15 @@ Prefered Side: <select id="pref">
         fitResults(located.features);
       });
     };
+
+    function onTileLayerChange() {
+      var tileurl = document.getElementById('tileurl').value;
+      var token = document.getElementById('maptoken').value;
+      if (tileurl.includes('mapbox') && token) {
+        tileurl += '?access_token=' + token;
+      }
+      baseLayer.setUrl(tileurl);
+    }
 
     //hook up the callback for the text box changing
     map.on('click', onClick);
@@ -249,8 +282,12 @@ Prefered Side: <select id="pref">
         onClick(e);
       });
 
-      // ?q=%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%B8%82&format=json
-    })
+    });
+
+    //hook up the callback for the tile url changing
+    document.getElementById('tileurl').addEventListener('change', onTileLayerChange);
+    document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
+
   </script>
 </body>
 </html>

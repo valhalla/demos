@@ -857,9 +857,9 @@ if (typeof module !== undefined) module.exports = polyline;
 				return Math.round(t / 60) + ' min';
 			} else if (t > 60) {
 				return Math.floor(t / 60) + ' min' +
-					(t % 60 !== 0 ? ' ' + (t % 60) + ' s' : '');
+					(t % 60 !== 0 ? ' ' + Math.round(t % 60) + ' s' : '');
 			} else {
-				return t + ' s';
+				return Math.round(t) + ' s';
 			}
 		},
 
@@ -2123,9 +2123,9 @@ if (typeof module !== undefined) module.exports = polyline;
         return Math.round(t / 60) + ' min';
       } else if (t > 60) {
         return Math.floor(t / 60) + ' min' +
-          (t % 60 !== 0 ? ' ' + (t % 60) + ' s' : '');
+          (t % 60 !== 0 ? ' ' + Math.round(t % 60) + ' s' : '');
       } else {
-        return t + ' s';
+        return Math.round(t) + ' s';
       }
     },
 
