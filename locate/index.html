@@ -34,7 +34,7 @@ crossorigin=""></script>
     <option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
   </select></br>
  -->
-  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
+  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="256" wrap="hard" placeholder="Enter token."></input></br>
   Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
   <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
   Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
