@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expansion</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+  <style>
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+    #input_max_index {
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map" style="width: 1440px; height: 960px"></div>
+  <div>
+    <label for="input_geojson">Paste expansion geojson:</label>
+    <textarea id="input_geojson" rows="4" cols="50"></textarea></br>
+  </div>
+  <div>
+    <label for="input_max_index">Expansion progress:</label>
+    <input type="range" id="input_max_index" min="0"/>
+    <span id="display_max_index"></span>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script>
+    //make a map
+    var map = L.map('map').setView([0, 0], 2);
+
+    //use osm tiles
+    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    }).addTo(map);
+
+    var input_geojson = document.querySelector('#input_geojson');
+    var input_max_index = document.querySelector('#input_max_index');
+    var display_max_index = document.querySelector('#display_max_index');
+    var geojson_layer = L.geoJSON().addTo(map);
+
+    function transformGeojson(geojson) {
+      const f = geojson['features'][0];
+      var features = f.geometry.coordinates.map((coords, idx) => {
+        return {
+          type: 'Feature',
+          properties: {
+            index: idx,
+            status: f.properties.statuses[idx],
+            edge_id: f.properties.edge_ids[idx],
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: coords
+          }
+        }
+      });
+      return { type: "FeatureCollection", properties: {}, features };
+    }
+
+    function onInputsUpdate() {
+      try {
+        var geojson = JSON.parse(input_geojson.value);
+        const transformed = transformGeojson(geojson);
+
+        input_max_index.max = transformed.features.length - 1;
+        var max_index = input_max_index.value || 0;
+        display_max_index.innerText = max_index;
+
+        map.removeLayer(geojson_layer);
+        geojson_layer = L.geoJSON(transformed, {
+          filter: function(feature, layer) {
+            return feature.properties.index < max_index;
+          },
+          style: function(feature) {
+            const s = feature.properties.status;
+            switch (s) {
+              case 'r':
+                return { color: "#ff0000" };
+              case 's':
+                return { color: "#0000ff" };
+              case 'c':
+                return { color: "#00ff00" };
+              default:
+                return { color: "#000" };
+            }
+          }
+        })
+        .addTo(map);
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    input_geojson.addEventListener('input', onInputsUpdate);
+    input_geojson.addEventListener('input', () => {
+      map.fitBounds(geojson_layer.getBounds());
+    });
+    input_max_index.addEventListener('input', onInputsUpdate);
+  </script>
+</body>
+</html>
