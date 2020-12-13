@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Centroid</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+</head>
+<body>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+crossorigin=""></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="../polyline/decode.js"></script>
+
+  <div style="width:100%">
+
+  <div id="map" style="height: 800px"></div>
+
+  Tile Layer: <select id="tileurl">
+    <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+    <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
+  </select></br>
+  Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
+
+  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
+
+<!--   <select id="baseurl">
+    <option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
+    <option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
+    <option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
+  </select></br>
+ -->
+  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
+  Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
+  <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
+  Reachibility: <input id="reach" type="range" min="0" max="1000" value="100" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
+  <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
+  Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
+  <input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
+  Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1" onchange="document.getElementById('node_text').value=this.value;" />
+  <input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
+  Costing: <select id="costing">
+    <option selected>auto</option>
+    <option>pedestrian</option>
+    <option>bicycle</option>
+  </select></br>
+  Preferred Side: <select id="pref">
+    <option selected>either</option>
+    <option>same</option>
+    <option>opposite</option>
+  </select></br>
+  <button type="button" id="route">Find Centroid</button>
+
+  </div>
+
+  <script>
+    //make a map using osm tiles
+    var map = L.map('map').setView([40.2, -76.6], 10);
+    var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    })
+    baseLayer.addTo(map);
+
+    //the button
+    var routeButton = document.getElementById('route');
+
+    //state
+    var geojson = null;
+    var locations = [];
+    var inputs = [];
+
+    //build a location object for the request
+    map.on('click', function (event) {
+      //clear this if its not null
+      if(geojson != null)
+        geojson.removeFrom(map);
+     
+      //make the location
+      var loc = {
+        lat: event.latlng.lat,
+        lon: event.latlng.lng,
+        minimum_reachability: parseInt(document.getElementById('reach').value),
+        radius: parseInt(document.getElementById('radius').value),
+        heading: parseInt(document.getElementById('heading').value),
+        node_snap_tolerance: parseInt(document.getElementById('node').value),
+        preferred_side: document.getElementById('pref').value
+      };
+      locations.push(loc);
+
+      //mark where they clicked
+      input = new L.CircleMarker(event.latlng, { color: '#99dd99', radius: 10, fillOpacity: 0.75 });
+      /*input.on('click', function (event) {
+        //TODO: display location json?
+        L.DomEvent.stopPropagation(event);
+      });*/
+
+      input.addTo(map);
+      inputs.push(input);
+    });
+
+    //build the url from all the locations
+    function build_url() {
+      var json = {
+        locations: locations
+      };
+      //remove negative heading
+      if(json.locations[0].heading < 0)
+        delete json.locations[0].heading;
+      //selectable base url
+      var baseurl = document.getElementById('baseurl').value;
+      if (!baseurl)
+        baseurl = 'http://localhost:8002/';
+      //access token
+      var token = document.getElementById('token').value;
+      //optional costing
+      var costing = document.getElementById('costing').value;
+      json['costing'] = costing;
+      //give back the string
+      var url = baseurl + 'centroid?json=' + escape(JSON.stringify(json));
+      if (token)
+        url += '&access_token=' + token;
+      return url;
+    }
+
+    //convert the result into geojson so its displayable
+    function build_geojson(result) {
+      var fc = { type:'FeatureCollection', features: [] };
+
+      // get the route geometry as linestirngs
+      result.alternates.push(result.trip);
+      result.alternates.forEach(function (route) {
+        // the route
+        var route_feature = {
+          type: 'Feature',
+          properties: {
+            color: '#' + ('000000' + Math.floor(Math.random()*16777215*.5).toString(16)).substr(-6),
+            opacity: 0.75,
+            weight: 5
+          },
+          geometry:{
+            type: 'LineString',
+            coordinates: decode(route.legs[0].shape, 1e6)
+          }
+        };
+
+        console.log(route_feature.properties.color);
+
+        // the destination
+        var destination_feature = {
+          type: 'Feature',
+          properties: {
+            color: '#bb0000',
+            radius: 5,
+            fillOpacity: 0.75
+          },
+          geometry:{
+            type: 'Point',
+            coordinates: route_feature.geometry.coordinates.slice(-1)[0]
+          }
+        };
+
+        fc.features.push(route_feature);
+        fc.features.push(destination_feature);
+      });
+
+      // show all the origins
+      locations.forEach(function (loc){
+        var origin_feature = {
+          type: 'Feature',
+          properties: {
+            color: '#00bb00',
+            radius: 5,
+            fillOpacity: 0.75
+          },
+          geometry:{
+            type: 'Point',
+            coordinates: [loc.lon, loc.lat]
+          }
+        }
+
+        fc.features.push(origin_feature);
+      });
+
+      //give back the feature collection
+      return fc;
+    }
+
+    //button press callback to fire off the request to the server
+    routeButton.onclick = function onRoute(event) {
+      //update the map with the results
+      var url = build_url();
+      //grab the url
+      $.getJSON(url, function(result) {
+        //turn the result into geojson
+        fc = build_geojson(result)
+        //make a leaflet geojson object
+        geojson = L.geoJson(fc, {
+          style: function(feature) { return feature.properties; },
+          pointToLayer: function(feature, ll) { return new L.CircleMarker(ll, feature.properties); }
+        });
+        //disappear the input
+        inputs.forEach(function (input) {
+          input.removeFrom(map);
+        });
+        inputs = [];
+        locations = [];
+        //render the geojson
+        var added = geojson.addTo(map);
+        //fit it in view
+        map.fitBounds(added.getBounds(), { maxZoom: 19 });
+      });
+    };
+
+    function onTileLayerChange() {
+      var tileurl = document.getElementById('tileurl').value;
+      var token = document.getElementById('maptoken').value;
+      if (tileurl.includes('mapbox') && token) {
+        tileurl += '?access_token=' + token;
+      }
+      baseLayer.setUrl(tileurl);
+    }
+
+    //hook up the callback for the tile url changing
+    document.getElementById('tileurl').addEventListener('change', onTileLayerChange);
+    document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
+  </script>
+</body>
+</html>
