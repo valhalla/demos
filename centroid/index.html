@@ -92,12 +92,7 @@ crossorigin=""></script>
       locations.push(loc);
 
       //mark where they clicked
-      input = new L.CircleMarker(event.latlng, { color: '#99dd99', radius: 10, fillOpacity: 0.75 });
-      /*input.on('click', function (event) {
-        //TODO: display location json?
-        L.DomEvent.stopPropagation(event);
-      });*/
-
+      input = new L.CircleMarker(event.latlng, { color: '#0000bb', radius: 5, fillOpacity: 0.75 });
       input.addTo(map);
       inputs.push(input);
     });
@@ -105,7 +100,12 @@ crossorigin=""></script>
     //build the url from all the locations
     function build_url() {
       var json = {
-        locations: locations
+        locations: locations/*,
+        costing_options: {
+          auto: {
+            use_highways: 0.35
+          }
+        }*/
       };
       //remove negative heading
       if(json.locations[0].heading < 0)
