@@ -146,9 +146,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
   osmlayer.addTo(map);
 
-  var mapboxlayer = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png', {
+  var mapboxlayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    tileSize: 512,
     maxZoom: 19,
-    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    zoomOffset: -1,
+    id: 'mapbox/streets-v11',
   });
 
   var baseMaps = {
@@ -158,10 +161,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   L.control.layers(baseMaps).addTo(map);
 
-
   document.getElementById('maptoken').addEventListener('change', function(ev) {
     var maptoken = event.target.value;
-    mapboxlayer.setUrl('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png?access_token=' + maptoken);
+    mapboxlayer.setUrl('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + maptoken);
   });
 
   // If iframed, we're going to have to disable some of the touch interaction
