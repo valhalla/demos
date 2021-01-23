@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Routing</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+</head>
+<body>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+crossorigin=""></script>
+  <!--script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script-->
+  <script src="http://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="../polyline/decode.js"></script>
+
+  <div style="width:100%">
+  <div id="map" style="height: 1050px"></div>
+  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
+  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="100" wrap="hard" placeholder="Enter token."></input></br>
+  Request Body:</br><textarea id="request_body" rows="5" cols="100" maxlength="500" wrap="hard">{"costing":"auto"}</textarea></br>
+  <button type="button" id="route">Route</button>
+
+  </div>
+
+  <script>
+    ////////////////////// INITIALIZATION ////////////////////////
+
+    //make a map using osm tiles
+    const map = L.map('map').setView([40.2, -76.6], 10);
+    const baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    });
+    baseLayer.addTo(map);
+
+    //state
+    let geojson = null;
+    let inputs = [];
+
+    /////////////////// REQUEST PROCESSING //////////////////////
+
+    //do all the requests
+    async function fetch(json_body) {
+      // parse the requests
+      let requests = null;
+      try {
+        requests = JSON.parse(json_body);
+        if(!Array.isArray(requests)) {
+          requests = [requests]
+        }
+      }
+      catch(e) {
+        alert('Invalid Json Request');
+      }
+
+      //create base url
+      let baseurl = document.getElementById('baseurl').value;
+      if (!baseurl)
+        baseurl = 'http://localhost:8002/';
+      baseurl += 'route?';
+      const token = document.getElementById('token').value;
+      if (token)
+        baseurl += 'access_token=' + token + '&json=';
+      else
+        baseurl += 'json=';
+      
+      //do them all
+      const responses = await Promise.all(
+        requests.map(async (request) => {
+          const url = baseurl + JSON.stringify(request);
+          const response = await $.getJSON(url);
+          return response;
+        })
+      );
+
+      //set the text box
+      return {requests, responses};
+    }
+
+    ////////////////////// RESPONSE PROCESSING /////////////////////////
+
+    //convert the result into geojson so its displayable
+    function build_geojson(responses) {
+      const fc = { type:'FeatureCollection', features: [] };
+
+      // for each response
+      responses.forEach( (response) => {
+        // pick a main color and then each alternate will be lighter
+        let color = Math.floor(Math.random()*16777215*.5);
+        let color_scale = 1.5;
+
+        // get the route geometry as linestirngs
+        const routes = [response.trip].concat(response.alternates || []);
+        routes.forEach( (route) => {
+          route.legs.forEach( (leg) => {
+            // the route
+            const route_feature = {
+              type: 'Feature',
+              properties: {
+                color: '#' + ('000000' + color.toString(16)).substr(-6),
+                opacity: 0.75,
+                weight: 5
+              },
+              geometry:{
+                type: 'LineString',
+                coordinates: decode(leg.shape, 1e6)
+              }
+            };
+
+            // the origin
+            const origin_feature = {
+              type: 'Feature',
+              properties: {
+                color: '#00bb00',
+                radius: 5,
+                fillOpacity: 0.75
+              },
+              geometry:{
+                type: 'Point',
+                coordinates: route_feature.geometry.coordinates[0]
+              }
+            }
+
+            // the destination
+            const destination_feature = {
+              type: 'Feature',
+              properties: {
+                color: '#bb0000',
+                radius: 5,
+                fillOpacity: 0.75
+              },
+              geometry:{
+                type: 'Point',
+                coordinates: route_feature.geometry.coordinates.slice(-1)[0]
+              }
+            };
+
+            fc.features.push(origin_feature);
+            fc.features.push(destination_feature);
+            fc.features.push(route_feature);
+          }); // legs
+
+          // alternates are lighter
+          color *= Math.floor(color_scale);
+          color_scale = 1;
+
+        }); // routes
+      }); // responses
+
+      //give back the feature collection
+      return fc;
+    }
+
+    function render(req_rep) {
+      const {requests, responses} = req_rep;
+      previous_geojson = geojson;
+      //turn the result into geojson
+      fc = build_geojson(responses)
+      //make a leaflet geojson object
+      geojson = L.geoJson(fc, {
+        style: (feature) => { return feature.properties; },
+        pointToLayer: (feature, ll) => { return new L.CircleMarker(ll, feature.properties); }
+      });
+      //clear the previous
+      if(previous_geojson != null) {
+        previous_geojson.removeFrom(map);
+      }
+      //disappear the input
+      inputs.forEach( (input) => {
+        input.removeFrom(map);
+      });
+      //render the geojson
+      var added = geojson.addTo(map);
+      //fit it in view
+      map.fitBounds(added.getBounds(), { maxZoom: 19 });
+      //update text box and anchor
+      document.getElementById('request_body').value = JSON.stringify(requests);
+      window.history.pushState(null, null, window.location.pathname + '#' + JSON.stringify(requests));
+    }
+
+
+    ///////////////////// EVENTS ////////////////////////
+
+    //build a location object for the request
+    map.on('click', (event) => {
+      //clear this if its not null
+      if(geojson != null) {
+        inputs = [];
+        geojson.removeFrom(map);
+        geojson = null;
+        document.getElementById('request_body').value = '{"costing":"auto"}';
+      }
+
+      //make the location
+      let body = document.getElementById('request_body').value;
+      try{
+        body = JSON.parse(body);
+      }
+      catch(e){
+        alert('Invalid Json Request');
+      }
+
+      if (!('locations'  in body)) {
+        body['locations'] = [];
+      }
+      body['locations'].push({ lat: event.latlng.lat, lon: event.latlng.lng });
+      document.getElementById('request_body').value = JSON.stringify(body);
+      window.history.pushState(null, null, window.location.pathname + '#' + JSON.stringify(body));
+
+      //mark where they clicked
+      input = new L.CircleMarker(event.latlng, { color: '#0000bb', radius: 5, fillOpacity: 0.75 });
+      input.addTo(map);
+      inputs.push(input);
+    });
+
+    //button press callback to fire off the request to the server and render the result
+    document.getElementById('route').onclick = async (event) => {
+      const results = await fetch(document.getElementById('request_body').value);
+      render(results);
+    };
+
+    //Check if we should initialize from anchor
+    $(document).ready(async () => {
+      //parse the anchor
+      const idx = window.location.href.indexOf("#");
+      if (idx == -1) {
+        return;
+      }
+      const url_encoded = window.location.href.substring(idx+1);
+      const url_decoded = decodeURIComponent(url_encoded);
+      const results = await fetch(url_decoded);
+      render(results);
+    });
+
+  </script>
+</body>
+</html>
