@@ -87,8 +87,21 @@ crossorigin=""></script>
 
       // for each response
       responses.forEach( (response) => {
+        // if you set an id that is a number thats less than 24 bits wide
+        // we can use that as a color
+        let chosen_color = null;
+        try {
+          chosen_color = parseInt(response.id, 16);
+          if (chosen_color > 16777215) {
+            chosen_color = null;
+          }
+        }
+        catch(e) {
+          chosen_color = null;
+        }
+
         // pick a main color and then each alternate will be lighter
-        let color = Math.floor(Math.random()*16777215*.5);
+        let color = chosen_color || Math.floor(Math.random()*16777215*.5);
         let color_scale = 1.5;
 
         // get the route geometry as linestirngs
