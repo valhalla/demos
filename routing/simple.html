@@ -105,9 +105,9 @@ crossorigin=""></script>
         let color_scale = 1.5;
 
         // get the route geometry as linestirngs
-        const routes = [response.trip].concat(response.alternates || []);
+        const routes = [response].concat(response.alternates || []);
         routes.forEach( (route) => {
-          route.legs.forEach( (leg) => {
+          route.trip.legs.forEach( (leg) => {
             // the route
             const route_feature = {
               type: 'Feature',
