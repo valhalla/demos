@@ -17,7 +17,7 @@ crossorigin=""></script>
   <div style="width:100%">
   <div style="float:left; width:75%">
 
-  <div id="map" style="height: 75vh"></div>
+  <div id="map" style="height: 72vh"></div>
 
   Tile Layer: <select id="tileurl">
     <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
@@ -34,6 +34,9 @@ crossorigin=""></script>
   </select></br>
  -->
   <!-- Valhalla Token: <input id="token" rows="1" cols="30" maxlength="256" wrap="hard" placeholder="Enter token."></input></br> -->
+
+  lat lng: <input type="text" id="latlng" value="51.24912, 0" size="20"/></br>
+    <!-- onchange=""  validate --> 
 
   Denoise: <input id="denoise" type="range" min="0" max="1" value="0" step="0.01" onchange="document.getElementById('denoise_text').value=this.value;" />
   <input type="text" id="denoise_text" value="0" maxlength="4" size="4" 
@@ -152,6 +155,7 @@ crossorigin=""></script>
 
     function onMapClick(e) {
       last_pos = e.latlng;
+      document.getElementById('latlng').value = `${e.latlng.lat.toFixed(6)},${e.latlng.lng.toFixed(6)}`
       getContours(e.latlng);
     }
 
@@ -206,6 +210,18 @@ crossorigin=""></script>
       baseLayer.setUrl(tileurl);
     }
 
+    function onCoordChanged() {
+      try {
+        var s = document.getElementById('latlng').value;
+        var values = s.split(',').map(i => parseFloat(i));
+        last_pos = {'lat': values[0], 'lng': values[1]};
+        onParametersChanged();
+      } catch (e) {
+        console.log(e);
+        // set text message to invalid coord
+      }
+    }
+
     //hook up the callback for the text box changing
     map.on('click', onMapClick);
 
@@ -216,6 +232,8 @@ crossorigin=""></script>
     ['denoise', 'generalize', 'costing', 'polygons_lines', 'contours'].forEach(
       element => document.getElementById(element).addEventListener('change', onParametersChanged)
     );
+    document.getElementById('latlng').addEventListener('change', onCoordChanged);
+
   </script>
 </body>
 </html>
