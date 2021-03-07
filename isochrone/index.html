@@ -74,8 +74,11 @@ crossorigin=""></script>
   </div>
 
   <script>
+    const initLocation = {lat: 51.24912, lng: 0};
+
+
     //make a map using osm tiles
-    var map = L.map('map').setView([51.24912, 0], 14);
+    var map = L.map('map').setView([initLocation.lat, initLocation.lng], 14);
     var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
@@ -145,35 +148,35 @@ crossorigin=""></script>
       }
     }
 
-    var coord = null;
 
-    function onParametersChanged() {
-      document.getElementById('latlng').value = `${coord.lat.toFixed(6)},${coord.lng.toFixed(6)}`
-      getContours(coord);
-    }
-
-    var marker = null;
-    function onMapClick(e) {
-      coord = e.latlng;
-
-      if (marker != null) {
-        map.removeLayer(marker);
-      }
-      marker = new L.marker(coord, {draggable:'true'});
+    function createMarker(latlng) {
+      var marker = new L.marker(latlng, {draggable:'true'});
       marker.on('dragend', event => {
-        coord = event.target.getLatLng()
-        onParametersChanged();
+        onLocationChanged(event.target.getLatLng());
       });
-      map.addLayer(marker);
+      return marker;
+    }
+    var coord = initLocation;
+    var marker = createMarker(initLocation);
+    map.addLayer(marker);
 
-      onParametersChanged();
+    function onLocationChanged(new_coord) {
+      coord = new_coord;
+      document.getElementById('latlng').value = `${coord.lat.toFixed(6)},${coord.lng.toFixed(6)}`;
+      getContours();
     }
 
-    function getContours(latlng) {
+    function onMapClick(e) {
+      const new_coord = e.latlng;
+      marker.setLatLng(new_coord, {draggable: 'true'});
+      onLocationChanged(new_coord);
+    }
+
+    function getContours() {
       //build url
       var url = 'http://localhost:8002/isochrone?json=';
       var json = {}
-      json['locations'] = [{"lat":latlng.lat, "lon":latlng.lng}];
+      json['locations'] = [{"lat":coord.lat, "lon":coord.lng}];
       json['costing'] = document.getElementById('costing').value;
       json['denoise'] = document.getElementById('denoise').value;
       json['generalize'] = document.getElementById('generalize').value;
@@ -220,30 +223,28 @@ crossorigin=""></script>
       baseLayer.setUrl(tileurl);
     }
 
-    function onCoordChanged() {
+    function onLatlngInputChanged() {
       try {
         var s = document.getElementById('latlng').value;
         var values = s.split(',').map(i => parseFloat(i));
         coord = {'lat': values[0], 'lng': values[1]};
-        onParametersChanged();
+        onMapClick({latlng: coord});
       } catch (e) {
         console.log(e);
-        // set text message to invalid coord
+        // TODO: show invalid-coord-message?
       }
     }
 
-    //hook up the callback for the text box changing
     map.on('click', onMapClick);
+    //hook up the callback for the text box changing
+    document.getElementById('latlng').addEventListener('change', onLatlngInputChanged);
+    ['denoise', 'generalize', 'costing', 'polygons_lines', 'contours'].forEach(
+      element => document.getElementById(element).addEventListener('change', getContours)
+    );
 
     //hook up the callback for the tile url changing
     document.getElementById('tileurl').addEventListener('change', onTileLayerChange);
     document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
-
-    ['denoise', 'generalize', 'costing', 'polygons_lines', 'contours'].forEach(
-      element => document.getElementById(element).addEventListener('change', onParametersChanged)
-    );
-    document.getElementById('latlng').addEventListener('change', onCoordChanged);
-
   </script>
 </body>
 </html>
