@@ -145,18 +145,28 @@ crossorigin=""></script>
       }
     }
 
-    var last_pos = null;
+    var coord = null;
 
     function onParametersChanged() {
-      if (last_pos != null) {
-        getContours(last_pos);
-      }
+      document.getElementById('latlng').value = `${coord.lat.toFixed(6)},${coord.lng.toFixed(6)}`
+      getContours(coord);
     }
 
+    var marker = null;
     function onMapClick(e) {
-      last_pos = e.latlng;
-      document.getElementById('latlng').value = `${e.latlng.lat.toFixed(6)},${e.latlng.lng.toFixed(6)}`
-      getContours(e.latlng);
+      coord = e.latlng;
+
+      if (marker != null) {
+        map.removeLayer(marker);
+      }
+      marker = new L.marker(coord, {draggable:'true'});
+      marker.on('dragend', event => {
+        coord = event.target.getLatLng()
+        onParametersChanged();
+      });
+      map.addLayer(marker);
+
+      onParametersChanged();
     }
 
     function getContours(latlng) {
@@ -214,7 +224,7 @@ crossorigin=""></script>
       try {
         var s = document.getElementById('latlng').value;
         var values = s.split(',').map(i => parseFloat(i));
-        last_pos = {'lat': values[0], 'lng': values[1]};
+        coord = {'lat': values[0], 'lng': values[1]};
         onParametersChanged();
       } catch (e) {
         console.log(e);
