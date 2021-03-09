@@ -4,39 +4,153 @@
   <title>Isochrones</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
 </head>
-<body>
-  <div id="map" style="width: 1440px; height: 960px"></div>
-  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+<body style="width:100%;height:100%">
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+crossorigin=""></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
+  <div style="width:100%">
+  <div style="float:left; width:75%">
+
+  <div id="map" style="height: 72vh"></div>
+
+  Tile Layer: <select id="tileurl">
+    <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+    <option id=mapbox value='https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.png'>Mapbox</option>
+  </select></br>
+  Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
+
+  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
+
+<!--   <select id="baseurl">
+    <option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
+    <option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
+    <option id=production value="https://api.mapbox.com/valhalla/v1/">production</option>
+  </select></br>
+ -->
+  <!-- Valhalla Token: <input id="token" rows="1" cols="30" maxlength="256" wrap="hard" placeholder="Enter token."></input></br> -->
+
+  lat lng: <input type="text" id="latlng" value="51.24912, 0" size="20"/></br>
+    <!-- onchange=""  validate --> 
+
+  Denoise: <input id="denoise" type="range" min="0" max="1" value="0" step="0.01" onchange="document.getElementById('denoise_text').value=this.value;" />
+  <input type="text" id="denoise_text" value="0" maxlength="4" size="4" 
+    onchange="this.value = Math.max(0, Math.min(this.value, 1)); document.getElementById('denoise').value=this.value;" 
+  /></br>
+
+  Generalize: <input id="generalize" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('generalize_text').value=this.value;" />
+  <input type="text" id="generalize_text" value="0" maxlength="4" size="4" 
+    onchange="this.value = Math.max(0, Math.min(this.value, 1000)); document.getElementById('generalize').value=this.value;" 
+  /></br>
+
+  Contour minutes: <select id="contours">
+    <option selected>10 min</option>
+    <option>20 min</option>
+    <option>30 min</option>
+    <option>10 min increments</option>
+    </select></br>
+
+
+  Polygons/lines: <select id="polygons_lines">
+    <option selected>polygons</option>
+    <option>lines</option>
+    </select></br>
+
+  Costing: <select id="costing">
+    <option selected>pedestrian</option>
+    <option>bicycle</option>
+    <option>auto</option>
+    </select></br>
+
+  </div>
+    <div id="sidebar" style="float:right; width:25%">
+      <pre id="properties"></pre>
+    </div>
+  </div>
+
   <script>
-    //make a map
-    var map = L.map('map').setView([40.4, -76.0], 13);
-    L.polyline([[41.21, 9.36], [41.24, 9.35], [41.23, 9.34]]).addTo(map).bindTooltip('Top tooltip following mouse', {sticky: true, direction: 'top'});
+    const initLocation = {lat: 51.24912, lng: 0};
+
+    //make a map using osm tiles
+    var map = L.map('map').setView([initLocation.lat, initLocation.lng], 14);
+    var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+    })
+    baseLayer.addTo(map);
+
     var geojson = null;
     var tooltips = [];
 
-    //use osm tiles
-    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-    }).addTo(map);
-    
-    //click callback
+    //fit the results in the map
+    // function fitResults(features) {
+    //   var coords = [];
+    //   features.forEach(function (feature) {
+    //     coords.push(feature.geometry.coordinates);
+    //   });
+    //   map.fitBounds(L.GeoJSON.coordsToLatLngs(coords), { maxZoom: 19 });
+    // }
+
+
+    function parseContour(s) {
+      try {
+        let range = n => [...Array(n).keys()]
+
+        const time = parseInt(s.split(' '));
+        var values = [];
+        if (s.includes('increments')) {
+          // [time, 2 * time, 3 * time, ...]
+          values = range(3).map(i => (i + 1) * time);
+        } else {
+          values = [time];
+        }
+
+        return values.map(t => Object.fromEntries([["time", t]]));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+
+    function createMarker(latlng) {
+      var marker = new L.marker(latlng, {draggable:'true'});
+      marker.on('dragend', event => {
+        onLocationChanged(event.target.getLatLng());
+      });
+      return marker;
+    }
+    var coord = initLocation;
+    var marker = createMarker(initLocation);
+    map.addLayer(marker);
+
+    function onLocationChanged(new_coord) {
+      coord = new_coord;
+      document.getElementById('latlng').value = `${coord.lat.toFixed(6)},${coord.lng.toFixed(6)}`;
+      getContours();
+    }
+
     function onMapClick(e) {
+      const new_coord = e.latlng;
+      marker.setLatLng(new_coord, {draggable: 'true'});
+      onLocationChanged(new_coord);
+    }
+
+    function getContours() {
       //build url
       var url = 'http://localhost:8002/isochrone?json=';
-      var json = {
-        locations: [{"lat":e.latlng.lat, "lon":e.latlng.lng}],
-        costing: "auto",
-        contours: [{"time":15},{"time":30},{"time":45},{"time":60}],
-        polygons: false,
-        denoise: .2,
-        generalize: 150
-      };
+      var json = {}
+      json['locations'] = [{"lat":coord.lat, "lon":coord.lng}];
+      json['costing'] = document.getElementById('costing').value;
+      json['denoise'] = document.getElementById('denoise').value;
+      json['generalize'] = document.getElementById('generalize').value;
+      json['contours'] =  parseContour(document.getElementById('contours').value);
+      json['polygons'] = document.getElementById('polygons_lines').value === 'polygons';
+
       url += escape(JSON.stringify(json));
       //grab the url
       $.getJSON(url,function(isochrones){
@@ -53,7 +167,6 @@
         geojson = L.geoJson(isochrones, {
           style: function(feature) { 
             return { opacity: feature.properties.opacity * 2,
-                     weight: 10,
                      color: feature.properties.color
                    };
           },
@@ -68,9 +181,39 @@
         geojson.addTo(map);
       })
     }
-    
-    //hook up the callback
+
+    function onTileLayerChange() {
+      var tileurl = document.getElementById('tileurl').value;
+      var token = document.getElementById('maptoken').value;
+      if (tileurl.includes('mapbox') && token) {
+        tileurl += '?access_token=' + token;
+      }
+      baseLayer.setUrl(tileurl);
+    }
+
+    function onLatLngInputChanged() {
+      try {
+        var s = document.getElementById('latlng').value;
+        var values = s.split(',').map(i => parseFloat(i));
+        coord = {'lat': values[0], 'lng': values[1]};
+        map.panTo(coord);
+        onMapClick({latlng: coord});
+      } catch (e) {
+        console.error(e);
+        // TODO: show invalid-coord-message?
+      }
+    }
+
     map.on('click', onMapClick);
+    //hook up the callback for the text box changing
+    document.getElementById('latlng').addEventListener('change', onLatLngInputChanged);
+    ['denoise', 'generalize', 'costing', 'polygons_lines', 'contours'].forEach(
+      element => document.getElementById(element).addEventListener('change', getContours)
+    );
+
+    //hook up the callback for the tile url changing
+    document.getElementById('tileurl').addEventListener('change', onTileLayerChange);
+    document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
   </script>
 </body>
 </html>
