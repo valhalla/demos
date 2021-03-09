@@ -228,6 +228,7 @@ crossorigin=""></script>
         var s = document.getElementById('latlng').value;
         var values = s.split(',').map(i => parseFloat(i));
         coord = {'lat': values[0], 'lng': values[1]};
+        map.panTo(coord);
         onMapClick({latlng: coord});
       } catch (e) {
         console.log(e);
