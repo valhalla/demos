@@ -76,7 +76,6 @@ crossorigin=""></script>
   <script>
     const initLocation = {lat: 51.24912, lng: 0};
 
-
     //make a map using osm tiles
     var map = L.map('map').setView([initLocation.lat, initLocation.lng], 14);
     var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -88,45 +87,14 @@ crossorigin=""></script>
     var geojson = null;
     var tooltips = [];
 
-    //update the properties
-    pretty = {
-      replacer: function(match, pIndent, pKey, pVal, pEnd) {
-        var key = '<span class=json-key>';
-        var num = '<span class=json-number>';
-        var str = '<span class=json-string>';
-        var con = '<span class=json-constant>';
-        var r = pIndent || '';
-        if (pKey)
-          r = r + key + pKey.replace(/: +$/g, '') + '</span>: ';
-        if (pVal) {
-          var which = pVal[0] == '"' ? str : (isNaN(pVal) ? num : con);
-          r = r + which + pVal + '</span>';
-        }
-        return r + (pEnd || '');
-      },
-      print: function(obj) {
-        var line = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{]|\[\],?|{},?)?$/mg;
-        var html = JSON.stringify(obj, null, 2)
-          .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
-          .replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        var y = html.replace(line, pretty.replacer);
-        return y;
-      }
-    };
-    function clickGroup(event) {
-      var printed = pretty.print(event.target.feature.properties.edges);
-      $('#properties').html(printed);
-      L.DomEvent.stopPropagation(event);
-    }
-
     //fit the results in the map
-    function fitResults(features) {
-      var coords = [];
-      features.forEach(function (feature) {
-        coords.push(feature.geometry.coordinates);
-      });
-      map.fitBounds(L.GeoJSON.coordsToLatLngs(coords), { maxZoom: 19 });
-    }
+    // function fitResults(features) {
+    //   var coords = [];
+    //   features.forEach(function (feature) {
+    //     coords.push(feature.geometry.coordinates);
+    //   });
+    //   map.fitBounds(L.GeoJSON.coordsToLatLngs(coords), { maxZoom: 19 });
+    // }
 
 
     function parseContour(s) {
@@ -223,7 +191,7 @@ crossorigin=""></script>
       baseLayer.setUrl(tileurl);
     }
 
-    function onLatlngInputChanged() {
+    function onLatLngInputChanged() {
       try {
         var s = document.getElementById('latlng').value;
         var values = s.split(',').map(i => parseFloat(i));
@@ -231,14 +199,14 @@ crossorigin=""></script>
         map.panTo(coord);
         onMapClick({latlng: coord});
       } catch (e) {
-        console.log(e);
+        console.error(e);
         // TODO: show invalid-coord-message?
       }
     }
 
     map.on('click', onMapClick);
     //hook up the callback for the text box changing
-    document.getElementById('latlng').addEventListener('change', onLatlngInputChanged);
+    document.getElementById('latlng').addEventListener('change', onLatLngInputChanged);
     ['denoise', 'generalize', 'costing', 'polygons_lines', 'contours'].forEach(
       element => document.getElementById(element).addEventListener('change', getContours)
     );
