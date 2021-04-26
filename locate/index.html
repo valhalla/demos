@@ -14,6 +14,7 @@
 integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
 crossorigin=""></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.0/polyline.min.js"></script>
 
   <div style="width:100%">
   <div style="float:left; width:75%">
@@ -21,7 +22,7 @@ crossorigin=""></script>
   <div id="map" style="height: 800px"></div>
 
   Tile Layer: <select id="tileurl">
-    <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+    <option id=osm selected="selected" value='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
     <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
   </select></br>
   Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
@@ -57,6 +58,8 @@ crossorigin=""></script>
 
   </div>
     <div id="sidebar" style="float:right; width:25%">
+      <input id="saerchquery" type="text" placeholder="lat,lon or word" style="width:60%; margin: 5px">
+      <button id="saerch">search</button>
       <pre id="properties"></pre>
     </div>
   </div>
@@ -95,9 +98,28 @@ crossorigin=""></script>
         return y;
       }
     };
+
+    var shapes = [];
     function clickGroup(event) {
-      var printed = pretty.print(event.target.feature.properties.edges);
+      var edges = event.target.feature.properties.edges;
+      // print properties
+      var printed = pretty.print(edges);
       $('#properties').html(printed);
+
+      // remove before add shape
+      if (shapes.length > 0) {
+        shapes.map(s=>{
+          s.removeFrom(map);
+        });
+        shapes = [];
+      }
+      // print shape
+      edges.map(edge=>{
+        var shape = L.geoJson(polyline.toGeoJSON(edge.edge_info.shape, 6));
+        shape.addTo(map);
+        shapes.push(shape);
+      });
+
       L.DomEvent.stopPropagation(event);
     }
 
@@ -235,9 +257,37 @@ crossorigin=""></script>
     //hook up the callback for the text box changing
     map.on('click', onMapClick);
 
+
+    // geocode and jump result point
+    $('#saerch').on('click', ()=>{
+      const query = $('#saerchquery').val();
+      if (query === '') {
+        return;
+      }
+      $.ajax({
+        type: 'GET',
+        url: 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURI(query),
+        dataType: 'jsonp',
+        jsonp: 'json_callback',
+      }).done((data) => {
+        if (data.length === 0) {
+          alert('no result search data.')
+        }
+
+        let e = {};
+        e.latlng = {
+          lat : data[0].lat,
+          lng : data[0].lon,
+        };
+        onMapClick(e);
+      });
+
+    });
+
     //hook up the callback for the tile url changing
     document.getElementById('tileurl').addEventListener('change', onTileLayerChange);
     document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
+
   </script>
 </body>
 </html>
