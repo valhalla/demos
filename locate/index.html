@@ -1,63 +1,73 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Locate</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-   crossorigin=""/>
-  <link rel="stylesheet" href="json.css" />
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+    crossorigin=""></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 </head>
+
 <body>
-   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-crossorigin=""></script>
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-
-  <div style="width:100%">
-  <div style="float:left; width:75%">
-
-  <div id="map" style="height: 800px"></div>
-
-  Tile Layer: <select id="tileurl">
-    <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
-    <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
-  </select></br>
-  Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
-
-  Base URL: <input id="baseurl" placeholder="http://localhost:8002/"></input></br>
-
-<!--   <select id="baseurl">
-    <option id=localhost selected="selected" value="http://localhost:8002/">localhost</option>
-    <option id=staging value="https://api-valhalla-route-staging.tilestream.net/valhalla/v1/">staging</option>
-    <option id=production value="https://valhalla1.openstreetmap.de/">production</option>
-  </select></br>
- -->
-  Valhalla Token: <input id="token" rows="1" cols="30" maxlength="256" wrap="hard" placeholder="Enter token."></input></br>
-  Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('radius_text').value=this.value;" />
-  <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
-  Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1" onchange="document.getElementById('reach_text').value=this.value;" />
-  <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
-  Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1" onchange="document.getElementById('heading_text').value=this.value;" />
-  <input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
-  Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1" onchange="document.getElementById('node_text').value=this.value;" />
-  <input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
-  Costing: <select id="costing">
-    <option selected>none</option>
-    <option>auto</option>
-    <option>pedestrian</option>
-    <option>bicycle</option>
-  </select></br>
-  Preferred Side: <select id="pref">
-    <option selected>either</option>
-    <option>same</option>
-    <option>opposite</option>
-  </select></br>
-
-  </div>
-    <div id="sidebar" style="float:right; width:25%">
+  <div id="container">
+    <div id="sidebar">
+      <div id="logo">
+        <img src="../routing/images/Valhalla.png" height="175" width="175" alt="Valhalla Logo">
+      </div>
       <pre id="properties"></pre>
+      Tile Layer: <select id="tileurl">
+        <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+        <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
+      </select></br>
+      Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
+
+      Base URL:
+
+      <select id="baseurl">
+        <option id=production selected="selected" value="https://valhalla1.openstreetmap.de/">production</option>
+        <option id=localhost value="http://localhost:8002/">localhost</option>
+      </select></br>
+
+      Valhalla Token: <input id="token" rows="1" cols="30" maxlength="256" wrap="hard"
+        placeholder="Enter token."></input></br>
+      Radius: <input id="radius" type="range" min="0" max="1000" value="0" step="1"
+        onchange="document.getElementById('radius_text').value=this.value;" />
+      <input type="text" id="radius_text" value="0" maxlength="4" size="4" /></br>
+      Reachibility: <input id="reach" type="range" min="0" max="1000" value="0" step="1"
+        onchange="document.getElementById('reach_text').value=this.value;" />
+      <input type="text" id="reach_text" value="0" maxlength="4" size="4" /></br>
+      Heading: <input id="heading" type="range" min="-1" max="359" value="-1" step="1"
+        onchange="document.getElementById('heading_text').value=this.value;" />
+      <input type="text" id="heading_text" value="-1" maxlength="4" size="4" /></br>
+      Node Tolerance: <input id="node" type="range" min="0" max="1000" value="5" step="1"
+        onchange="document.getElementById('node_text').value=this.value;" />
+      <input type="text" id="node_text" value="0" maxlength="4" size="4" /></br>
+      Costing: <select id="costing">
+        <option selected>none</option>
+        <option>auto</option>
+        <option>pedestrian</option>
+        <option>bicycle</option>
+      </select></br>
+      Preferred Side: <select id="pref">
+        <option selected>either</option>
+        <option>same</option>
+        <option>opposite</option>
+      </select></br>
+
+      <h5><b><a target="_blank" href='https://valhalla.github.io/valhalla/api/locate/api-reference/'>locate API
+            reference</a></b></h5>
+
+    </div>
+    <div id="map-container">
+      <div id="map"></div>
     </div>
   </div>
 
@@ -72,7 +82,7 @@ crossorigin=""></script>
 
     //update the properties
     pretty = {
-      replacer: function(match, pIndent, pKey, pVal, pEnd) {
+      replacer: function (match, pIndent, pKey, pVal, pEnd) {
         var key = '<span class=json-key>';
         var num = '<span class=json-number>';
         var str = '<span class=json-string>';
@@ -86,7 +96,7 @@ crossorigin=""></script>
         }
         return r + (pEnd || '');
       },
-      print: function(obj) {
+      print: function (obj) {
         var line = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{]|\[\],?|{},?)?$/mg;
         var html = JSON.stringify(obj, null, 2)
           .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
@@ -95,7 +105,7 @@ crossorigin=""></script>
         return y;
       }
     };
-    function clickGroup(event) {
+    function clickGroup (event) {
       var printed = pretty.print(event.target.feature.properties.edges);
       $('#properties').html(printed);
       L.DomEvent.stopPropagation(event);
@@ -103,7 +113,7 @@ crossorigin=""></script>
 
     //form the request url
     var input;
-    function build_url(ll) {
+    function build_url (ll) {
       var json = {
         locations: [{
           lat: ll.lat,
@@ -117,7 +127,7 @@ crossorigin=""></script>
         verbose: true
       };
       //remove negative heading
-      if(json.locations[0].heading < 0)
+      if (json.locations[0].heading < 0)
         delete json.locations[0].heading;
       //selectable base url
       var baseurl = document.getElementById('baseurl').value;
@@ -127,10 +137,10 @@ crossorigin=""></script>
       var token = document.getElementById('token').value;
       //optional costing
       var costing = document.getElementById('costing').value;
-      if(costing != 'none')
+      if (costing != 'none')
         json['costing'] = costing;
       //mark where they clicked
-      if(input != null)
+      if (input != null)
         input.removeFrom(map);
       input = new L.CircleMarker(ll, { color: '#99dd99', radius: 10, fillOpacity: 0.75 });
       input.on('click', function (event) {
@@ -141,20 +151,18 @@ crossorigin=""></script>
       input.addTo(map);
       //give back the string
       var url = baseurl + 'locate?json=' + escape(JSON.stringify(json));
-      if (token)
-        url += '&access_token=' + token;
       return url;
     }
 
     //convert the locate result into geojson
-    function build_geojson(result, ll) {
-      var fc = { type:'FeatureCollection', features: [] };
+    function build_geojson (result, ll) {
+      var fc = { type: 'FeatureCollection', features: [] };
       try {
         //group edges by lat lon
         var grouped_edges = {};
         result[0].edges.forEach(function (edge) {
           cll = JSON.stringify([edge.correlated_lon, edge.correlated_lat]);
-          if(cll in grouped_edges)
+          if (cll in grouped_edges)
             grouped_edges[cll].push(edge);
           else
             grouped_edges[cll] = [edge];
@@ -171,26 +179,26 @@ crossorigin=""></script>
           });
         });
         //update the properties panel with summary info
-        $('#properties').html(pretty.print({ result_count: Object.keys(grouped_edges).length }));
+        $('#properties').html(pretty.print(result));
       }//something went wrong likely the result was borked
-      catch(e) {
+      catch (e) {
         //show something in the properties panel
         $('#properties').html(pretty.print(result));
-        fc.features = [ {
+        fc.features = [{
           type: 'Feature',
           geometry: {
             type: 'Point',
             coordinates: [ll.lng, ll.lat]
           },
           properties: { 'error': result }
-        } ];
+        }];
       }
       //give back the feature collection
       return fc;
     }
 
     //fit the results in the map
-    function fitResults(features) {
+    function fitResults (features) {
       var coords = [];
       features.forEach(function (feature) {
         coords.push(feature.geometry.coordinates);
@@ -200,21 +208,21 @@ crossorigin=""></script>
 
     //map click callback
     var geojson = null;
-    function onMapClick(event) {
+    function onMapClick (event) {
       //update the map with the results
       var url = build_url(event.latlng);
       //grab the url
-      $.getJSON(url,function(result){
+      $.getJSON(url, function (result) {
         //clear this if its not null
-        if(geojson != null)
+        if (geojson != null)
           geojson.removeFrom(map);
         //turn the result into geojson
         located = build_geojson(result, event.latlng)
         //make a leaflet geojson object with style and click events per result
         geojson = L.geoJson(located, {
-          style: function(feature) { return { color: '#dd99dd' }; },
-          pointToLayer: function(feature, ll) { return new L.CircleMarker(ll, { radius: 5, fillOpacity: 0.75 }); },
-          onEachFeature: function(feature, layer) { layer.on('click', clickGroup) }
+          style: function (feature) { return { color: '#dd99dd' }; },
+          pointToLayer: function (feature, ll) { return new L.CircleMarker(ll, { radius: 5, fillOpacity: 0.75 }); },
+          onEachFeature: function (feature, layer) { layer.on('click', clickGroup) }
         });
         //render the geojson
         geojson.addTo(map);
@@ -223,7 +231,7 @@ crossorigin=""></script>
       });
     };
 
-    function onTileLayerChange() {
+    function onTileLayerChange () {
       var tileurl = document.getElementById('tileurl').value;
       var token = document.getElementById('maptoken').value;
       if (tileurl.includes('mapbox') && token) {
@@ -240,4 +248,5 @@ crossorigin=""></script>
     document.getElementById('maptoken').addEventListener('change', onTileLayerChange);
   </script>
 </body>
+
 </html>

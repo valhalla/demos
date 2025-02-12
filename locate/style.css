@@ -1,0 +1,73 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 100%;
+  height: 100%;
+  color: #383a3a;
+  min-height: 600px;
+  padding: 0;
+  margin: 0;
+}
+
+#container {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+#map-container {
+  height: 100%;
+  flex-grow: 1;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+#sidebar {
+  height: 100%;
+  padding: 10px;
+  overflow: scroll;
+  width: 25%;
+}
+
+#logo {
+  text-align: center;
+}
+
+#properties {
+  max-height: 50vh;
+  overflow: scroll;
+}
+
+pre {
+  background-color: ghostwhite;
+  border: 1px solid silver;
+  padding: 5px 5px;
+  margin: 5px;
+}
+
+.json-key {
+  color: brown;
+}
+
+.json-number {
+  color: darkgreen;
+}
+
+.json-string {
+  color: brown;
+}
+
+.json-constant {
+  color: navy;
+}

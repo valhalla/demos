@@ -1,10 +1,9 @@
 var app = angular.module('elevation', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
-serviceUrl = server.local;
+serviceUrl = server.prod;
 token = prodToken;
 
-//??
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
     'center' : {
@@ -85,7 +84,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
     var slider = document.getElementById('resample_distance');
     slider.min = low;
     slider.max = high;  
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>';
+    document.getElementById('sampling_text').innerHTML = 'Sampling Distance: ' + slider.value + 'm';
     return slider.value;
   };
   
@@ -218,7 +217,7 @@ app.controller('ElevationController', function($scope, $rootScope, $sce, $http) 
   });
   $("#resample_distance").on("input", function() {
     var slider = document.getElementById('resample_distance');
-    document.getElementById('sampling_text').innerHTML = '<h5>Sampling Distance: ' + slider.value + 'm</h5>'
+    document.getElementById('sampling_text').innerHTML = 'Sampling Distance: ' + slider.value + 'm'
   });
 
   // Resize graph when viewport changes
