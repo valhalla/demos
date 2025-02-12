@@ -2,66 +2,49 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="stylesheet" href="https://unpkg.com/bootstrap@3.4.1/dist/css/bootstrap.min.css" />
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@0.7.7/dist/leaflet.css" />
   <link rel="stylesheet" href="css/classic.css" />
   <link rel="stylesheet" href="css/leaflet.label.css" />
   <link rel="stylesheet" href="css/matrix.css" />
-  <link rel="stylesheet" href="https://unpkg.com/nextzen.js@1.0.0/dist/nextzen.standalone.css">
   <script src="conf/env.conf"></script>
-  <!-- Main tangram library -->
-  <script type="text/javascript" src="https://unpkg.com/tangram@0.22.0/dist/tangram.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/jquery@1.12.4/dist/jquery.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/angular@1.8.3/angular.min.js"></script>
-  <script src="js/jquery.columns.min.js"></script>
 </head>
 
 <body>
-
-  <div class="container-fluid row" ng-controller="MatrixController">
+  <div id="container" ng-controller="MatrixController">
     <div id="controls" class="control-container">
       <img src="../routing/images/Valhalla.png" height="175" width="175" alt="Valhalla Logo">
       <!---------control view ------>
       <div ng-hide="appView == 'matrixTable'" class="not-table ng-hide">
-        <div class="matrixWrapper">
-          <div class="{{startPoints.length != 0 ? 'block ' : ''}}matrixBlocker"></div>
-          <h4 class="instruction"> 1. Select a matrix type </h4>
-          <button id="one_to_many" ng-click="oneToManyClick()"
-            class="{{matrixType == 'one_to_many' ? 'selected' : ''}} stitched" type="button">One-to-Many</button>
-          <button id="many_to_one" ng-click="manyToOneClick()"
-            class="{{matrixType == 'many_to_one' ? 'selected' : ''}} stitched" type="button">Many-to-One</button>
-          <button id="many_to_many" ng-click="manyToManyClick()"
-            class="{{matrixType == 'many_to_many' ? 'selected' : ''}} stitched" type="button">Many-to-Many</button>
-        </div>
-
-        <div class="startPointsWrapper">
+        <div class="matrixResultWrapper">
           <div class="start" id="start" name="start">
-            <h4 class="instruction"> 2. Add start point(s) </h4>
+            <h4 class="instruction"> 2. Add source(s) </h4>
             <ol>
               <li id="startpt" ng-repeat="point in startPoints">
-                <div class="start marker">{{point.index}}</div>
-                <span class="geocode"> {{point.latlon}} </span>
+                <div class="start marker">{{ $index}}</div>
+                <span class="geocode"> {{ point.lat }}, {{ point.lon }}</span>
               </li>
               <li ng-hide="startPoints.length != 0">
                 <div class="start marker"></div>
                 <span class="placeholder geocode"> <i>{{startgeocode}}</i></span>
               </li>
             </ol>
-            <div class="start_mapInstruction"> {{start_mapInstruction}} </div>
-            <button ng-show="matrixType == 'many_to_one'&&editingFocus == 'start_points'" ng-click="goToEndPoints()"
-              class="done"> Next &gt; </button>
+            <button ng-show="editingFocus == 'start_points'" ng-click="goToEndPoints()" class="done"> Next &gt;
+            </button>
           </div>
-          <div ng-show="matrixType == ''||editingFocus=='end_points'" class="block pointsBlocker"></div>
+          <div ng-show="editingFocus=='end_points'" class="block pointsBlocker"></div>
           <!--<div class = "{{editingFocus == 'start' ? '' : 'block'}} pointsBlocker"></div>-->
         </div>
 
-        <div ng-hide="matrixType == 'many_to_many'" class="endPointsWrapper">
+        <div class="endPointsWrapper">
           <div class="end" id="end" name="end">
-            <h4 class="instruction"> 3. Add end point(s) </h4>
+            <h4 class="instruction"> 3. Add target(s) </h4>
             <ol>
               <li ng-repeat="point in endPoints">
-                <div class="end marker">{{point.index}}</div>
-                <span class="geocode"> {{point.latlon}}</span>
+                <div class="end marker">{{ $index}}</div>
+                <span class="geocode"> {{ point.lat }}, {{ point.lon }}</span>
               </li>
               <li ng-hide="endPoints.length != 0">
                 <div class="end marker"></div>
@@ -70,7 +53,7 @@
             </ol>
             <div class="end_mapInstruction"> {{end_mapInstruction}} </div>
           </div>
-          <div ng-show="matrixType == ''||editingFocus=='start_points'" class="block pointsBlocker"></div>
+          <div ng-show="editingFocus=='start_points'" class="block pointsBlocker"></div>
         </div>
 
         <div class="btnWrapper">
@@ -88,52 +71,52 @@
           </div>
         </div>
       </div>
-      <h5><b><a target="_blank" href='https://valhalla.github.io/valhalla/api/matrix/api-reference/'>Time-Distance
-            Matrix API reference</a></b></h5>
-      <!---------table view ------>
+      <h5><b><a target="_blank" href='https://valhalla.github.io/valhalla/api/matrix/api-reference/'>
+            Time-Distance Matrix API reference
+          </a></b></h5>
       <div ng-hide="appView == 'control'" class="tableView ng-hide">
-        <button class="plain" ng-click="backToControlView()"> &lt; Back</button>
-        <div id="columns"></div>
+        <table id="matrix-result-table">
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>To</th>
+              <th>Time (secs)</th>
+              <th>Distance (km)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in matrixResult">
+              <td style="background-color: #000; color: #fff;">{{ row.from_index }}</td>
+              <td style="background-color: #68c175; color: #fff;">{{ row.to_index }}</td>
+              <td>{{ row.time }}</td>
+              <td>{{ row.distance }}</td>
+            </tr>
+          </tbody>
+        </table>
         <div class="routingBtns">
-          <button class="btnMatrix" s ng-click="clearAll()"> start over </button>
+          <button class="plain" ng-click="backToControlView()"> &lt; Back</button>
+          <button class="btnMatrix" ng-click="clearAll()"> start over </button>
         </div>
-        <div id="matrixResponse" style="display:inline-block;">JSON Matrix Response Link</div>
+        <a id="matrixResponseLink" style="display:inline-block;">JSON Matrix Response Link</a>
       </div>
     </div>
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
 
-    <div id="map"></div>
+  <script type="text/javascript" src="https://unpkg.com/leaflet@0.7.7/dist/leaflet.js"></script>
+  <script src="js/leaflet.label.js"></script>
+  <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
+  <script type="text/javascript" src="js/matrix.js"></script>
 
-    <script type="text/javascript" src="https://unpkg.com/leaflet@0.7.7/dist/leaflet.js"></script>
-    <script src="js/leaflet.label.js"></script>
-    <script src='../routing/dist/leaflet-routing-machine.js'></script>
-    <script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
-
-    <script type="text/javascript" src="js/matrix.js"></script>
-    <script type="text/javascript" src="js/L.Matrix.Widget.js"></script>
-    <script type="text/javascript" src="../routing/js/locate/L.Locate.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/nextzen.js@1.0.0/dist/nextzen.standalone.js"></script>
-
-    <script>
-      var defaultMode = 'auto';
-      var road = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-      });
-      var cycle = L.tileLayer('http://b.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
-        attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest, </a>;Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-      });
-      var outdoors = L.tileLayer('https://b.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=f8f13e0070864ac3ad996f7bf7beb9af', {
-        attribution: 'Maps &copy; <a href="https://www.thunderforest.com">Thunderforest</a> | Data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-      });
-      var defaultlayer = road;
-    </script>
-
-    <script type="text/javascript">
-      // Apply special root-element class for iframed demo situations
-      if (window.self !== window.top) {
-        document.documentElement.className += ' is-iframed-demo';
-      }
-      window.addEventListener("hashchange", function () { parent.postMessage(window.location.hash, "*") });
-    </script>
+  <script type="text/javascript">
+    // Apply special root-element class for iframed demo situations
+    if (window.self !== window.top) {
+      document.documentElement.className += ' is-iframed-demo';
+    }
+    window.addEventListener("hashchange", function () { parent.postMessage(window.location.hash, "*") });
+  </script>
 </body>
 
 </html>
