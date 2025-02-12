@@ -1,32 +1,8 @@
 var app = angular.module('matrix', []);
 var hash_params = L.Hash.parseHash(location.hash);
 
-var serviceUrl = "https://matrix.mapzen.com/";
-var envServer = "production";
-var envToken = accessToken.prod;
+var envToken = "";
 var sentManyToManyEnd = false;
-
-function selectEnv() {
-  $("option:selected").each(function() {
-    envServer = $(this).text();
-    serviceUrl = document.getElementById(envServer).value;
-    getEnvToken();
-  });
-}
-
-function getEnvToken() {
-  switch (envServer) {
-  case "localhost":
-    envToken = accessToken.local;
-    break;
-  case "development":
-    envToken = accessToken.dev;
-    break;
-  case "production":
-    envToken = accessToken.prod;
-    break;
-  }
-}
 
 app.run(function($rootScope) {
   var hash_loc = hash_params ? hash_params : {
@@ -56,13 +32,11 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   var baseLayers = {
     "Road" : road,
     "Cycle" : cycle,
-    "Outdoors" : outdoors,
-    "Zinc (Mapzen)" : zinc
+    "Outdoors" : outdoors
   };
 
   var manhattan = [40.7510, -73.9783];
-  L.Mapzen.apiKey = 'valhalla-UdVXVeg';
-  var map = L.Mapzen.map('map', {
+  var map = L.Nextzen.map('map', {
     zoom : $rootScope.geobase.zoom,
     zoomControl : true,
     tangramOptions: defaultlayer,
@@ -80,7 +54,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     layers: 'coarse'
   };
 
-  L.control.geocoder('search-8LtGSDw', options).addTo(map);
   L.control.layers(baseLayers, null).addTo(map);
 
   // If iframed, we're going to have to disable some of the touch interaction
@@ -128,37 +101,35 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   });
 
   $rootScope.$on('map.dropOriginMarker', function(ev, geo, locCount) {
-
-      var marker = new L.marker(geo, {
-          icon : getOriginIcon()
-          }).bindLabel((locCount).toString(), (locCount < 10) ? {
-          position: [geo.lat,geo.lon],
-          noHide: true,
-          offset: [-9,-12]
-          } : {
-          position: [geo.lat,geo.lon],
-          noHide: true,
-          offset: [-12,-12]
-          }
-        );
+    var marker = new L.marker(geo, {
+        icon : getOriginIcon()
+        }).bindLabel((locCount).toString(), (locCount < 10) ? {
+        position: [geo.lat,geo.lon],
+        noHide: true,
+        offset: [-9,-12]
+        } : {
+        position: [geo.lat,geo.lon],
+        noHide: true,
+        offset: [-12,-12]
+        }
+      );
     map.addLayer(marker);
     markers.push(marker);
   });
 
   $rootScope.$on('map.dropDestMarker', function(ev, geo, locCount) {
-
-      var marker = new L.marker(geo, {
-        icon : getDestinationIcon()
-      }).bindLabel((locCount).toString(), (locCount < 10) ? {
-        position: [geo.lat,geo.lon],
-        noHide: true,
-        offset: [-9,-12]
-      } : {
-        position: [geo.lat,geo.lon],
-        noHide: true,
-        offset: [-13,-12]
-        }
-      );  
+    var marker = new L.marker(geo, {
+      icon : getDestinationIcon()
+    }).bindLabel((locCount).toString(), (locCount < 10) ? {
+      position: [geo.lat,geo.lon],
+      noHide: true,
+      offset: [-9,-12]
+    } : {
+      position: [geo.lat,geo.lon],
+      noHide: true,
+      offset: [-13,-12]
+      }
+    );  
     map.addLayer(marker);
     markers.push(marker);
   });
@@ -226,7 +197,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.end_mapInstruction = " Click on the map to add points";
     $scope.startgeocode = "lat, long";
     $scope.endgeocode = "lat, long";
-    getEnvToken();
   }
 
   $scope.manyToOneClick = function(e) {
@@ -234,14 +204,12 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     reset_form();
     $scope.start_mapInstruction = " Click on the map to add points";
     $scope.end_mapInstruction = " Click on the map to add a point";
-    getEnvToken();
   };
 
   $scope.manyToManyClick = function(e) {
     $scope.matrixType = "many_to_many";
     reset_form();
     $scope.start_mapInstruction = " Click on the map to add points";
-    getEnvToken();
   };
 
   matrixBtn.addEventListener('click', function(e) {
@@ -252,7 +220,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
 
-    selectEnv();
     var  matrix = L.Matrix.widget(envToken, $scope.mode, $scope.matrixType);
     matrix.matrix({
       waypoints : waypoints
@@ -261,7 +228,7 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     $scope.$apply();
   });
 
-//locate edge snap markers
+  //locate edge snap markers
   var locateEdgeMarkers = function (locate_result) {
     // clear it
     locateMarkers.forEach(function (element, index, array) {
@@ -299,8 +266,6 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
   };
 
   var counterText = 0;
-
-
 
   function chooseLocations() {
     map.on('click', function(e) {
@@ -372,15 +337,15 @@ app.controller('MatrixController', function($scope, $rootScope, $sce, $http) {
     }
     });
   };
-    // ask the service for information about this location
-    map.on("contextmenu", function(e) {
-      var ll = {
-        lat : e.latlng.lat,
-        lon : e.latlng.lng
-      };
-      getEnvToken();
-      var locate = L.locate(envToken);
-      locate.locate(ll, locateEdgeMarkers);
-    });
 
-})
+  // ask the service for information about this location
+  map.on("contextmenu", function(e) {
+    var ll = {
+      lat : e.latlng.lat,
+      lon : e.latlng.lng
+    };
+    var locate = L.locate(envToken);
+    locate.locate(ll, locateEdgeMarkers);
+  });
+
+});
