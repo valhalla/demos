@@ -1,107 +1,305 @@
-<html class="optimized_route-widget" data-ng-app="optimized_route">
+<!DOCTYPE html>
+<html>
+
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
-  <link rel="stylesheet" href="../routing/css/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="css/classic.css" />
-  <link rel="stylesheet" href="css/leaflet.label.css" />
-  <link rel="stylesheet" href="../routing/css/valhalla.css" />
-  <link rel="stylesheet" href="css/optimized_route.css" />
+  <script src="https://unpkg.com/@mapbox/polyline@1.1.1/src/polyline.js"></script>
+  <script src="https://unpkg.com/@turf/turf@7.2.0/turf.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@^5.1.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@mapbox/mapbox-gl-draw@1.4.3/dist/mapbox-gl-draw.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^5.1.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <link href="https://unpkg.com/@mapbox/mapbox-gl-draw@1.4.3/dist/mapbox-gl-draw.css" rel="stylesheet" />
 
-  <script src="conf/env.conf"></script>
-  <!-- Main tangram library -->
-  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-  <script src="js/jquery.columns.min.js"></script>
+  <link href="style.css" rel="stylesheet" />
+  <script src="main.js"></script>
 </head>
+
 <body>
-
-<div class="container-fluid row" ng-controller="OptimizedRouteController">
-  <div id="controls" class = "control-container">
-    <img src="../routing/images/turnbyturnlogo.png" alt="logo">
-    <!---------control view ------>
-    <div ng-hide="appView == 'tspTable'" class = "not-table ng-hide">
-      <div class = "btnWrapper">
-          <div class = "routingBtns">
-              <div class="vehicleBox" id="vehicleoptions">
-                  <button ng-click="setMode('auto')" name="auto"
-                          class = "{{mode == 'auto' ? 'active ' : ''}}vehicle auto"> </button>
-
-                  <button ng-click="setMode('bicycle')" name="bike"
-                          class = "{{mode == 'bicycle' ? 'active ' : ''}}vehicle bike"> </button>
-
-                  <button ng-click="setMode('pedestrian')" name="pedestrian"
-                          class = "{{mode == 'pedestrian' ? 'active ' : ''}}vehicle pedestrian"> </button>
-              </div>
-              <button ng-click="clearAll()" class="plain" id="clear_btn" type="button">Clear All</button>
-          </div>
+  <div class="container">
+    <div id="controls" class="control-container">
+      <img src="../routing/images/Valhalla.png" height="175" width="175" alt="Valhalla Logo">
+      <div class="vehicleBox" id="vehicleoptions">
+        <button onclick="setMode('auto')" name="auto" class="vehicle auto active"></button>
+        <button onclick="setMode('bicycle')" name="bicycle" class="vehicle bike"></button>
+        <button onclick="setMode('pedestrian')" name="pedestrian" class="vehicle pedestrian"></button>
       </div>
 
       <div class="endPointsWrapper">
-          <h4 class="instruction"> Options </h4>
-          <p>Radius: <input type="text" id="radius" value=""/></p>
+        <h4 class="instruction">Options</h4>
+        <p>Radius: <input type="number" id="radius" value="25" minimum="1" maximum="100" /></p>
       </div>
 
       <div class="geojsonWrapper">
-          <h4 class="instruction"> GeoJSON </h4>
-          <textarea id="geojson" name="geojson" cols="40" rows="5"></textarea>
-          <input id="geojson_match" type="button" value="Match">
-      </div>
-
-      <div class = "endPointsWrapper">
-        <div class="end" id="end" name="end">
-          <h4 class="instruction"> Locations </h4>
-          <ol>
-            <li ng-repeat="point in endPoints">
-              <div class = "end marker">{{point.index}}</div>
-              <span class = "geocode"> {{point.latlon}}</span>
-            </li>
-            <li ng-hide="endPoints.length != 0">
-              <div class = "end marker"></div>
-              <span class = "placeholder geocode"> <i>{{endgeocode}}</i></span>
-            </li>
-          </ol>
-          <div class="end_mapInstruction"> {{end_mapInstruction}} </div>
-        </div>
-        <div ng-show = "matrixType == ''||editingFocus=='start_points'" class = "block pointsBlocker"></div>
+        <h4 class="instruction">GeoJSON</h4>
+        <textarea id="geojson" name="geojson" cols="40" rows="5">
+{
+  "type": "LineString",
+  "coordinates": [
+    [-122.419700, 37.807744],
+    [-122.419755, 37.807744],
+    [-122.419817, 37.807745],
+    [-122.419878, 37.807741],
+    [-122.419939, 37.807736],
+    [-122.419997, 37.807739],
+    [-122.420048, 37.807745],
+    [-122.420100, 37.807745],
+    [-122.420151, 37.807744],
+    [-122.420203, 37.807730],
+    [-122.420256, 37.807711],
+    [-122.420310, 37.807691],
+    [-122.420339, 37.807673],
+    [-122.420369, 37.807657],
+    [-122.420426, 37.807629],
+    [-122.420456, 37.807614],
+    [-122.420509, 37.807586],
+    [-122.420565, 37.807563],
+    [-122.420631, 37.807553],
+    [-122.420690, 37.807541],
+    [-122.420721, 37.807517],
+    [-122.420735, 37.807486],
+    [-122.420732, 37.807452],
+    [-122.420715, 37.807418],
+    [-122.420690, 37.807387],
+    [-122.420680, 37.807356],
+    [-122.420666, 37.807320],
+    [-122.420655, 37.807279],
+    [-122.420667, 37.807238],
+    [-122.420676, 37.807201],
+    [-122.420663, 37.807162],
+    [-122.420654, 37.807119],
+    [-122.420653, 37.807078],
+    [-122.420639, 37.807043],
+    [-122.420628, 37.807007],
+    [-122.420620, 37.806973],
+    [-122.420615, 37.806936],
+    [-122.420625, 37.806897],
+    [-122.420633, 37.806858],
+    [-122.420646, 37.806819],
+    [-122.420667, 37.806782],
+    [-122.420700, 37.806757],
+    [-122.420755, 37.806757],
+    [-122.420826, 37.806742],
+    [-122.420860, 37.806732],
+    [-122.420921, 37.806717],
+    [-122.420982, 37.806700],
+    [-122.421040, 37.806680],
+    [-122.421106, 37.806669],
+    [-122.421140, 37.806664],
+    [-122.421202, 37.806655],
+    [-122.421263, 37.806641],
+    [-122.421315, 37.806630],
+    [-122.421371, 37.806619],
+    [-122.421430, 37.806612],
+    [-122.421495, 37.806602],
+    [-122.421561, 37.806598],
+    [-122.421625, 37.806594],
+    [-122.421692, 37.806585],
+    [-122.421753, 37.806568],
+    [-122.421786, 37.806554],
+    [-122.421825, 37.806545],
+    [-122.421860, 37.806539],
+    [-122.421898, 37.806536],
+    [-122.421933, 37.806535],
+    [-122.421967, 37.806531],
+    [-122.422001, 37.806522],
+    [-122.422034, 37.806512],
+    [-122.422086, 37.806491],
+    [-122.422136, 37.806472],
+    [-122.422194, 37.806449],
+    [-122.422258, 37.806436],
+    [-122.422317, 37.806436],
+    [-122.422377, 37.806452],
+    [-122.422436, 37.806453],
+    [-122.422474, 37.806452],
+    [-122.422539, 37.806447],
+    [-122.422595, 37.806444],
+    [-122.422637, 37.806430],
+    [-122.422682, 37.806419],
+    [-122.422723, 37.806407],
+    [-122.422767, 37.806394],
+    [-122.422813, 37.806377],
+    [-122.422862, 37.806363],
+    [-122.422927, 37.806343],
+    [-122.422963, 37.806338],
+    [-122.422998, 37.806337],
+    [-122.423034, 37.806332],
+    [-122.423071, 37.806329],
+    [-122.423108, 37.806326],
+    [-122.423145, 37.806324],
+    [-122.423192, 37.806328],
+    [-122.423232, 37.806332],
+    [-122.423269, 37.806334],
+    [-122.423333, 37.806332],
+    [-122.423398, 37.806324],
+    [-122.423462, 37.806314],
+    [-122.423515, 37.806303],
+    [-122.423575, 37.806289],
+    [-122.423629, 37.806272],
+    [-122.423684, 37.806250],
+    [-122.423747, 37.806236],
+    [-122.423806, 37.806213],
+    [-122.423862, 37.806213],
+    [-122.423898, 37.806191],
+    [-122.423877, 37.806169],
+    [-122.423877, 37.806142],
+    [-122.423876, 37.806101],
+    [-122.423870, 37.806053],
+    [-122.423869, 37.806010],
+    [-122.423868, 37.805966],
+    [-122.423860, 37.805927],
+    [-122.423849, 37.805892],
+    [-122.423831, 37.805859],
+    [-122.423822, 37.805822],
+    [-122.423817, 37.805785],
+    [-122.423823, 37.805752],
+    [-122.423818, 37.805718],
+    [-122.423797, 37.805684],
+    [-122.423769, 37.805650],
+    [-122.423747, 37.805619],
+    [-122.423733, 37.805594],
+    [-122.423716, 37.805569],
+    [-122.423697, 37.805535],
+    [-122.423678, 37.805505],
+    [-122.423670, 37.805473],
+    [-122.423672, 37.805445],
+    [-122.423691, 37.805416],
+    [-122.423740, 37.805403],
+    [-122.423800, 37.805399],
+    [-122.423867, 37.805386],
+    [-122.423901, 37.805378],
+    [-122.423963, 37.805358],
+    [-122.424015, 37.805338],
+    [-122.424060, 37.805320],
+    [-122.424100, 37.805302],
+    [-122.424138, 37.805291],
+    [-122.424175, 37.805296],
+    [-122.424224, 37.805309],
+    [-122.424271, 37.805313],
+    [-122.424313, 37.805316],
+    [-122.424351, 37.805312],
+    [-122.424386, 37.805302],
+    [-122.424421, 37.805304],
+    [-122.424456, 37.805308],
+    [-122.424495, 37.805304],
+    [-122.424520, 37.805276],
+    [-122.424558, 37.805263],
+    [-122.424599, 37.805251],
+    [-122.424647, 37.805251],
+    [-122.424685, 37.805251],
+    [-122.424725, 37.805256],
+    [-122.424768, 37.805247],
+    [-122.424813, 37.805234],
+    [-122.424853, 37.805222],
+    [-122.424911, 37.805202],
+    [-122.424968, 37.805199],
+    [-122.425025, 37.805192],
+    [-122.425057, 37.805195],
+    [-122.425109, 37.805209],
+    [-122.425175, 37.805222],
+    [-122.425273, 37.805216],
+    [-122.425329, 37.805192],
+    [-122.425386, 37.805167],
+    [-122.425445, 37.805114],
+    [-122.425417, 37.805039],
+    [-122.425373, 37.804995],
+    [-122.425395, 37.804958],
+    [-122.425405, 37.804915],
+    [-122.425399, 37.804867],
+    [-122.425381, 37.804822],
+    [-122.425371, 37.804777],
+    [-122.425356, 37.804739],
+    [-122.425350, 37.804702],
+    [-122.425350, 37.804668],
+    [-122.425334, 37.804629],
+    [-122.425321, 37.804581],
+    [-122.425322, 37.804553],
+    [-122.425322, 37.804500],
+    [-122.425312, 37.804449],
+    [-122.425311, 37.804421],
+    [-122.425309, 37.804395],
+    [-122.425304, 37.804351],
+    [-122.425295, 37.804319],
+    [-122.425305, 37.804289],
+    [-122.425339, 37.804261],
+    [-122.425378, 37.804231],
+    [-122.425427, 37.804209],
+    [-122.425475, 37.804193],
+    [-122.425523, 37.804176],
+    [-122.425567, 37.804164],
+    [-122.425608, 37.804151],
+    [-122.425659, 37.804139],
+    [-122.425706, 37.804117],
+    [-122.425774, 37.804093],
+    [-122.425828, 37.804072],
+    [-122.425890, 37.804057],
+    [-122.425923, 37.804049],
+    [-122.425984, 37.804027],
+    [-122.426019, 37.804023],
+    [-122.426057, 37.804021],
+    [-122.426091, 37.804015],
+    [-122.426125, 37.804006],
+    [-122.426160, 37.803999],
+    [-122.426194, 37.803995],
+    [-122.426228, 37.803989],
+    [-122.426262, 37.803984],
+    [-122.426299, 37.803979],
+    [-122.426335, 37.803973],
+    [-122.426369, 37.803965],
+    [-122.426389, 37.803950],
+    [-122.426444, 37.803932],
+    [-122.426480, 37.803911],
+    [-122.426590, 37.803879],
+    [-122.426680, 37.803859],
+    [-122.426752, 37.803846],
+    [-122.426853, 37.803852],
+    [-122.426945, 37.803872],
+    [-122.426987, 37.803906],
+    [-122.427017, 37.803915],
+    [-122.427052, 37.803918],
+    [-122.427083, 37.803922],
+    [-122.427118, 37.803906],
+    [-122.427152, 37.803892],
+    [-122.427189, 37.803880],
+    [-122.427224, 37.803874],
+    [-122.427258, 37.803868],
+    [-122.427287, 37.803855],
+    [-122.427350, 37.803847],
+    [-122.427383, 37.803855],
+    [-122.427450, 37.803864],
+    [-122.427485, 37.803861],
+    [-122.427550, 37.803860],
+    [-122.427579, 37.803844],
+    [-122.427607, 37.803822],
+    [-122.427635, 37.803799],
+    [-122.427662, 37.803776],
+    [-122.427689, 37.803754],
+    [-122.427718, 37.803736],
+    [-122.427743, 37.803717],
+    [-122.427798, 37.803688],
+    [-122.427866, 37.803675],
+    [-122.427900, 37.803670],
+    [-122.427935, 37.803664],
+    [-122.428001, 37.803656],
+    [-122.428069, 37.803647],
+    [-122.428132, 37.803643],
+    [-122.428186, 37.803633],
+    [-122.428249, 37.803643],
+    [-122.428283, 37.803653],
+    [-122.428316, 37.803666],
+    [-122.428380, 37.803685],
+    [-122.428416, 37.803694]
+  ]
+}
+        </textarea>
+        <input type="button" value="Match" onclick="geojsonMatch()" />
       </div>
     </div>
 
-    <!---------table view ------>
-    <div ng-hide="appView == 'control'" class = "tableView ng-hide">
-      <button class = "plain" ng-click="backToControlView()"> &lt; Back</button>
-      <div id="columns"></div>
-      <div class="routingBtns">
-        <button  class="btnMatrix"s ng-click="clearAll()"> start over </button>
-      </div>
-      <div id='permalink' style='display:inline-block;'></div><br>
-      <div id="optimized_routeResponse" style="display:inline-block;">JSON Optimized Route Response Link</div>
+    <div id="map-container">
+      <div id="map"></div>
     </div>
   </div>
-  <div id="route_inst" ng-bind-html="renderHtml(route_instructions)"></div>
-  <div id="map"></div>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-<script type="text/javascript" src="../routing/js/leaflet-hash.js"></script>
-
-<script src="../matrix/js/leaflet.label.js"></script>
-<script type="text/javascript" src="js/map_matching.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
-<script src='../routing/dist/leaflet-routing-machine.js'></script>
-<script src='../routing/dist/lrm-mapzen-optimized-route-patched.js'></script>
-<script type="text/javascript" src="js/locate/L.Locate.js"></script>
-
-<!-- Load geocoding plugin after Leaflet -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
-
-<script type="text/javascript">
-  // Apply special root-element class for iframed demo situations
-  if (window.self !== window.top) {
-    document.documentElement.className += ' is-iframed-demo';
-  }
-  window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
-</script>
 </body>
+
 </html>
