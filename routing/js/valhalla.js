@@ -975,7 +975,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       truckBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getToken();
-      var costing = 'truck';
+        var costing = 'truck';
         if (document.getElementById('truckoptions').style.display == "block") {
           var truckoptions = setTruckOptions();
           var calendarInput = document.getElementById("datepicker").value;
