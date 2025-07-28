@@ -190,7 +190,7 @@
 
     L.MapMatching = L.Control.extend({
         options: {
-            serviceUrl: 'http://valhalla.mapzen.com/trace_attributes',
+            serviceUrl: 'https://valhalla1.openstreetmap.de/trace_attributes',
             serviceUrlParams: {},
             traceBuilder: defaultTraceBuilder,
             matchLineBuilder: defaultMatchLineBuilder,
