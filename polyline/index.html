@@ -9,6 +9,7 @@
 <body>
   <div id="map" style="width: 1440px; height: 700px"></div>
   <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.1.0/leaflet.polylineDecorator.min.js" integrity="sha512-2oK40N5b+8g4Fhp1rfdtmNaroXsh7tFN4OY6++9lB/Hb+uLQWmn0SSAXvnQfbn8BP8qtpri2YQLaFGpyzKUHow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
   <script src="./decode.js"></script>
 
@@ -32,6 +33,7 @@ Decoded Line:</br>
   <script>
     //text change callback
     var geojson = null;
+    var decorator = null;
     function render() {
       try {
         //update the window location so that we have a proper permalink
@@ -55,7 +57,13 @@ Decoded Line:</br>
         //clear this if its not null
         if(geojson != null)
           geojson.removeFrom(map);
-        //turn this into geojson
+
+        if (decorator) {
+          decorator.remove();
+          decorator = null;
+        }
+
+        // turn this into geojson
         var json = {
           type:'FeatureCollection',
           features: [{
@@ -67,15 +75,25 @@ Decoded Line:</br>
             properties: {}
           }]
         };
-        geojson = L.geoJson(json,{ style: function(feature) { 
-          return { fillColor: feature.properties.fill,
+        console.log(decoded);
+        geojson = L.polyline(decoded.map(([lon, lat]) => [lat, lon]) ,{ 
             color: '#9900CC',
             opacity: 0.75,
             weight: 7,
-          };
-        }});
+          }
+        );
         //render the geojson
         geojson.addTo(map);
+
+        decorator = L.polylineDecorator(geojson, {
+        patterns: [
+            { offset: '5px', repeat: '110px', symbol: L.Symbol.arrowHead({
+                pixelSize: 10, polygon: false, pathOptions: { stroke: true, color: '#9900CC' }
+              })
+            }
+          ]
+        }).addTo(map);
+
         //fit it in view
         map.fitBounds(L.GeoJSON.coordsToLatLngs(decoded));
       }
