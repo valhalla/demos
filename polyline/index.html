@@ -326,7 +326,10 @@
     const ta = row.querySelector('textarea');
     ta.focus();
 
+    let committed = false;
     const commit = () => {
+      if (committed) return;
+      committed = true;
       const val = ta.value.trim();
       if (!val) { row.remove(); return; }
       const lines = getLines();
