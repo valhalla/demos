@@ -1,136 +1,584 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Polyline</title>
-  <meta charset="utf-8" />
+  <title>Polyline Viewer</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      color: #333;
+    }
+
+    #map { width: 100%; height: 700px; }
+
+    /* --- Controls panel below map --- */
+    #controls {
+      display: flex;
+      gap: 16px;
+      padding: 10px 12px;
+    }
+
+    /* Left: input panel */
+    #input-panel {
+      flex: 0 0 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #input-panel .options {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #input-panel .options label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #input-panel h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #encoded-input {
+      width: 100%;
+      flex: 1;
+      min-height: 200px;
+      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: none;
+    }
+
+    #encoded-input:focus { outline: 2px solid #4a90d9; border-color: transparent; }
+
+    /* Right: generated polyline list */
+    #polyline-list {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 200px;
+    }
+
+    /* Each polyline entry row */
+    .entry {
+      margin: 3px 0;
+      display: flex;
+      align-items: start;
+      gap: 5px;
+    }
+
+    .entry textarea {
+      flex: 1;
+      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11px;
+      padding: 4px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      resize: none;
+    }
+
+    .entry-new textarea {
+      border: 2px dashed #999;
+      background: #fafafa;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 700;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Small action buttons */
+    .btn {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      padding: 0;
+      color: #555;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: #e0e0e0; }
+    .btn-remove { color: #c00; }
+    .btn-remove:hover { background: #fdd; }
+
+    /* + insert row between entries */
+    .insert-row {
+      display: flex;
+      align-items: center;
+      margin: 1px 0;
+      padding-left: 28px;
+    }
+
+    .insert-row .btn {
+      width: auto;
+      padding: 0 6px;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .insert-row hr {
+      flex: 1;
+      border: none;
+      border-top: 1px dashed #e0e0e0;
+      margin: 0 6px;
+    }
+
+    /* Drag handle */
+    .drag-handle {
+      cursor: grab;
+      color: #aaa;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .drag-handle:hover { color: #666; }
+    .drag-handle:active { cursor: grabbing; }
+
+    /* Drag states */
+    .entry.dragging {
+      opacity: 0.35;
+    }
+
+    .entry.drag-over {
+      border-top: 2px solid #4a90d9;
+      margin-top: 1px;
+    }
+  </style>
 </head>
 <body>
-  <div id="map" style="width: 1440px; height: 700px"></div>
-  <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.1.0/leaflet.polylineDecorator.min.js" integrity="sha512-2oK40N5b+8g4Fhp1rfdtmNaroXsh7tFN4OY6++9lB/Hb+uLQWmn0SSAXvnQfbn8BP8qtpri2YQLaFGpyzKUHow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-  <script src="./decode.js"></script>
 
-  <script>
-    //make a map using osm tiles
-    var map = L.map('map').setView([40.5, -76.5], 9);
-    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
-    }).addTo(map);
-  </script>
+<div id="map"></div>
 
-Unescape '\': <input id="unescape" type="checkbox"></br>
-Polyline6: <input id="polyline6" type="checkbox"></br>
-Number of Points: <a id="cardinality"></a></br>
-Encoded Line:</br>
-  <textarea id="encoded_polyline" rows="4" cols="50"></textarea></br>
-Decoded Line:</br>
-  <textarea id="decoded_polyline" rows="4" cols="50"></textarea></br>
+<div id="controls">
+  <div id="input-panel">
+    <div class="options">
+      <label><input type="checkbox" id="unescape"> Unescape '\'</label>
+      <label><input type="checkbox" id="polyline6"> Polyline6</label>
+    </div>
+    <h3>Encoded Lines (one per line)</h3>
+    <textarea id="encoded-input" placeholder="Paste one or more encoded polylines, one per line"></textarea>
+  </div>
+  <div id="polyline-list"></div>
+</div>
 
-  <script>
-    //text change callback
-    var geojson = null;
-    var decorator = null;
-    function render() {
-      try {
-        //update the window location so that we have a proper permalink
-        window.history.pushState(null, null, window.location.pathname +
-          '?unescape=' + ($('#unescape').is(":checked") ? 'true' : 'false') +
-          '&polyline6=' + ($('#polyline6').is(":checked") ? 'true' : 'false') +
-          '#' + encodeURIComponent($("#encoded_polyline").val()));
-        //if they have escaped escapes
-        var encoded = $('#unescape').is(":checked") ?
-            $("#encoded_polyline").val().replace(/\\\\/g, '\\') :
-            $("#encoded_polyline").val();
-        if(encoded.length == 0)
-          return;
-        //if they want 6 digits of precision
-        var mul = $('#polyline6').is(":checked") ? 1e6 : 1e5;
-        //decode it
-        var decoded = decode(encoded, mul);
-        //update the display
-        $('#decoded_polyline').val(JSON.stringify(decoded));
-        $('#cardinality').val(decoded.length);
-        //clear this if its not null
-        if(geojson != null)
-          geojson.removeFrom(map);
+<script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js"></script>
+<script src="./decode.js"></script>
+<script>
+(async () => {
+  'use strict';
 
-        if (decorator) {
-          decorator.remove();
-          decorator = null;
+  // ── Constants ──────────────────────────────────────────────────────────────
+  const COLORS = [
+    '#9900CC', '#0066FF', '#E6001A', '#00994D', '#FF8C00',
+    '#8B4513', '#00CED1', '#FF1493', '#6B8E23', '#4B0082',
+  ];
+
+  const VECTOR_STYLE_URL = 'https://tiles.versatiles.org/assets/styles/colorful/style.json';
+  const RASTER_STYLE = {
+    version: 8,
+    sources: {
+      'osm-raster': {
+        type: 'raster',
+        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      },
+    },
+    layers: [{ id: 'osm-tiles', type: 'raster', source: 'osm-raster' }],
+  };
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const $map           = document.getElementById('map');
+  const $input         = document.getElementById('encoded-input');
+  const $list          = document.getElementById('polyline-list');
+  const $unescape      = document.getElementById('unescape');
+  const $polyline6     = document.getElementById('polyline6');
+
+  // ── Load map style (vector tiles with raster fallback) ────────────────────
+  let mapStyle;
+  try {
+    const resp = await fetch(VECTOR_STYLE_URL);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    mapStyle = await resp.json();
+    console.info('✓ Shortbread vector tiles loaded');
+  } catch (err) {
+    console.warn('Vector tile style unavailable – using raster fallback:', err.message);
+    mapStyle = RASTER_STYLE;
+  }
+
+  const map = new maplibregl.Map({
+    container: $map,
+    style: mapStyle,
+    center: [-76.5, 40.5],
+    zoom: 8,
+  });
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let mapReady = false;
+  let activeLayers = [];   // { source, line, arrows }
+  let activeMarkers = [];  // maplibregl.Marker instances
+
+  // ── Arrow icon (SDF) ──────────────────────────────────────────────────────
+  const addArrowImage = () => {
+    const size = 16;
+    const canvas = Object.assign(document.createElement('canvas'), { width: size, height: size });
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(size, size / 2);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(size * 0.3, size / 2);
+    ctx.lineTo(0, size);
+    ctx.closePath();
+    ctx.fill();
+    map.addImage('arrow', ctx.getImageData(0, 0, size, size), { sdf: true });
+  };
+
+  map.on('load', () => {
+    addArrowImage();
+    mapReady = true;
+    initFromUrl();
+  });
+
+  // If vector tiles fail at runtime, swap to raster
+  let tileErrors = 0;
+  map.on('error', (e) => {
+    const msg = e.error?.message || '';
+    // Only count actual tile/source fetch failures
+    if (!/tile|source|fetch|network|404|403/i.test(msg)) return;
+    if (++tileErrors >= 20 && mapStyle !== RASTER_STYLE) {
+      console.warn('Tile loading errors detected – switching to raster tiles');
+      mapStyle = RASTER_STYLE;
+      map.setStyle(RASTER_STYLE);
+      map.once('idle', () => {
+        addArrowImage();
+        if ($input.value.trim()) render();
+      });
+    }
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  /** Get non-empty trimmed lines from the input textarea. */
+  const getLines = () =>
+    $input.value.split('\n').filter(l => l.trim().length > 0);
+
+  /** Overwrite the input textarea and re-render everything. */
+  const setLinesAndRender = (lines) => {
+    $input.value = lines.join('\n');
+    render();
+  };
+
+  /** Remove a line by index, sync input, re-render. */
+  const removeLine = (idx) => {
+    const lines = getLines();
+    lines.splice(idx, 1);
+    setLinesAndRender(lines);
+  };
+
+  /** Insert a blank editable textbox at `position` in the right-side list. */
+  const insertBlankEntry = (position) => {
+    const row = document.createElement('div');
+    row.className = 'entry entry-new';
+    row.innerHTML = `<span class="badge" style="background:#999">?</span>
+                     <textarea rows="2" placeholder="Paste encoded polyline here"></textarea>`;
+
+    const insertRows = $list.querySelectorAll('.insert-row');
+    insertRows[position]?.after(row);
+
+    const ta = row.querySelector('textarea');
+    ta.focus();
+
+    let committed = false;
+    const commit = () => {
+      if (committed) return;
+      committed = true;
+      const val = ta.value.trim();
+      if (!val) { row.remove(); return; }
+      const lines = getLines();
+      lines.splice(position, 0, val);
+      setLinesAndRender(lines);
+    };
+
+    ta.addEventListener('paste', () => setTimeout(commit, 0));
+    ta.addEventListener('blur', commit);
+  };
+
+  /** Remove all map layers, sources and markers from previous render. */
+  const clearMap = () => {
+    for (const { arrows, line, source } of activeLayers) {
+      if (map.getLayer(arrows)) map.removeLayer(arrows);
+      if (map.getLayer(line))   map.removeLayer(line);
+      if (map.getSource(source)) map.removeSource(source);
+    }
+    activeLayers = [];
+
+    for (const m of activeMarkers) m.remove();
+    activeMarkers = [];
+  };
+
+  /** Create a numbered pin marker with MapLibre's built-in pin shape. */
+  const createPinMarker = (lngLat, color, number) => {
+    const marker = new maplibregl.Marker({ color })
+      .setLngLat(lngLat)
+      .addTo(map);
+
+    // Replace the white dot with the route number
+    const svg = marker.getElement().querySelector('svg');
+    svg.querySelectorAll('circle').forEach(c => c.remove());
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    Object.entries({
+      x: '13.5', y: '15',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#fff',
+      'font-size': '12',
+      'font-weight': 'bold',
+      'font-family': 'sans-serif',
+    }).forEach(([k, v]) => text.setAttribute(k, v));
+    text.textContent = number;
+    svg.appendChild(text);
+
+    return marker;
+  };
+
+  /** Build one "+ insert" row button. */
+  const createInsertRow = (position) => {
+    const row = document.createElement('div');
+    row.className = 'insert-row';
+    row.innerHTML = `<button class="btn" title="Insert polyline here">+</button><hr>`;
+    row.querySelector('button').addEventListener('click', () => insertBlankEntry(position));
+    return row;
+  };
+
+  /** Build one polyline entry row (handle, badge, textarea, remove button). */
+  const createEntryRow = (idx, rawLine, color) => {
+    const num = idx + 1;
+    const row = document.createElement('div');
+    row.className = 'entry';
+    row.draggable = true;
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <span class="drag-handle" title="Drag to reorder">&#x2630;</span>
+      <button class="btn btn-remove" title="Remove this polyline">&minus;</button>
+      <span class="badge" style="background:${color}">${num}</span>
+      <textarea rows="2" readonly></textarea>`;
+
+    row.querySelector('textarea').value = rawLine;
+    row.querySelector('.btn-remove').addEventListener('click', () => removeLine(idx));
+
+    // Drag events
+    row.addEventListener('dragstart', (e) => {
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(idx));
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      $list.querySelectorAll('.entry.drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+
+    row.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      // Highlight only this row
+      $list.querySelectorAll('.entry.drag-over').forEach(el => el.classList.remove('drag-over'));
+      if (!row.classList.contains('dragging')) {
+        row.classList.add('drag-over');
+      }
+    });
+
+    row.addEventListener('dragleave', () => {
+      row.classList.remove('drag-over');
+    });
+
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      const toIdx = parseInt(row.dataset.idx, 10);
+      if (fromIdx === toIdx) return;
+
+      const lines = getLines();
+      const [moved] = lines.splice(fromIdx, 1);
+      lines.splice(toIdx, 0, moved);
+      setLinesAndRender(lines);
+    });
+
+    return row;
+  };
+
+  // ── Permalink ──────────────────────────────────────────────────────────────
+
+  const updatePermalink = () => {
+    const params = new URLSearchParams({
+      unescape: $unescape.checked,
+      polyline6: $polyline6.checked,
+    });
+    const hash = encodeURIComponent($input.value);
+    history.pushState(null, '', `${location.pathname}?${params}#${hash}`);
+  };
+
+  const initFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    $unescape.checked  = params.get('unescape') !== 'false' && params.get('unescape') !== null;
+    $polyline6.checked = params.get('polyline6') === 'true';
+
+    const hashIdx = location.href.indexOf('#');
+    const encoded = hashIdx === -1 ? '' : decodeURIComponent(location.href.slice(hashIdx + 1));
+    $input.value = encoded;
+
+    if (encoded) render();
+  };
+
+  // ── Main render ────────────────────────────────────────────────────────────
+
+  const render = () => {
+    if (!mapReady) return;
+
+    try {
+      updatePermalink();
+
+      const lines = getLines();
+
+      if (lines.length === 0) {
+        clearMap();
+        $list.innerHTML = '';
+        return;
+      }
+
+      const doUnescape = $unescape.checked;
+      const mul = $polyline6.checked ? 1e6 : 1e5;
+
+      clearMap();
+      $list.innerHTML = '';
+
+      const bounds = new maplibregl.LngLatBounds();
+      const fragment = document.createDocumentFragment();
+
+      // Top insert row
+      fragment.appendChild(createInsertRow(0));
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        const rawLine = lines[idx].trim();
+        if (!rawLine) continue;
+
+        const encoded = doUnescape ? rawLine.replace(/\\\\/g, '\\') : rawLine;
+        const color   = COLORS[idx % COLORS.length];
+        const decoded = decode(encoded, mul);
+
+        // ── Right-side list entry ──
+        fragment.appendChild(createEntryRow(idx, rawLine, color));
+        fragment.appendChild(createInsertRow(idx + 1));
+
+        // ── Map: line layer ──
+        const sourceId = `pl-src-${idx}`;
+        const lineId   = `pl-line-${idx}`;
+        const arrowId  = `pl-arrow-${idx}`;
+
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: { type: 'Feature', geometry: { type: 'LineString', coordinates: decoded } },
+        });
+
+        map.addLayer({
+          id: lineId, type: 'line', source: sourceId,
+          paint: { 'line-color': color, 'line-width': 7, 'line-opacity': 0.75 },
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+        });
+
+        map.addLayer({
+          id: arrowId, type: 'symbol', source: sourceId,
+          layout: {
+            'symbol-placement': 'line',
+            'symbol-spacing': 100,
+            'icon-image': 'arrow',
+            'icon-size': 1.2,
+            'icon-allow-overlap': true,
+            'icon-rotation-alignment': 'map',
+          },
+          paint: { 'icon-color': color },
+        });
+
+        activeLayers.push({ source: sourceId, line: lineId, arrows: arrowId });
+
+        // ── Map: numbered pin (only for multiple polylines) ──
+        if (lines.length > 1) {
+          const start = [decoded[0][0], decoded[0][1]];
+          activeMarkers.push(createPinMarker(start, color, idx + 1));
         }
 
-        // turn this into geojson
-        var json = {
-          type:'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            geometry: {
-              type: 'LineString',
-              coordinates: decoded
-            },
-            properties: {}
-          }]
-        };
-        console.log(decoded);
-        geojson = L.polyline(decoded.map(([lon, lat]) => [lat, lon]) ,{ 
-            color: '#9900CC',
-            opacity: 0.75,
-            weight: 7,
-          }
-        );
-        //render the geojson
-        geojson.addTo(map);
+        // ── Expand bounds ──
+        for (const [lon, lat] of decoded) {
+          bounds.extend([lon, lat]);
+        }
+      }
 
-        decorator = L.polylineDecorator(geojson, {
-        patterns: [
-            { offset: '5px', repeat: '110px', symbol: L.Symbol.arrowHead({
-                pixelSize: 10, polygon: false, pathOptions: { stroke: true, color: '#9900CC' }
-              })
-            }
-          ]
-        }).addTo(map);
+      $list.appendChild(fragment);
 
-        //fit it in view
-        map.fitBounds(L.GeoJSON.coordsToLatLngs(decoded));
+      if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, { padding: 40 });
       }
-      catch(e){
-        alert('Invalid Encoded Polyline');
-      }
-    };
-    
-    //hook up the callback
-    $("#encoded_polyline").on('keyup', render);
-    $('#unescape').change(render);
-    $('#polyline6').change(render);
-    
-    //Check if we should initialize from anchor
-    window.onload = function () {
-      //parse query params
-      var query = window.location.search.substring(1);
-      var vars = query.split('&');
-      for(var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        //assume you want to escape some polyline that was from json
-        if(decodeURIComponent(pair[0]) == 'unescape')
-          $("#unescape").prop("checked", decodeURIComponent(pair[1]) != 'false');
-        //assume you dont want polyline6
-        else if(decodeURIComponent(pair[0]) == 'polyline6')
-          $("#polyline6").prop("checked", decodeURIComponent(pair[1]) == 'true');
-      }
-      //parse the anchor
-      var idx = window.location.href.indexOf("#");
-      var url_encoded = idx == -1 ? '' : window.location.href.substring(idx+1);
-      var polyline = decodeURIComponent(url_encoded);
-      $("#encoded_polyline").val(polyline);
-      //show it if there is something to show
-      if(polyline.length > 0)
-        render();
-    };
-    
-  </script>
+    } catch (e) {
+      console.error('Render error:', e);
+      alert(`Invalid Encoded Polyline: ${e.message}`);
+    }
+  };
+
+  // ── Debounced input ────────────────────────────────────────────────────────
+
+  let renderTimer = null;
+  const debouncedRender = () => {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 250);
+  };
+
+  // ── Event bindings ─────────────────────────────────────────────────────────
+
+  $input.addEventListener('input', debouncedRender);
+  $unescape.addEventListener('change', render);
+  $polyline6.addEventListener('change', render);
+
+})();
+</script>
 </body>
 </html>
