@@ -975,6 +975,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       truckBtn.addEventListener('click', function(e) {
         if (!rr) return;
         getToken();
+        var costing = 'truck';
         if (document.getElementById('truckoptions').style.display == "block") {
           var truckoptions = setTruckOptions();
           var calendarInput = document.getElementById("datepicker").value;
@@ -982,19 +983,19 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
             dateStr = datetimeUpdate(calendarInput);
             var dtoptions = setDateTime(dateStr);
             rr.route({
-              costing : 'truck',
+              costing : costing,
               costing_options : truckoptions,
               date_time : dtoptions
             });
           } else {
             rr.route({
-              costing : 'truck',
+              costing : costing,
               costing_options : truckoptions,
             });
           }
         } else {
           rr.route({
-            costing : 'truck'
+            costing : costing
           });
         }
         updateHashCosting(costing,truckoptions,dtoptions);
