@@ -33,9 +33,9 @@
     var map = L.map('map').setView([0, 0], 2);
 
     //use osm tiles
-    L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributers'
     }).addTo(map);
 
     var input_geojson = document.querySelector('#input_geojson');
