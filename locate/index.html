@@ -74,9 +74,9 @@
   <script>
     //make a map using osm tiles
     var map = L.map('map').setView([16.73, -169.52], 14);
-    var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var baseLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     })
     baseLayer.addTo(map);
 
