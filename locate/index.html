@@ -24,7 +24,7 @@
       </div>
       <pre id="properties"></pre>
       Tile Layer: <select id="tileurl">
-        <option id=osm selected="selected" value='http://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
+        <option id=osm selected="selected" value='https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'>OSM</option>
         <option id=mapbox value='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png'>Mapbox</option>
       </select></br>
       Map Token: <input id="maptoken" placeholder="Enter token."></input></br>
@@ -74,9 +74,9 @@
   <script>
     //make a map using osm tiles
     var map = L.map('map').setView([16.73, -169.52], 14);
-    var baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var baseLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     })
     baseLayer.addTo(map);
 

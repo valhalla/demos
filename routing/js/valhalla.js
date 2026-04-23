@@ -1,4 +1,4 @@
-var app = angular.module('routing', []);
+var app = angular.module("routing", []);
 var hash_params = L.Hash.parseHash(location.hash);
 
 var date = new Date();
@@ -12,16 +12,18 @@ var environmentExists = false;
 var locale = "en-US";
 
 function selectEnv() {
-  $("#env_dropdown").find("option:selected").each(function() {
-    environmentExists = true;
-    envServer = $(this).text();
-    serviceUrl = document.getElementById(envServer).value;
-    getToken();
-  });
+  $("#env_dropdown")
+    .find("option:selected")
+    .each(function () {
+      environmentExists = true;
+      envServer = $(this).text();
+      serviceUrl = document.getElementById(envServer).value;
+      getToken();
+    });
 }
 
 function handleChange(evt) {
-  var sel = document.getElementById('fileSelector');
+  var sel = document.getElementById("fileSelector");
   for (var i = 0; i < sel.options.length; i++) {
     var results = sel.options[i].text + "  " + sel.options[i].value;
     sel.options[i].innerHTML = results;
@@ -30,29 +32,31 @@ function handleChange(evt) {
 
 function getToken() {
   switch (envServer) {
-  case "localhost":
-    token = "";
-    heightUrl = heightServer.local;
-    break;
-  case "staging":
-    token = $("#token").val() != "" ? $("#token").val() : stageToken;
-    heightUrl = heightServer.staging;
-    break;
-  case "production":
-    token = $("#token").val() != "" ? $("#token").val() : prodToken;
-    heightUrl = heightServer.prod;
-    break;
-  default:
-    token = $("#token").val() != "" ? $("#token").val() : prodToken;
-    heightUrl = heightServer.prod;
-    break;
+    case "localhost":
+      token = "";
+      heightUrl = heightServer.local;
+      break;
+    case "staging":
+      token = $("#token").val() != "" ? $("#token").val() : stageToken;
+      heightUrl = heightServer.staging;
+      break;
+    case "production":
+      token = $("#token").val() != "" ? $("#token").val() : prodToken;
+      heightUrl = heightServer.prod;
+      break;
+    default:
+      token = $("#token").val() != "" ? $("#token").val() : prodToken;
+      heightUrl = heightServer.prod;
+      break;
   }
 }
 
 function selectLocale() {
-  $("#locale_dropdown").find("option:selected").each(function() {
-    locale = $(this).text();
-  });
+  $("#locale_dropdown")
+    .find("option:selected")
+    .each(function () {
+      locale = $(this).text();
+    });
 }
 
 //format needs to be YYYY-MM-DDTHH:MM
@@ -77,28 +81,29 @@ function selectFiles(evt) {
     var files = evt.target.files;
 
     if (!files.length) {
-      alert('Please select a file!');
+      alert("Please select a file!");
       return;
     }
     var file = files[0];
-   // var lastUpdate = file.lastModified;
+    // var lastUpdate = file.lastModified;
     var reader = new FileReader();
     var delimiter = "-j";
-    reader.onloadend = function(evt) {
+    reader.onloadend = function (evt) {
       if (evt.target.readyState == FileReader.DONE) {
         var lines = evt.target.result.split(delimiter);
         var index;
-        var select = document.getElementById('fileSelector').options.length = 0;
+        var select = (document.getElementById("fileSelector").options.length =
+          0);
         if (lines[0] == "") {
           for (index = 1; index < lines.length; index++) {
-            var newOption = document.createElement('option');
-            var pattern = new RegExp("{\".*}", "g");
+            var newOption = document.createElement("option");
+            var pattern = new RegExp('{".*}', "g");
             var results = pattern.exec(unescape(lines[index]));
             lines[index] = results[0];
             newOption.value = lines[index];
             newOption.text = index;
             // reset selector options
-            select = document.getElementById('fileSelector');
+            select = document.getElementById("fileSelector");
             try {
               select.add(newOption, null);
             } catch (ex) {
@@ -112,58 +117,71 @@ function selectFiles(evt) {
   }
 }
 
-app.run(function($rootScope) {
-  var hash_loc = hash_params ? hash_params : {
-    'center' : {
-      'lat' : 40.7486,
-      'lng' : -73.9690
-    },
-    'zoom' : 14
-  };
+app.run(function ($rootScope) {
+  var hash_loc = hash_params
+    ? hash_params
+    : {
+        center: {
+          lat: 40.7486,
+          lng: -73.969,
+        },
+        zoom: 14,
+      };
   $rootScope.geobase = {
-    'zoom' : hash_loc.zoom,
-    'lat' : hash_loc.center.lat,
-    'lon' : hash_loc.center.lng
+    zoom: hash_loc.zoom,
+    lat: hash_loc.center.lat,
+    lon: hash_loc.center.lng,
   };
-  $(document).on('new-location', function(e) {
+  $(document).on("new-location", function (e) {
     $rootScope.geobase = {
-      'zoom' : e.zoom,
-      'lat' : e.lat,
-      'lon' : e.lon
+      zoom: e.zoom,
+      lat: e.lat,
+      lon: e.lon,
     };
   });
 });
 
-app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-  var manhattan = [40.7510, -73.9783];
-  var map = L.map('map', {
-    zoom : $rootScope.geobase.zoom,
-    zoomControl : true,
+app.controller("RouteController", function ($scope, $rootScope, $sce, $http) {
+  var manhattan = [40.751, -73.9783];
+  var map = L.map("map", {
+    zoom: $rootScope.geobase.zoom,
+    zoomControl: true,
   }).setView(manhattan, 13);
-  var osmlayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-  });
+  var osmlayer = L.tileLayer(
+    "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+    },
+  );
   osmlayer.addTo(map);
 
-  var mapboxlayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    tileSize: 512,
-    maxZoom: 19,
-    zoomOffset: -1,
-    id: 'mapbox/streets-v11',
-  });
+  var mapboxlayer = L.tileLayer(
+    "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+    {
+      attribution:
+        '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      tileSize: 512,
+      maxZoom: 19,
+      zoomOffset: -1,
+      id: "mapbox/streets-v11",
+    },
+  );
 
   var baseMaps = {
-    "OSM": osmlayer,
-    "Mapbox": mapboxlayer
+    OSM: osmlayer,
+    Mapbox: mapboxlayer,
   };
 
   L.control.layers(baseMaps).addTo(map);
 
-  document.getElementById('maptoken').addEventListener('change', function(ev) {
+  document.getElementById("maptoken").addEventListener("change", function (ev) {
     var maptoken = event.target.value;
-    mapboxlayer.setUrl('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + maptoken);
+    mapboxlayer.setUrl(
+      "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=" +
+        maptoken,
+    );
   });
 
   // If iframed, we're going to have to disable some of the touch interaction
@@ -173,84 +191,95 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }
 
   //mobile narrative display logic
-  var mobileRouteEL = document.createElement('div');
-    mobileRouteEL.className = 'mobile-route';
-    mobileRouteEL.classList.add('list-route');
-    mobileRouteEL.addEventListener('click', function (e) {
+  var mobileRouteEL = document.createElement("div");
+  mobileRouteEL.className = "mobile-route";
+  mobileRouteEL.classList.add("list-route");
+  mobileRouteEL.addEventListener(
+    "click",
+    function (e) {
       e.stopPropagation();
-      var routingContainer = document.getElementsByClassName('leaflet-routing-container')[0];
-      if(routingContainer.classList.contains('left-align')){
-        routingContainer.classList.remove('left-align');
-        mobileRouteEL.classList.add('list-route');
-        mobileRouteEL.classList.remove('cancel-route');
-      }else{
+      var routingContainer = document.getElementsByClassName(
+        "leaflet-routing-container",
+      )[0];
+      if (routingContainer.classList.contains("left-align")) {
+        routingContainer.classList.remove("left-align");
+        mobileRouteEL.classList.add("list-route");
+        mobileRouteEL.classList.remove("cancel-route");
+      } else {
         //if is small hack to load the narrative on the initial mobile load
-        if (document.getElementsByClassName('leaflet-routing-container')[0].innerText == ""){
+        if (
+          document.getElementsByClassName("leaflet-routing-container")[0]
+            .innerText == ""
+        ) {
           window.location.reload();
         }
-        routingContainer.classList.add('left-align');
-        mobileRouteEL.classList.remove('list-route');
-        mobileRouteEL.classList.add('cancel-route');
+        routingContainer.classList.add("left-align");
+        mobileRouteEL.classList.remove("list-route");
+        mobileRouteEL.classList.add("cancel-route");
       }
-    }, true);
-  document.querySelector('.leaflet-top.leaflet-right').appendChild(mobileRouteEL);
+    },
+    true,
+  );
+  document
+    .querySelector(".leaflet-top.leaflet-right")
+    .appendChild(mobileRouteEL);
 
-  $scope.route_instructions = '';
+  $scope.route_instructions = "";
 
-  $scope.setMode = function(mode){
+  $scope.setMode = function (mode) {
     $scope.mode = mode;
-  }
+  };
 
   var Locations = [];
-  $scope.mode = (typeof defaultMode != 'undefined' ? defaultMode : 'auto');
+  $scope.mode = typeof defaultMode != "undefined" ? defaultMode : "auto";
 
   var icon = L.icon({
-    iconUrl : 'resource/via_dot.png',
+    iconUrl: "resource/via_dot.png",
 
-    iconSize : [ 38, 35 ], // size of the icon
-    shadowSize : [ 50, 64 ], // size of the shadow
-    iconAnchor : [ 22, 34 ], // point of the icon which will correspond to
+    iconSize: [38, 35], // size of the icon
+    shadowSize: [50, 64], // size of the shadow
+    iconAnchor: [22, 34], // point of the icon which will correspond to
     // marker's location
-    shadowAnchor : [ 4, 62 ], // the same for the shadow
-    popupAnchor : [ -3, -76 ]
-  // point from which the popup should open relative to the iconAnchor
+    shadowAnchor: [4, 62], // the same for the shadow
+    popupAnchor: [-3, -76],
+    // point from which the popup should open relative to the iconAnchor
   });
 
   var mode_icons = {
-    'car' : '../images/drive.png',
-    'foot' : '../images/walk.png',
-    'bicycle' : '../images/bike.png'
+    car: "../images/drive.png",
+    foot: "../images/walk.png",
+    bicycle: "../images/bike.png",
   };
 
-  var getOriginIcon = function(icon) {
+  var getOriginIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/startmarker@2x.png',
-      iconSize : [ 44, 56 ], // size of the icon
-      iconAnchor : [ 22, 42 ]
+      iconUrl: "resource/startmarker@2x.png",
+      iconSize: [44, 56], // size of the icon
+      iconAnchor: [22, 42],
     });
   };
 
-  var getViaIcon = function(icon) {
+  var getViaIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/via_dot.png',
-      iconSize : [ 30, 30 ]
+      iconUrl: "resource/via_dot.png",
+      iconSize: [30, 30],
     });
   };
 
-  var getDestinationIcon = function(icon) {
+  var getDestinationIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/destmarker@2x.png',
-      iconSize : [ 44, 56 ], // size of the icon
-      iconAnchor : [ 22, 42 ]
+      iconUrl: "resource/destmarker@2x.png",
+      iconSize: [44, 56], // size of the icon
+      iconAnchor: [22, 42],
     });
   };
 
- // allow hash links
+  // allow hash links
   var hash = new L.Hash(map);
   var markers = [];
 
   var locateMarkers = [];
-  var remove_markers = function() {
+  var remove_markers = function () {
     for (var i = 0; i < markers.length; i++) {
       map.removeLayer(markers[i]);
     }
@@ -261,89 +290,106 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     locateMarkers = [];
   };
 
-  var getFileOriginIcon = function(icon) {
+  var getFileOriginIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/start_greendot.png'
+      iconUrl: "resource/start_greendot.png",
     });
   };
 
-  var getFileViaIcon = function(icon) {
+  var getFileViaIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/dot.png',
-      iconSize : [ 24, 24 ]
+      iconUrl: "resource/dot.png",
+      iconSize: [24, 24],
     });
   };
 
-  var getFileDestIcon = function(icon) {
+  var getFileDestIcon = function (icon) {
     return L.icon({
-      iconUrl : 'resource/destmarker@2x.png'
+      iconUrl: "resource/destmarker@2x.png",
     });
   };
 
-  var parseHash = function() {
+  var parseHash = function () {
     var hash = window.location.hash;
-    if (hash.indexOf('#') === 0)
-      hash = hash.substr(1);
-    return hash.split('&');
+    if (hash.indexOf("#") === 0) hash = hash.substr(1);
+    return hash.split("&");
   };
 
-  var parseParams = function(pieces) {
+  var parseParams = function (pieces) {
     var parameters = {};
-    pieces.forEach(function(e, i, a) {
-      var parts = e.split('=');
-      if (parts.length < 2)
-        parts.push('');
+    pieces.forEach(function (e, i, a) {
+      var parts = e.split("=");
+      if (parts.length < 2) parts.push("");
       parameters[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
     });
     return parameters;
   };
 
   var force = false;
-  var update = function(show, locs, costing) {
+  var update = function (show, locs, costing) {
     // update the permalink hash
     var pieces = parseHash();
-    var extra = '';
-    pieces.forEach(function(e, i, a) {
-      if (e.length && e.slice(0, 'locations='.length) != 'locations=' && e.slice(0, 'costing='.length) != 'costing=' && e.slice(0, 'directions_options='.length) != 'directions_options=')
-        extra = extra + (extra.length ? '&' : '') + e;
+    var extra = "";
+    pieces.forEach(function (e, i, a) {
+      if (
+        e.length &&
+        e.slice(0, "locations=".length) != "locations=" &&
+        e.slice(0, "costing=".length) != "costing=" &&
+        e.slice(0, "directions_options=".length) != "directions_options="
+      )
+        extra = extra + (extra.length ? "&" : "") + e;
     });
     var hash_locs = [];
-    locs.forEach(function(locs) {
+    locs.forEach(function (locs) {
       hash_locs.push({
-        'lat' : locs.lat,
-        'lon' : locs.lng
-      })
+        lat: locs.lat,
+        lon: locs.lng,
+      });
     });
-    var parameter = (extra.length ? '&locations=' : 'locations=') + JSON.stringify(hash_locs) + '&costing=' + JSON.stringify(costing);
+    var parameter =
+      (extra.length ? "&locations=" : "locations=") +
+      JSON.stringify(hash_locs) +
+      "&costing=" +
+      JSON.stringify(costing);
     force = show;
-    window.location.hash = '#' + extra + parameter;
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    window.location.hash = "#" + extra + parameter;
+    document.getElementById("permalink").innerHTML =
+      "<a href='http://valhalla.github.io/demos/routing/index.html" +
+      window.location.hash +
+      "' target='_top'>Route Permalink</a>";
   };
 
-  var updateHashCosting = function(costing, costingOptions, directionsOptions, dateTime) {
+  var updateHashCosting = function (
+    costing,
+    costingOptions,
+    directionsOptions,
+    dateTime,
+  ) {
     // update the permalink hash
     var pieces = parseHash();
-    if (pieces[2].indexOf('&costing='))
-      extra = '&costing=' + JSON.stringify(costing);
+    if (pieces[2].indexOf("&costing="))
+      extra = "&costing=" + JSON.stringify(costing);
 
     if (costingOptions != null)
-      extra = extra + '&costingoptions=' + JSON.stringify(costingOptions);
+      extra = extra + "&costingoptions=" + JSON.stringify(costingOptions);
 
     if (directionsOptions != null)
-      extra = extra + '&directionsoptions=' + JSON.stringify(directionsOptions);
+      extra = extra + "&directionsoptions=" + JSON.stringify(directionsOptions);
 
     if (dateTime != null)
-      extra = extra + '&datetime=' + JSON.stringify(dateTime);
+      extra = extra + "&datetime=" + JSON.stringify(dateTime);
 
-    window.location.hash = '#' + pieces[0] + '&' + pieces[1] + extra;
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    window.location.hash = "#" + pieces[0] + "&" + pieces[1] + extra;
+    document.getElementById("permalink").innerHTML =
+      "<a href='http://valhalla.github.io/demos/routing/index.html" +
+      window.location.hash +
+      "' target='_top'>Route Permalink</a>";
   };
 
-  var hashRoute = function() {
+  var hashRoute = function () {
     // something has to have changed for us to request again
     var parameters = parseParams(parseHash());
-    if (!force && parameters.locations == JSON.stringify(locations))
-      return;
+    if (!force && parameters.locations == JSON.stringify(locations)) return;
     force = false;
 
     // shape
@@ -351,8 +397,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.locations !== undefined)
       waypoints = JSON.parse(parameters.locations);
 
-    waypoints.forEach(function(waypoint) {
-      waypoint['latLng'] = L.latLng(waypoint.lat, waypoint.lon);
+    waypoints.forEach(function (waypoint) {
+      waypoint["latLng"] = L.latLng(waypoint.lat, waypoint.lon);
     });
 
     if (parameters.costing !== undefined)
@@ -367,123 +413,169 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (parameters.datetime !== undefined)
       var date_time = JSON.parse(parameters.datetime);
 
-    rr = createRouting({
-      waypoints: waypoints,
-      costing: costing,
-      costing_options: costing_options,
-      directions_options: directions_options,
-      date_time: date_time
-    }, true);
+    rr = createRouting(
+      {
+        waypoints: waypoints,
+        costing: costing,
+        costing_options: costing_options,
+        directions_options: directions_options,
+        date_time: date_time,
+      },
+      true,
+    );
 
     locations = waypoints.length;
 
-    document.getElementById('permalink').innerHTML = "<a href='http://valhalla.github.io/demos/routing/index.html" + window.location.hash + "' target='_top'>Route Permalink</a>";
+    document.getElementById("permalink").innerHTML =
+      "<a href='http://valhalla.github.io/demos/routing/index.html" +
+      window.location.hash +
+      "' target='_top'>Route Permalink</a>";
   };
 
   // Number of locations
   var locations = 0;
 
-  var reset = function() {
+  var reset = function () {
     if (rr) {
       rr.removeFrom(map);
       rr = null;
     }
-    $scope.$emit('resetRouteInstruction');
+    $scope.$emit("resetRouteInstruction");
     remove_markers();
     locations = 0;
-    document.getElementById('permalink').innerHTML = "";
+    document.getElementById("permalink").innerHTML = "";
   };
 
-  var resetFileLoader = function() {
-   // remove_markers();
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $('.leaflet-marker-icon.leaflet-marker-draggable').remove();
-    $scope.$emit('resetRouteInstruction');
+  var resetFileLoader = function () {
+    // remove_markers();
+    $("svg").html("");
+    $(".leaflet-routing-container").remove();
+    $(".leaflet-marker-icon.leaflet-marker-draggable").remove();
+    $scope.$emit("resetRouteInstruction");
   };
 
-  $rootScope.$on('map.setView', function(ev, geo, zoom) {
+  $rootScope.$on("map.setView", function (ev, geo, zoom) {
     map.setView(geo, zoom || 8);
     map.options.maxZoom = 14;
   });
-  $rootScope.$on('map.dropMarker', function(ev, geo, m) {
-
+  $rootScope.$on("map.dropMarker", function (ev, geo, m) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'transit')
+        icon: getOriginIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     } else {
       var marker = new L.marker(geo, {
-        icon : getDestinationIcon(m || 'transit')
+        icon: getDestinationIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     }
     map.addLayer(marker);
     markers.push(marker);
   });
-  $rootScope.$on('map.dropMultiLocsMarker', function(ev, geo, m) {
-
+  $rootScope.$on("map.dropMultiLocsMarker", function (ev, geo, m) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getOriginIcon(m || 'transit')
+        icon: getOriginIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     } else {
       var marker = new L.marker(geo, {
-        icon : getViaIcon(m || 'transit')
+        icon: getViaIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     }
     map.addLayer(marker);
     markers.push(marker);
   });
 
-  $rootScope.$on('map.dropOriginMarker', function(ev, geo, m) {
+  $rootScope.$on("map.dropOriginMarker", function (ev, geo, m) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getFileOriginIcon(m || 'transit')
+        icon: getFileOriginIcon(m || "transit"),
       });
     } else {
       var marker = new L.marker(geo, {
-        icon : getFileOriginIcon(m || 'transit')
+        icon: getFileOriginIcon(m || "transit"),
       });
     }
     map.addLayer(marker);
     markers.push(marker);
   });
 
-  $rootScope.$on('map.dropViaMarker', function(ev, geo, m) {
+  $rootScope.$on("map.dropViaMarker", function (ev, geo, m) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getFileViaIcon(m || 'transit')
+        icon: getFileViaIcon(m || "transit"),
       });
     } else {
       var marker = new L.marker(geo, {
-        icon : getFileViaIcon(m || 'transit')
+        icon: getFileViaIcon(m || "transit"),
       });
     }
     map.addLayer(marker);
     markers.push(marker);
   });
 
-  $rootScope.$on('map.dropDestMarker', function(ev, geo, m) {
+  $rootScope.$on("map.dropDestMarker", function (ev, geo, m) {
     if (locations == 0) {
       var marker = new L.marker(geo, {
-        icon : getFileDestIcon(m || 'transit')
+        icon: getFileDestIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     } else {
       var marker = new L.marker(geo, {
-        icon : getFileDestIcon(m || 'transit')
+        icon: getFileDestIcon(m || "transit"),
       });
-      marker.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-          + "&layers=Q target=_blank>Edit POI here<a/>");
+      marker.bindPopup(
+        "<a href = http://www.openstreetmap.org/#map=" +
+          $rootScope.geobase.zoom +
+          "/" +
+          $rootScope.geobase.lat +
+          "/" +
+          $rootScope.geobase.lon +
+          "&layers=Q target=_blank>Edit POI here<a/>",
+      );
     }
     map.addLayer(marker);
     markers.push(marker);
@@ -499,159 +591,190 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
     //get the edges and nodes grouped up
     var results = {};
-    if(locate_result.nodes != null && locate_result.nodes.length > 0) {
+    if (locate_result.nodes != null && locate_result.nodes.length > 0) {
       locate_result.nodes.forEach(function (node, index, array) {
-        if(!([node.lat,node.lon] in results))
-          results[[node.lat,node.lon]] = []
-        results[[node.lat,node.lon]].push(node)
+        if (!([node.lat, node.lon] in results))
+          results[[node.lat, node.lon]] = [];
+        results[[node.lat, node.lon]].push(node);
       });
     }
-    if(locate_result.edges != null) {
+    if (locate_result.edges != null) {
       locate_result.edges.forEach(function (edge, index, array) {
-        if(!([edge.correlated_lat,edge.correlated_lon] in results))
-          results[[edge.correlated_lat,edge.correlated_lon]] = []
-        results[[edge.correlated_lat,edge.correlated_lon]].push(edge)
+        if (!([edge.correlated_lat, edge.correlated_lon] in results))
+          results[[edge.correlated_lat, edge.correlated_lon]] = [];
+        results[[edge.correlated_lat, edge.correlated_lon]].push(edge);
       });
     }
-    if(Object.keys(results).length == 0) {
-      results[[locate_result.input_lat,locate_result.input_lon]] = [locate_result]
+    if (Object.keys(results).length == 0) {
+      results[[locate_result.input_lat, locate_result.input_lon]] = [
+        locate_result,
+      ];
     }
 
     //show some stuff
     for (var coord in results) {
       if (results.hasOwnProperty(coord)) {
-        var marker = L.circle( coord.split(','), 2, { color: '#444', opacity: 1, fill: true, fillColor: '#eee', fillOpacity: 1 });
+        var marker = L.circle(coord.split(","), 2, {
+          color: "#444",
+          opacity: 1,
+          fill: true,
+          fillColor: "#eee",
+          fillOpacity: 1,
+        });
         map.addLayer(marker);
-        var popup = L.popup({maxHeight : 200});
-        popup.setContent("<pre id='json'>" + JSON.stringify(results[coord], null, 2) + "</pre>");
+        var popup = L.popup({ maxHeight: 200 });
+        popup.setContent(
+          "<pre id='json'>" +
+            JSON.stringify(results[coord], null, 2) +
+            "</pre>",
+        );
         marker.bindPopup(popup).openPopup();
         locateMarkers.push(marker);
       }
     }
-
   };
 
-  $scope.renderHtml = function(html_code) {
+  $scope.renderHtml = function (html_code) {
     return $sce.trustAsHtml(html_code);
   };
 
-  $scope.$on('setRouteInstruction', function(ev, instructions) {
-    $scope.$apply(function() {
+  $scope.$on("setRouteInstruction", function (ev, instructions) {
+    $scope.$apply(function () {
       $scope.route_instructions = instructions;
     });
   });
 
-  $scope.$on('resetRouteInstruction', function(ev) {
-    $scope.$apply(function() {
-      $scope.route_instructions = '';
+  $scope.$on("resetRouteInstruction", function (ev) {
+    $scope.$apply(function () {
+      $scope.route_instructions = "";
     });
   });
 
   if (document.getElementById("inputFile")) {
-    document.querySelector(".select").addEventListener('click', function(evt) {
-      resetFileLoader();
-      handleChange(evt);
-      var select = document.getElementById('fileSelector');
-      var i;
-      for (i = 0; i < select.length; i++) {
-        if (select.options[i].selected) {
-          Locations = [];
-          var json = JSON.parse(select.options[i].value);
-          json.locations.forEach(function (location) {
-            location.latLng = L.latLng(location.lat, location.lon);
-          });
+    document.querySelector(".select").addEventListener(
+      "click",
+      function (evt) {
+        resetFileLoader();
+        handleChange(evt);
+        var select = document.getElementById("fileSelector");
+        var i;
+        for (i = 0; i < select.length; i++) {
+          if (select.options[i].selected) {
+            Locations = [];
+            var json = JSON.parse(select.options[i].value);
+            json.locations.forEach(function (location) {
+              location.latLng = L.latLng(location.lat, location.lon);
+            });
 
-          var rr = L.Routing.control({
-            waypoints : json.locations,
-            geocoder : null,
-            costing : json.costing,
-            routeWhileDragging : false,
-            router : L.Routing.mapzen(token, json),
-            summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
+            var rr = L.Routing.control({
+              waypoints: json.locations,
+              geocoder: null,
+              costing: json.costing,
+              routeWhileDragging: false,
+              router: L.Routing.mapzen(token, json),
+              summaryTemplate:
+                '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
 
-            createMarker : function(i, wp, n) {
-              var iconV;
-              if (i == 0) {
-                iconV = L.icon({
-                  iconUrl : 'resource/start_green_dot.gif',
-                  iconSize : [ 24, 24 ]
-                });
-              } else if (i == (n - 1)) {
-                iconV = L.icon({
-                  iconUrl : 'resource/dest_red_dot.png',
-                  iconSize : [ 24, 24 ]
-                })
-              } else {
-                iconV = L.icon({
-                  iconUrl : 'resource/dot.png',
-                  iconSize : [ 24, 24 ]
-                })
-              }
-              var options = {
-                draggable : true,
-                icon : iconV
-              }
-              var poi = L.marker(wp.latLng, options);
-              return poi.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + wp.latLng.lat + "/" + wp.latLng.lng + "&layers=Q target=_blank>Edit POI here<a/>");
-            },
-            formatter : new L.Routing.Mapzen.Formatter(),
-            pointMarkerStyle : {
-              radius: 6,
-              color: '#20345b',
-              fillColor: '#fff',
-              opacity: 1,
-              fillOpacity: 1
-            }
-          }).addTo(map);
-
+              createMarker: function (i, wp, n) {
+                var iconV;
+                if (i == 0) {
+                  iconV = L.icon({
+                    iconUrl: "resource/start_green_dot.gif",
+                    iconSize: [24, 24],
+                  });
+                } else if (i == n - 1) {
+                  iconV = L.icon({
+                    iconUrl: "resource/dest_red_dot.png",
+                    iconSize: [24, 24],
+                  });
+                } else {
+                  iconV = L.icon({
+                    iconUrl: "resource/dot.png",
+                    iconSize: [24, 24],
+                  });
+                }
+                var options = {
+                  draggable: true,
+                  icon: iconV,
+                };
+                var poi = L.marker(wp.latLng, options);
+                return poi.bindPopup(
+                  "<a href = http://www.openstreetmap.org/#map=" +
+                    $rootScope.geobase.zoom +
+                    "/" +
+                    wp.latLng.lat +
+                    "/" +
+                    wp.latLng.lng +
+                    "&layers=Q target=_blank>Edit POI here<a/>",
+                );
+              },
+              formatter: new L.Routing.Mapzen.Formatter(),
+              pointMarkerStyle: {
+                radius: 6,
+                color: "#20345b",
+                fillColor: "#fff",
+                opacity: 1,
+                fillOpacity: 1,
+              },
+            }).addTo(map);
+          }
         }
-      }
-    }, false);
+      },
+      false,
+    );
   }
   // if the hash changes
   // L.DomEvent.addListener(window, "hashchange", hashRoute);
 
   // show something to start with but only if it was requested
-  $(window).load(function(e) {
+  $(window).load(function (e) {
     //rr = L.Routing.mapzen(token);
     force = true;
     hashRoute();
   });
 
-  map.on('click', function(e) {
+  map.on("click", function (e) {
     var geo = {
-      'lat' : e.latlng.lat,
-      'lon' : e.latlng.lng
+      lat: e.latlng.lat,
+      lon: e.latlng.lng,
     };
 
-  var eventObj = window.event ? event : e.originalEvent;
+    var eventObj = window.event ? event : e.originalEvent;
     getToken();
     //way to test multi-locations
-    if(eventObj.ctrlKey) {
+    if (eventObj.ctrlKey) {
       if (locations == 0) {
         Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
+          lat: geo.lat,
+          lon: geo.lon,
         });
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], $scope.mode);
+        $rootScope.$emit(
+          "map.dropMultiLocsMarker",
+          [geo.lat, geo.lon],
+          $scope.mode,
+        );
         locations++;
         return;
       } else {
         Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
+          lat: geo.lat,
+          lon: geo.lon,
         });
-        $rootScope.$emit('map.dropMultiLocsMarker', [ geo.lat, geo.lon ], $scope.mode);
+        $rootScope.$emit(
+          "map.dropMultiLocsMarker",
+          [geo.lat, geo.lon],
+          $scope.mode,
+        );
         locations++;
         return;
       }
     } else if (!eventObj.shiftKey) {
       if (locations == 0) {
         Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
+          lat: geo.lat,
+          lon: geo.lon,
         });
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
+        $rootScope.$emit("map.dropMarker", [geo.lat, geo.lon], $scope.mode);
         locations++;
         return;
       } else if (locations > 1) {
@@ -659,632 +782,664 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
         reset();
 
         Locations.push({
-          lat : geo.lat,
-          lon : geo.lon
+          lat: geo.lat,
+          lon: geo.lon,
         });
-        $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
+        $rootScope.$emit("map.dropMarker", [geo.lat, geo.lon], $scope.mode);
         locations++;
         return;
       }
     }
 
-    $scope.$on('setRouteInstruction', function(ev, instructions) {
-      $scope.$apply(function() {
+    $scope.$on("setRouteInstruction", function (ev, instructions) {
+      $scope.$apply(function () {
         $scope.route_instructions = instructions;
       });
     });
 
-    $scope.$on('resetRouteInstruction', function(ev) {
-      $scope.$apply(function() {
-        $scope.route_instructions = '';
+    $scope.$on("resetRouteInstruction", function (ev) {
+      $scope.$apply(function () {
+        $scope.route_instructions = "";
       });
     });
 
     var waypoints = [];
-    Locations.forEach(function(gLoc) {
+    Locations.forEach(function (gLoc) {
       waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
     });
 
     waypoints.push(L.latLng(geo.lat, geo.lon));
 
-    $rootScope.$emit('map.dropMarker', [ geo.lat, geo.lon ], $scope.mode);
+    $rootScope.$emit("map.dropMarker", [geo.lat, geo.lon], $scope.mode);
     locations++;
 
     selectEnv();
 
-    rr = createRouting({waypoints: waypoints, costing: $scope.mode});
+    rr = createRouting({ waypoints: waypoints, costing: $scope.mode });
     update(true, waypoints, $scope.mode);
   });
 
-    var rr;
+  var rr;
 
-    var createRouting = function(options, createMarkers) {
-        if (options.directions_options == undefined) {
-          selectLocale();
-          options.directions_options = { "language" : locale };
+  var createRouting = function (options, createMarkers) {
+    if (options.directions_options == undefined) {
+      selectLocale();
+      options.directions_options = { language: locale };
+    }
+    var defaultOptions = {
+      geocoder: null,
+      routeWhileDragging: false,
+      router: L.Routing.mapzen(token, options),
+      summaryTemplate:
+        '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
+
+      createMarker: function (i, wp, n) {
+        var iconV;
+        if (i == 0) {
+          iconV = L.icon({
+            iconUrl: "resource/via_dot.png",
+            iconSize: [30, 30],
+          });
+        } else {
+          iconV = L.icon({
+            iconUrl: "resource/via_dot.png",
+            iconSize: [30, 30],
+          });
         }
-        var defaultOptions = {
-          geocoder : null,
-          routeWhileDragging : false,
-          router : L.Routing.mapzen(token, options),
-          summaryTemplate : '<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
 
-          createMarker : function(i, wp, n) {
-            var iconV;
-            if (i == 0) {
-              iconV = L.icon({
-                iconUrl : 'resource/via_dot.png',
-                iconSize : [ 30, 30 ]
-              });
-            } else {
-              iconV = L.icon({
-                iconUrl : 'resource/via_dot.png',
-                iconSize : [ 30, 30 ]
-              });
-            }
-
-            if (createMarkers) {
-                if (i == 0) {
-                    iconV = getOriginIcon();
-                } else if (i == n -1) {
-                    iconV = getDestinationIcon();
-                }
-            }
-
-            var options = {
-              draggable : true,
-              icon : iconV
-            };
-            var dot = L.marker(wp.latLng, options);
-            markers.push(dot);
-            return dot.bindPopup("<a href = http://www.openstreetmap.org/#map=" + $rootScope.geobase.zoom + "/" + $rootScope.geobase.lat + "/" + $rootScope.geobase.lon
-                + "&layers=Q target=_blank>Edit POI here<a/>");
-          },
-          formatter : new L.Routing.Mapzen.Formatter(),
-          pointMarkerStyle : {
-            radius: 6,
-            color: '#20345b',
-            fillColor: '#fff',
-            opacity: 1,
-            fillOpacity: 1
+        if (createMarkers) {
+          if (i == 0) {
+            iconV = getOriginIcon();
+          } else if (i == n - 1) {
+            iconV = getDestinationIcon();
           }
-        };
-
-        options = options || {};
-        for (var k in options) {
-            defaultOptions[k] = options[k];
         }
-        return L.Routing.control(defaultOptions).addTo(map);
+
+        var options = {
+          draggable: true,
+          icon: iconV,
+        };
+        var dot = L.marker(wp.latLng, options);
+        markers.push(dot);
+        return dot.bindPopup(
+          "<a href = http://www.openstreetmap.org/#map=" +
+            $rootScope.geobase.zoom +
+            "/" +
+            $rootScope.geobase.lat +
+            "/" +
+            $rootScope.geobase.lon +
+            "&layers=Q target=_blank>Edit POI here<a/>",
+        );
+      },
+      formatter: new L.Routing.Mapzen.Formatter(),
+      pointMarkerStyle: {
+        radius: 6,
+        color: "#20345b",
+        fillColor: "#fff",
+        opacity: 1,
+        fillOpacity: 1,
+      },
     };
 
-    var driveBtn, bikeBtn, walkBtn, multiBtn, scooterBtn, motorcycleBtn, truckBtn, elevationBtn, bikeshareBtn, routeresponse;
+    options = options || {};
+    for (var k in options) {
+      defaultOptions[k] = options[k];
+    }
+    return L.Routing.control(defaultOptions).addTo(map);
+  };
 
-    if (document.getElementById('drive_btn') != undefined) {
-      driveBtn = document.getElementById("drive_btn");
+  var driveBtn,
+    bikeBtn,
+    walkBtn,
+    multiBtn,
+    scooterBtn,
+    motorcycleBtn,
+    truckBtn,
+    elevationBtn,
+    bikeshareBtn,
+    routeresponse;
 
-      driveBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'auto';
-        var directionsoptions = { "language" : locale };
-        var calendarInput="";
+  if (document.getElementById("drive_btn") != undefined) {
+    driveBtn = document.getElementById("drive_btn");
+
+    driveBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "auto";
+      var directionsoptions = { language: locale };
+      var calendarInput = "";
+      if (document.getElementById("datepicker"))
+        calendarInput = document.getElementById("datepicker").value;
+      if (calendarInput != "") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+          date_time: dtoptions,
+        });
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(costing, null, directionsoptions, dtoptions);
+    });
+  }
+
+  if (document.getElementById("bike_btn") != undefined) {
+    bikeBtn = document.getElementById("bike_btn");
+
+    bikeBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "bicycle";
+      var directionsoptions = { language: locale };
+      if (
+        document.getElementById("bikeoptions") &&
+        document.getElementById("bikeoptions").style.display == "block"
+      ) {
+        var bikeoptions = setBikeOptions(costing);
+        var calendarInput = "";
         if (document.getElementById("datepicker"))
           calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions,
-            date_time : dtoptions
+            costing: costing,
+            costing_options: bikeoptions,
+            directions_options: directionsoptions,
+            date_time: dtoptions,
           });
         } else {
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions
+            costing: costing,
+            costing_options: bikeoptions,
+            directions_options: directionsoptions,
           });
         }
-        updateHashCosting(costing,null,directionsoptions,dtoptions);
-      });
-    }
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(costing, bikeoptions, directionsoptions, dtoptions);
+    });
+  }
 
-    if (document.getElementById('bike_btn') != undefined) {
-      bikeBtn = document.getElementById("bike_btn");
+  if (document.getElementById("walk_btn") != undefined) {
+    walkBtn = document.getElementById("walk_btn");
 
-      bikeBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'bicycle';
-        var directionsoptions = { "language" : locale };
-        if (document.getElementById('bikeoptions') && document.getElementById('bikeoptions').style.display == "block") {
-          var bikeoptions = setBikeOptions(costing);
-          var calendarInput="";
-          if (document.getElementById("datepicker"))
-            calendarInput = document.getElementById("datepicker").value;
-          if (calendarInput != "") {
-            dateStr = datetimeUpdate(calendarInput);
-            var dtoptions = setDateTime(dateStr);
-            rr.route({
-              costing : costing,
-              costing_options : bikeoptions,
-              directions_options : directionsoptions,
-              date_time : dtoptions
-            });
-          } else {
-            rr.route({
-              costing : costing,
-              costing_options : bikeoptions,
-              directions_options : directionsoptions
-            });
-          }
-        } else {
-          rr.route({
-            costing : costing,
-            directions_options : directionsoptions
-          });
-        }
-        updateHashCosting(costing,bikeoptions,directionsoptions,dtoptions);
-      });
-    }
+    walkBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "pedestrian";
+      var directionsoptions = { language: locale };
+      var calendarInput = "";
+      if (document.getElementById("datepicker"))
+        calendarInput = document.getElementById("datepicker").value;
+      if (calendarInput != "") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+          date_time: dtoptions,
+        });
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(costing, null, directionsoptions, dtoptions);
+    });
+  }
 
-   if (document.getElementById('walk_btn') != undefined) {
-      walkBtn = document.getElementById("walk_btn");
+  if (document.getElementById("motor_scooter_btn") != undefined) {
+    scooterBtn = document.getElementById("motor_scooter_btn");
 
-      walkBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'pedestrian';
-        var directionsoptions = { "language" : locale };
-        var calendarInput="";
+    scooterBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "motor_scooter";
+      var directionsoptions = { language: locale };
+      if (
+        document.getElementById("scooteroptions") &&
+        document.getElementById("scooteroptions").style.display == "block"
+      ) {
+        var scooteroptions = setScooterOptions(costing);
+        var calendarInput = "";
         if (document.getElementById("datepicker"))
           calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions,
-            date_time : dtoptions
+            costing: costing,
+            costing_options: scooteroptions,
+            directions_options: directionsoptions,
+            date_time: dtoptions,
           });
         } else {
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions
+            costing: costing,
+            costing_options: scooteroptions,
+            directions_options: directionsoptions,
           });
         }
-        updateHashCosting(costing,null,directionsoptions,dtoptions);
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(costing, scooteroptions, directionsoptions, dtoptions);
     });
-   }
+  }
 
-   if (document.getElementById('motor_scooter_btn') != undefined) {
-      scooterBtn = document.getElementById("motor_scooter_btn");
+  if (document.getElementById("motorcycle_btn") != undefined) {
+    motorcycleBtn = document.getElementById("motorcycle_btn");
 
-      scooterBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'motor_scooter';
-        var directionsoptions = { "language" : locale };
-        if (document.getElementById('scooteroptions') && document.getElementById('scooteroptions').style.display == "block") {
-          var scooteroptions = setScooterOptions(costing);
-          var calendarInput="";
-          if (document.getElementById("datepicker"))
-            calendarInput = document.getElementById("datepicker").value;
-          if (calendarInput != "") {
-            dateStr = datetimeUpdate(calendarInput);
-            var dtoptions = setDateTime(dateStr);
-            rr.route({
-              costing : costing,
-              costing_options : scooteroptions,
-              directions_options : directionsoptions,
-              date_time : dtoptions
-            });
-          } else {
-            rr.route({
-              costing : costing,
-              costing_options : scooteroptions,
-              directions_options : directionsoptions
-            });
-          }
-        } else {
-          rr.route({
-            costing : costing,
-            directions_options : directionsoptions
-          });
-        }
-        updateHashCosting(costing,scooteroptions,directionsoptions,dtoptions);
-      });
-    }
-
-    if (document.getElementById('motorcycle_btn') != undefined) {
-        motorcycleBtn = document.getElementById("motorcycle_btn");
-
-        motorcycleBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'motorcycle';
-        var directionsoptions = { "language" : locale };
-        if (document.getElementById('motorcycleoptions') && document.getElementById('motorcycleoptions').style.display == "block") {
-          var motorcycleoptions = setMotorcycleOptions(costing);
-          var calendarInput="";
-          if (document.getElementById("datepicker"))
-            calendarInput = document.getElementById("datepicker").value;
-          if (calendarInput != "") {
-            dateStr = datetimeUpdate(calendarInput);
-            var dtoptions = setDateTime(dateStr);
-            rr.route({
-              costing : costing,
-              costing_options : motorcycleoptions,
-              directions_options : directionsoptions,
-              date_time : dtoptions
-            });
-          } else {
-            rr.route({
-              costing : costing,
-              costing_options : motorcycleoptions,
-              directions_options : directionsoptions
-            });
-          }
-        } else {
-          rr.route({
-            costing : costing,
-            directions_options : directionsoptions
-          });
-        }
-        updateHashCosting(costing,motorcycleoptions,directionsoptions,dtoptions);
-     });
-   }
-
-   if (document.getElementById('multi_btn') != undefined) {
-        multiBtn = document.getElementById("multi_btn");
-
-        multiBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'multimodal';
-        var directionsoptions = { "language" : locale };
-        var calendarInput;
-        if (document.getElementById("datepicker"))
-          calendarInput = document.getElementById("datepicker").value;
-        var dtoptions = "";
-        if (calendarInput != undefined) {
-          dateStr = datetimeUpdate(calendarInput);
-          dtoptions = setDateTime(dateStr);
-        }
-        if (document.getElementById('transitoptions') && document.getElementById('transitoptions').style.display == "block") {
-          var transitoptions = setTransitOptions();
-          rr.route({
-            costing : costing,
-            costing_options : transitoptions,
-            directions_options : directionsoptions,
-            date_time : dtoptions
-          });
-        } else {
-          rr.route({
-            costing : costing,
-            directions_options : directionsoptions,
-            date_time : dtoptions
-          });
-        }
-        updateHashCosting(costing,transitoptions,directionsoptions,dtoptions);
-      });
-    }
-
-    if (document.getElementById('truck_btn') != undefined) {
-      truckBtn = document.getElementById("truck_btn");
-
-      truckBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        if (document.getElementById('truckoptions').style.display == "block") {
-          var truckoptions = setTruckOptions();
-          var calendarInput = document.getElementById("datepicker").value;
-          if (calendarInput != "") {
-            dateStr = datetimeUpdate(calendarInput);
-            var dtoptions = setDateTime(dateStr);
-            rr.route({
-              costing : 'truck',
-              costing_options : truckoptions,
-              date_time : dtoptions
-            });
-          } else {
-            rr.route({
-              costing : 'truck',
-              costing_options : truckoptions,
-            });
-          }
-        } else {
-          rr.route({
-            costing : 'truck'
-          });
-        }
-        updateHashCosting(costing,truckoptions,dtoptions);
-      });
-    }
-
-    if (document.getElementById('bikeshare_btn') != undefined) {
-      bieshareBtn = document.getElementById("bikeshare_btn");
-      bieshareBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        getToken();
-        var costing = 'bikeshare';
-        var directionsoptions = { "language" : locale };
-        var calendarInput="";
+    motorcycleBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "motorcycle";
+      var directionsoptions = { language: locale };
+      if (
+        document.getElementById("motorcycleoptions") &&
+        document.getElementById("motorcycleoptions").style.display == "block"
+      ) {
+        var motorcycleoptions = setMotorcycleOptions(costing);
+        var calendarInput = "";
         if (document.getElementById("datepicker"))
           calendarInput = document.getElementById("datepicker").value;
         if (calendarInput != "") {
           dateStr = datetimeUpdate(calendarInput);
           var dtoptions = setDateTime(dateStr);
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions,
-            date_time : dtoptions
+            costing: costing,
+            costing_options: motorcycleoptions,
+            directions_options: directionsoptions,
+            date_time: dtoptions,
           });
         } else {
           rr.route({
-            costing : costing,
-            directions_options : directionsoptions
+            costing: costing,
+            costing_options: motorcycleoptions,
+            directions_options: directionsoptions,
           });
         }
-        updateHashCosting(costing,null,directionsoptions,dtoptions);
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(
+        costing,
+        motorcycleoptions,
+        directionsoptions,
+        dtoptions,
+      );
     });
-   }
+  }
 
-    if (document.getElementById('elevation_btn') != undefined) {
-        elevationBtn = document.getElementById("elevation_btn");
+  if (document.getElementById("multi_btn") != undefined) {
+    multiBtn = document.getElementById("multi_btn");
 
-      elevationBtn.addEventListener('click', function(e) {
-        if (!rr) return;
-        if (environmentExists)
-          selectEnv();
-        else getToken();
-
-        var elev = (typeof rr._routes[0] != "undefined") ? L.elevation(token, rr._router._rrshape) : 0;
-        elev.resetChart();
-        elev.profile(elev._rrshape);
-        document.getElementById('graph').style.display = "block";
-      });
-    }
-
-    function setBikeOptions(costing) {
-      var btype = document.getElementsByName("btype");
-      var bicycle_type = "Road";
-      for (var i = 0; i < btype.length; i++) {
-        if (btype[i].checked) {
-          bicycle_type = btype[i].value;
-        }
+    multiBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "multimodal";
+      var directionsoptions = { language: locale };
+      var calendarInput;
+      if (document.getElementById("datepicker"))
+        calendarInput = document.getElementById("datepicker").value;
+      var dtoptions = "";
+      if (calendarInput != undefined) {
+        dateStr = datetimeUpdate(calendarInput);
+        dtoptions = setDateTime(dateStr);
       }
-      var use_roads = document.getElementById("use_roads").value;
-      var cycling_speed = document.getElementById("cycle_speed").value;
-      var use_hills = document.getElementById("bike_use_hills").value;
-
-      var bikeoptions = {};
-      bikeoptions[costing.toString()] = {
-        bicycle_type : bicycle_type,
-        use_roads : use_roads,
-        cycling_speed : cycling_speed,
-        use_hills : use_hills
-      };
-      return bikeoptions;
-    }
-
-    function setScooterOptions(costing) {
-      var stype = document.getElementsByName("stype");
-      var use_hills = document.getElementById("scooter_use_hills").value;
-      var use_primary = document.getElementById("use_primary").value;
-      var top_speed = document.getElementById("top_speed").value;
-
-      var scooteroptions = {};
-      scooteroptions[costing.toString()] = {
-        use_hills : use_hills,
-        use_primary : use_primary,
-        top_speed : (160 >= top_speed >= 0) ? top_speed : "",
-      };
-      return scooteroptions;
-    }
-
-    function setMotorcycleOptions(costing) {
-      var stype = document.getElementsByName("stype");
-      var use_highways = document.getElementById("use_highways").value;
-      var use_tolls = document.getElementById("use_tolls").value;
-      var use_trails = document.getElementById("use_trails").value;
-
-      var motorcycleoptions = {};
-      motorcycleoptions[costing.toString()] = {
-        use_highways : use_highways,
-        use_tolls : use_tolls,
-        use_trails : use_trails
-      };
-      return motorcycleoptions;
-    }
-
-    function setTransitOptions() {
-      var use_bus = document.getElementById("use_bus").value;
-      var use_rail = document.getElementById("use_rail").value;
-      var use_transfers = document.getElementById("use_transfers").value;
-
-      var transitoptions = {
-        "transit" : {
-          use_bus : use_bus,
-          use_rail : use_rail,
-          use_transfers : use_transfers
-        }
-      };
-      return transitoptions;
-    }
-
-    function setTruckOptions() {
-      var height = document.getElementById("height").value;
-      var width = document.getElementById("width").value;
-      var length = document.getElementById("length").value;
-      var weight = document.getElementById("weight").value;
-      var axle_load = document.getElementById("axle_load").value;
-      var isHazmat = false;
-
-      if(document.getElementById("isHazmat").checked == true)
-        isHazmat = true;
-       else isHazmat = false;
-
-      var truckoptions = {
-        "truck" : {
-          height : height,
-          width : width,
-          length : length,
-          weight : weight,
-          axle_load : axle_load,
-          hazmat : isHazmat
-        }
-      };
-      return truckoptions;
-    }
-
-    function setDateTime(dateStr) {
-      var dttype = document.getElementsByName("dttype");
-      for (var i = 0; i < dttype.length; i++) {
-        if (dttype[i].checked) {
-          dt_type = dttype[i].value;
-        }
+      if (
+        document.getElementById("transitoptions") &&
+        document.getElementById("transitoptions").style.display == "block"
+      ) {
+        var transitoptions = setTransitOptions();
+        rr.route({
+          costing: costing,
+          costing_options: transitoptions,
+          directions_options: directionsoptions,
+          date_time: dtoptions,
+        });
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+          date_time: dtoptions,
+        });
       }
-      //if user selects current, then only send type = 0
-      if (dt_type == 0) {
-        dateStr = parseIsoDateTime(this.date.toISOString().toString());
-        var datetimeoptions = {
-          type : parseInt(dt_type),
-        };
-      }
-      else {
-        dateStr = parseIsoDateTime(dateStr);
-        var datetimeoptions = {
-          type : parseInt(dt_type),
-          value : dateStr.toString()
-        };
-      }
-      return datetimeoptions;
-    }
+      updateHashCosting(costing, transitoptions, directionsoptions, dtoptions);
+    });
+  }
 
-    /*
-     * function openWin(id) { var divText =
-     * document.getElementById(id).innerHTML;
-     * myWindow=window.open('','','height: 100; width:200;'); var doc =
-     * myWindow.document; doc.open(); doc.write(divText); doc.close(); }
-     */
+  if (document.getElementById("truck_btn") != undefined) {
+    truckBtn = document.getElementById("truck_btn");
 
-    function datetimeUpdate(datetime) {
-      var changeDt = datetime;
-      var inputDate, splitDate, year, month, day, time, hour, minute;
-      if (changeDt != null) {
-        if (changeDt.length >= 11) {
-          inputDate = changeDt.split(" ");
-          splitDate = inputDate[0].split("-");
-          day = splitDate[0];
-          if (day < 10) {
-            day = '0' + day;
-          }
-          month = GetMonthIndex(splitDate[1]) + 1;
-          if (month < 10) {
-            month = '0' + month;
-          }
-          year = splitDate[2];
-
-          time = inputDate[1].split(":");
-          hour = time[0];
-          minute = time[1];
-
-          dateStr = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
+    truckBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      if (document.getElementById("truckoptions").style.display == "block") {
+        var truckoptions = setTruckOptions();
+        var calendarInput = document.getElementById("datepicker").value;
+        if (calendarInput != "") {
+          dateStr = datetimeUpdate(calendarInput);
+          var dtoptions = setDateTime(dateStr);
+          rr.route({
+            costing: "truck",
+            costing_options: truckoptions,
+            date_time: dtoptions,
+          });
         } else {
-          dateStr = parseIsoDateTime(isoDateTime.toString());
+          rr.route({
+            costing: "truck",
+            costing_options: truckoptions,
+          });
         }
+      } else {
+        rr.route({
+          costing: "truck",
+        });
       }
-      return dateStr;
+      updateHashCosting(costing, truckoptions, dtoptions);
+    });
+  }
+
+  if (document.getElementById("bikeshare_btn") != undefined) {
+    bieshareBtn = document.getElementById("bikeshare_btn");
+    bieshareBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      getToken();
+      var costing = "bikeshare";
+      var directionsoptions = { language: locale };
+      var calendarInput = "";
+      if (document.getElementById("datepicker"))
+        calendarInput = document.getElementById("datepicker").value;
+      if (calendarInput != "") {
+        dateStr = datetimeUpdate(calendarInput);
+        var dtoptions = setDateTime(dateStr);
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+          date_time: dtoptions,
+        });
+      } else {
+        rr.route({
+          costing: costing,
+          directions_options: directionsoptions,
+        });
+      }
+      updateHashCosting(costing, null, directionsoptions, dtoptions);
+    });
+  }
+
+  if (document.getElementById("elevation_btn") != undefined) {
+    elevationBtn = document.getElementById("elevation_btn");
+
+    elevationBtn.addEventListener("click", function (e) {
+      if (!rr) return;
+      if (environmentExists) selectEnv();
+      else getToken();
+
+      var elev =
+        typeof rr._routes[0] != "undefined"
+          ? L.elevation(token, rr._router._rrshape)
+          : 0;
+      elev.resetChart();
+      elev.profile(elev._rrshape);
+      document.getElementById("graph").style.display = "block";
+    });
+  }
+
+  function setBikeOptions(costing) {
+    var btype = document.getElementsByName("btype");
+    var bicycle_type = "Road";
+    for (var i = 0; i < btype.length; i++) {
+      if (btype[i].checked) {
+        bicycle_type = btype[i].value;
+      }
     }
+    var use_roads = document.getElementById("use_roads").value;
+    var cycling_speed = document.getElementById("cycle_speed").value;
+    var use_hills = document.getElementById("bike_use_hills").value;
 
-    $(document).on('mode-alert', function(e, m) {
-      $scope.mode = m;
-      reset();
-      Locations = [];
-    });
+    var bikeoptions = {};
+    bikeoptions[costing.toString()] = {
+      bicycle_type: bicycle_type,
+      use_roads: use_roads,
+      cycling_speed: cycling_speed,
+      use_hills: use_hills,
+    };
+    return bikeoptions;
+  }
 
-    $(document).on('route:time_distance', function(e, td) {
-      var instructions = $('.leaflet-routing-container.leaflet-control').html();
-      $scope.$emit('setRouteInstruction', instructions);
-    });
+  function setScooterOptions(costing) {
+    var stype = document.getElementsByName("stype");
+    var use_hills = document.getElementById("scooter_use_hills").value;
+    var use_primary = document.getElementById("use_primary").value;
+    var top_speed = document.getElementById("top_speed").value;
+
+    var scooteroptions = {};
+    scooteroptions[costing.toString()] = {
+      use_hills: use_hills,
+      use_primary: use_primary,
+      top_speed: 160 >= top_speed >= 0 ? top_speed : "",
+    };
+    return scooteroptions;
+  }
+
+  function setMotorcycleOptions(costing) {
+    var stype = document.getElementsByName("stype");
+    var use_highways = document.getElementById("use_highways").value;
+    var use_tolls = document.getElementById("use_tolls").value;
+    var use_trails = document.getElementById("use_trails").value;
+
+    var motorcycleoptions = {};
+    motorcycleoptions[costing.toString()] = {
+      use_highways: use_highways,
+      use_tolls: use_tolls,
+      use_trails: use_trails,
+    };
+    return motorcycleoptions;
+  }
+
+  function setTransitOptions() {
+    var use_bus = document.getElementById("use_bus").value;
+    var use_rail = document.getElementById("use_rail").value;
+    var use_transfers = document.getElementById("use_transfers").value;
+
+    var transitoptions = {
+      transit: {
+        use_bus: use_bus,
+        use_rail: use_rail,
+        use_transfers: use_transfers,
+      },
+    };
+    return transitoptions;
+  }
+
+  function setTruckOptions() {
+    var height = document.getElementById("height").value;
+    var width = document.getElementById("width").value;
+    var length = document.getElementById("length").value;
+    var weight = document.getElementById("weight").value;
+    var axle_load = document.getElementById("axle_load").value;
+    var isHazmat = false;
+
+    if (document.getElementById("isHazmat").checked == true) isHazmat = true;
+    else isHazmat = false;
+
+    var truckoptions = {
+      truck: {
+        height: height,
+        width: width,
+        length: length,
+        weight: weight,
+        axle_load: axle_load,
+        hazmat: isHazmat,
+      },
+    };
+    return truckoptions;
+  }
+
+  function setDateTime(dateStr) {
+    var dttype = document.getElementsByName("dttype");
+    for (var i = 0; i < dttype.length; i++) {
+      if (dttype[i].checked) {
+        dt_type = dttype[i].value;
+      }
+    }
+    //if user selects current, then only send type = 0
+    if (dt_type == 0) {
+      dateStr = parseIsoDateTime(this.date.toISOString().toString());
+      var datetimeoptions = {
+        type: parseInt(dt_type),
+      };
+    } else {
+      dateStr = parseIsoDateTime(dateStr);
+      var datetimeoptions = {
+        type: parseInt(dt_type),
+        value: dateStr.toString(),
+      };
+    }
+    return datetimeoptions;
+  }
+
+  /*
+   * function openWin(id) { var divText =
+   * document.getElementById(id).innerHTML;
+   * myWindow=window.open('','','height: 100; width:200;'); var doc =
+   * myWindow.document; doc.open(); doc.write(divText); doc.close(); }
+   */
+
+  function datetimeUpdate(datetime) {
+    var changeDt = datetime;
+    var inputDate, splitDate, year, month, day, time, hour, minute;
+    if (changeDt != null) {
+      if (changeDt.length >= 11) {
+        inputDate = changeDt.split(" ");
+        splitDate = inputDate[0].split("-");
+        day = splitDate[0];
+        if (day < 10) {
+          day = "0" + day;
+        }
+        month = GetMonthIndex(splitDate[1]) + 1;
+        if (month < 10) {
+          month = "0" + month;
+        }
+        year = splitDate[2];
+
+        time = inputDate[1].split(":");
+        hour = time[0];
+        minute = time[1];
+
+        dateStr = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
+      } else {
+        dateStr = parseIsoDateTime(isoDateTime.toString());
+      }
+    }
+    return dateStr;
+  }
+
+  $(document).on("mode-alert", function (e, m) {
+    $scope.mode = m;
+    reset();
+    Locations = [];
+  });
+
+  $(document).on("route:time_distance", function (e, td) {
+    var instructions = $(".leaflet-routing-container.leaflet-control").html();
+    $scope.$emit("setRouteInstruction", instructions);
+  });
 
   // ask the service for information about this location
-  map.on("contextmenu", function(e) {
+  map.on("contextmenu", function (e) {
     var ll = {
-      lat : e.latlng.lat,
-      lon : e.latlng.lng
+      lat: e.latlng.lat,
+      lon: e.latlng.lng,
     };
     selectEnv();
     var locate = L.locate(token);
     locate.locate(ll, locateEdgeMarkers);
   });
 
-  $scope.clearAll = function(e) {
-
-    $('.leaflet-marker-icon').remove();
-    $('.leaflet-label').remove();
-    $('.leaflet-marker-shadow').remove();
-    $('svg').html('');
-    $('.leaflet-routing-container').remove();
-    $scope.appView = 'control'
+  $scope.clearAll = function (e) {
+    $(".leaflet-marker-icon").remove();
+    $(".leaflet-label").remove();
+    $(".leaflet-marker-shadow").remove();
+    $("svg").html("");
+    $(".leaflet-routing-container").remove();
+    $scope.appView = "control";
     locations = 0;
 
-    if (typeof elev != "undefined")
-      elev.resetChart();
-    $('#graph').empty();
-    $("[name=btype]").filter("[value='Road']").prop("checked",true);
-    $('input#use_roads').val("0.5");
-    $('input#cycle_speed').val("25.0");
-    $('input#use_hills').val("0.5");
+    if (typeof elev != "undefined") elev.resetChart();
+    $("#graph").empty();
+    $("[name=btype]").filter("[value='Road']").prop("checked", true);
+    $("input#use_roads").val("0.5");
+    $("input#cycle_speed").val("25.0");
+    $("input#use_hills").val("0.5");
     //reset datetime calendar and type
-    this.datetime=[];
-    dateStr="";
-    $("[name=dttype]").filter("[value='0']").prop("checked",true);
-    $('input#datepicker').val("");
+    this.datetime = [];
+    dateStr = "";
+    $("[name=dttype]").filter("[value='0']").prop("checked", true);
+    $("input#datepicker").val("");
     Locations = [];
-    document.getElementById('permalink').innerHTML = "";
+    document.getElementById("permalink").innerHTML = "";
     window.location.hash = "";
-  }
+  };
 
-  $("#showbtn").on("click", function() {
-    if (document.getElementById('driveoptions') != undefined)
-      document.getElementById('driveoptions').style.display = "block";
-    if (document.getElementById('bikeoptions') != undefined)
-      document.getElementById('bikeoptions').style.display = "block";
-    if (document.getElementById('scooteroptions') != undefined)
-      document.getElementById('scooteroptions').style.display = "block";
-    if (document.getElementById('motorcycleoptions') != undefined)
-      document.getElementById('motorcycleoptions').style.display = "block";
-    if (document.getElementById('walkoptions') != undefined)
-      document.getElementById('walkoptions').style.display = "block";
-    if (document.getElementById('transitoptions') != undefined)
-      document.getElementById('transitoptions').style.display = "block";
-    if (document.getElementById('truckoptions') != undefined)
-      document.getElementById('truckoptions').style.display = "block";
-    if (document.getElementById('dtoptions') != undefined)
-      document.getElementById('dtoptions').style.display = "block";
+  $("#showbtn").on("click", function () {
+    if (document.getElementById("driveoptions") != undefined)
+      document.getElementById("driveoptions").style.display = "block";
+    if (document.getElementById("bikeoptions") != undefined)
+      document.getElementById("bikeoptions").style.display = "block";
+    if (document.getElementById("scooteroptions") != undefined)
+      document.getElementById("scooteroptions").style.display = "block";
+    if (document.getElementById("motorcycleoptions") != undefined)
+      document.getElementById("motorcycleoptions").style.display = "block";
+    if (document.getElementById("walkoptions") != undefined)
+      document.getElementById("walkoptions").style.display = "block";
+    if (document.getElementById("transitoptions") != undefined)
+      document.getElementById("transitoptions").style.display = "block";
+    if (document.getElementById("truckoptions") != undefined)
+      document.getElementById("truckoptions").style.display = "block";
+    if (document.getElementById("dtoptions") != undefined)
+      document.getElementById("dtoptions").style.display = "block";
   });
 
-  $("#hidebtn").on("click", function() {
-    if (document.getElementById('driveoptions') != undefined)
-      document.getElementById('driveoptions').style.display = "none";
-    if (document.getElementById('bikeoptions') != undefined)
-      document.getElementById('bikeoptions').style.display = "none";
-    if (document.getElementById('scooteroptions') != undefined)
-      document.getElementById('scooteroptions').style.display = "none";
-    if (document.getElementById('motorcycleoptions') != undefined)
-      document.getElementById('motorcycleoptions').style.display = "none";
-    if (document.getElementById('walkoptions') != undefined)
-      document.getElementById('walkoptions').style.display = "none";
-    if (document.getElementById('transitoptions') != undefined)
-      document.getElementById('transitoptions').style.display = "none";
-    if (document.getElementById('truckoptions') != undefined)
-      document.getElementById('truckoptions').style.display = "none";
-    if (document.getElementById('dtoptions') != undefined)
-      document.getElementById('dtoptions').style.display = "none";
+  $("#hidebtn").on("click", function () {
+    if (document.getElementById("driveoptions") != undefined)
+      document.getElementById("driveoptions").style.display = "none";
+    if (document.getElementById("bikeoptions") != undefined)
+      document.getElementById("bikeoptions").style.display = "none";
+    if (document.getElementById("scooteroptions") != undefined)
+      document.getElementById("scooteroptions").style.display = "none";
+    if (document.getElementById("motorcycleoptions") != undefined)
+      document.getElementById("motorcycleoptions").style.display = "none";
+    if (document.getElementById("walkoptions") != undefined)
+      document.getElementById("walkoptions").style.display = "none";
+    if (document.getElementById("transitoptions") != undefined)
+      document.getElementById("transitoptions").style.display = "none";
+    if (document.getElementById("truckoptions") != undefined)
+      document.getElementById("truckoptions").style.display = "none";
+    if (document.getElementById("dtoptions") != undefined)
+      document.getElementById("dtoptions").style.display = "none";
   });
 
-  $("#hidechart").on("click", function() {
-    document.getElementById('graph').style.display = "none";
+  $("#hidechart").on("click", function () {
+    document.getElementById("graph").style.display = "none";
   });
 });

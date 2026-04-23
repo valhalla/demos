@@ -28,9 +28,9 @@ crossorigin=""></script>
 
     //make a map using osm tiles
     const map = L.map('map').setView([40.2, -76.6], 10);
-    const baseLayer = L.tileLayer('http://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const baseLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributers'
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributers'
     });
     baseLayer.addTo(map);
 
