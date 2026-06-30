@@ -1,6 +1,7 @@
 body {
   width: 100%;
   height: 100vh;
+  min-height: 100dvh;
   padding: 0;
   margin: 0;
   font-family: sans-serif;
@@ -14,8 +15,9 @@ body {
 }
 
 #map-container {
+  position: relative;
   height: 100%;
-  width: 75%;
+  flex: 1;
 }
 
 #map {
@@ -25,9 +27,29 @@ body {
 
 #sidebar {
   height: 100%;
-  flex-grow: 1;
+  width: 25%;
+  max-width: 360px;
   padding: 10px;
   text-align: center;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+#sidebar-logo {
+  margin: 0 auto 10px;
+  width: fit-content;
+}
+
+#sidebar-logo img {
+  display: block;
+}
+
+#map-logo {
+  display: none;
+}
+
+#map-logo img {
+  display: block;
 }
 
 form {
@@ -37,5 +59,81 @@ form {
 
 label {
   display: block;
-  margin-top: 10px;
+  margin: 15px 0 5px;
+}
+
+form input,
+form select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inline-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-controls input[type="range"] {
+  flex: 1 1 auto;
+}
+
+.inline-controls input[type="text"] {
+  width: 64px;
+  flex: 0 0 64px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100%;
+  }
+
+  #map-container {
+    position: relative;
+    width: 100%;
+    height: 55%;
+  }
+
+  #sidebar {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    height: 45%;
+    max-height: none;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 14px 14px 0 0;
+    box-shadow: none;
+    padding: 12px;
+    overflow-y: auto;
+  }
+
+  #sidebar-logo {
+    display: none;
+  }
+
+  #map-logo {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    line-height: 0;
+  }
+
+  #map-logo img {
+    width: 84px;
+    height: 84px;
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: minmax(120px, auto) 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  label {
+    margin: 0 0 5px 0;
+  }
+
 }
