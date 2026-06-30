@@ -59,7 +59,7 @@ function getContours () {
     polygons: document.getElementById('polygons_lines').value === 'polygons'
   }
 
-  const url = document.getElementById('baseurl').value + '/isochrone?json=' + JSON.stringify(json)
+  const url = document.getElementById('baseurl').value + 'isochrone?json=' + JSON.stringify(json)
 
   fetch(url).then(response => response.json()).then(isochrones => {
     // clear this if its not empty
