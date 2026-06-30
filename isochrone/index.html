@@ -5,8 +5,6 @@
   <title>Isochrones</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/turf/turf.js"></script>
   <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
 </head>
@@ -14,8 +12,8 @@
 <body>
   <div class="container">
     <div id="sidebar">
-      <div>
-        <img src="../routing/images/Valhalla.png" height="175" width="175" alt="Valhalla Logo">
+      <div id="sidebar-logo">
+        <img src="../routing/images/Valhalla.png" height="120" width="120" alt="Valhalla Logo">
       </div>
       <form>
         <label for="baseurl">Base URL</label>
@@ -28,16 +26,20 @@
         <input type="text" id="latlng" size="20" />
 
         <label for="denoise">Denoise</label>
-        <input id="denoise" type="range" min="0" max="1" value="0" step="0.01"
-          onchange="document.getElementById('denoise_text').value=this.value;" />
-        <input type="text" id="denoise_text" value="0" maxlength="4" size="4"
-          onchange="this.value = Math.max(0, Math.min(this.value, 1)); document.getElementById('denoise').value=this.value;" />
+        <div class="inline-controls">
+          <input id="denoise" type="range" min="0" max="1" value="0" step="0.01"
+            onchange="document.getElementById('denoise_text').value=this.value;" />
+          <input type="text" id="denoise_text" value="0" maxlength="4" size="4"
+            onchange="this.value = Math.max(0, Math.min(this.value, 1)); document.getElementById('denoise').value=this.value;" />
+        </div>
 
         <label for="generalize">Generalize</label>
-        <input id="generalize" type="range" min="0" max="1000" value="0" step="1"
-          onchange="document.getElementById('generalize_text').value=this.value;" />
-        <input type="text" id="generalize_text" value="0" maxlength="4" size="4"
-          onchange="this.value = Math.max(0, Math.min(this.value, 1000)); document.getElementById('generalize').value=this.value;" />
+        <div class="inline-controls">
+          <input id="generalize" type="range" min="0" max="1000" value="0" step="1"
+            onchange="document.getElementById('generalize_text').value=this.value;" />
+          <input type="text" id="generalize_text" value="0" maxlength="4" size="4"
+            onchange="this.value = Math.max(0, Math.min(this.value, 1000)); document.getElementById('generalize').value=this.value;" />
+        </div>
 
         <label for="contours">Contour minutes</label>
         <select id="contours">
@@ -64,10 +66,15 @@
             reference</a></b></h5>
     </div>
     <div id="map-container">
+      <div id="map-logo">
+        <img src="../routing/images/Valhalla.png" height="120" width="120" alt="Valhalla Logo">
+      </div>
       <div id="map"></div>
     </div>
   </div>
 
+  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/turf/turf.js"></script>
   <script src="main.js"></script>
 </body>
 
